@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
+import { Icon } from '@/components/ui/icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -81,12 +81,26 @@ export function TenantSignupForm({ step, onStepChange }: TenantSignupFormProps) 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="tenant-first-name">First Name</Label>
-              <Input id="tenant-first-name" placeholder="John" {...register('first_name')} />
+              <Input
+                id="tenant-first-name"
+                placeholder="John"
+                autoComplete="given-name"
+                aria-invalid={errors.first_name ? true : undefined}
+                aria-describedby={errors.first_name ? 'first_name-error' : undefined}
+                {...register('first_name')}
+              />
               <FieldError id="first_name-error" message={errors.first_name?.message} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="tenant-last-name">Last Name</Label>
-              <Input id="tenant-last-name" placeholder="Doe" {...register('last_name')} />
+              <Input
+                id="tenant-last-name"
+                placeholder="Doe"
+                autoComplete="family-name"
+                aria-invalid={errors.last_name ? true : undefined}
+                aria-describedby={errors.last_name ? 'last_name-error' : undefined}
+                {...register('last_name')}
+              />
               <FieldError id="last_name-error" message={errors.last_name?.message} />
             </div>
           </div>
@@ -96,13 +110,23 @@ export function TenantSignupForm({ step, onStepChange }: TenantSignupFormProps) 
               id="tenant-email"
               type="email"
               placeholder="john@example.com"
+              autoComplete="email"
+              aria-invalid={errors.email ? true : undefined}
+              aria-describedby={errors.email ? 'email-error' : undefined}
               {...register('email')}
             />
             <FieldError id="email-error" message={errors.email?.message} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="tenant-phone">Phone</Label>
-            <Input id="tenant-phone" placeholder="254700000000" {...register('msisdn')} />
+            <Input
+              id="tenant-phone"
+              placeholder="254700000000"
+              autoComplete="tel"
+              aria-invalid={errors.msisdn ? true : undefined}
+              aria-describedby={errors.msisdn ? 'msisdn-error' : undefined}
+              {...register('msisdn')}
+            />
             <FieldError id="msisdn-error" message={errors.msisdn?.message} />
           </div>
           <div className="space-y-2">
@@ -111,6 +135,9 @@ export function TenantSignupForm({ step, onStepChange }: TenantSignupFormProps) 
               id="tenant-password"
               type="password"
               placeholder="Create a password"
+              autoComplete="new-password"
+              aria-invalid={errors.password ? true : undefined}
+              aria-describedby={errors.password ? 'password-error' : undefined}
               {...register('password')}
             />
             <PasswordStrengthIndicator password={password || ''} />
@@ -122,13 +149,16 @@ export function TenantSignupForm({ step, onStepChange }: TenantSignupFormProps) 
               id="tenant-confirm-password"
               type="password"
               placeholder="Re-enter your password"
+              autoComplete="new-password"
+              aria-invalid={errors.confirm_password ? true : undefined}
+              aria-describedby={errors.confirm_password ? 'confirm_password-error' : undefined}
               {...register('confirm_password')}
             />
             <FieldError id="confirm_password-error" message={errors.confirm_password?.message} />
           </div>
           <Button type="button" onClick={goToStepTwo} className="w-full">
             Continue
-            <ChevronRight className="ml-2 h-4 w-4" />
+            <Icon name="ChevronRight" className="ml-2 h-4 w-4" />
           </Button>
         </div>
       )}
@@ -143,13 +173,23 @@ export function TenantSignupForm({ step, onStepChange }: TenantSignupFormProps) 
             <Input
               id="tenant-apartment"
               placeholder="Sunset Apartments"
+              autoComplete="off"
+              aria-invalid={errors.apartment_name ? true : undefined}
+              aria-describedby={errors.apartment_name ? 'apartment_name-error' : undefined}
               {...register('apartment_name')}
             />
             <FieldError id="apartment_name-error" message={errors.apartment_name?.message} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="tenant-unit">Unit Number</Label>
-            <Input id="tenant-unit" placeholder="3B" {...register('unit_number')} />
+            <Input
+              id="tenant-unit"
+              placeholder="3B"
+              autoComplete="off"
+              aria-invalid={errors.unit_number ? true : undefined}
+              aria-describedby={errors.unit_number ? 'unit_number-error' : undefined}
+              {...register('unit_number')}
+            />
             <FieldError id="unit_number-error" message={errors.unit_number?.message} />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -161,13 +201,23 @@ export function TenantSignupForm({ step, onStepChange }: TenantSignupFormProps) 
                 min="0"
                 step="any"
                 placeholder="25000"
+                autoComplete="off"
+                aria-invalid={errors.monthly_rent ? true : undefined}
+                aria-describedby={errors.monthly_rent ? 'monthly_rent-error' : undefined}
                 {...register('monthly_rent')}
               />
               <FieldError id="monthly_rent-error" message={errors.monthly_rent?.message} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="tenant-billing-date">Billing Date</Label>
-              <Input id="tenant-billing-date" type="date" {...register('billing_date')} />
+              <Input
+                id="tenant-billing-date"
+                type="date"
+                autoComplete="off"
+                aria-invalid={errors.billing_date ? true : undefined}
+                aria-describedby={errors.billing_date ? 'billing_date-error' : undefined}
+                {...register('billing_date')}
+              />
               <FieldError id="billing_date-error" message={errors.billing_date?.message} />
             </div>
           </div>
@@ -179,13 +229,13 @@ export function TenantSignupForm({ step, onStepChange }: TenantSignupFormProps) 
               className="flex-1"
               disabled={isLoading}
             >
-              <ChevronLeft className="mr-2 h-4 w-4" />
+              <Icon name="ChevronLeft" className="mr-2 h-4 w-4" />
               Back
             </Button>
             <Button type="submit" className="flex-1" disabled={isLoading}>
               {isLoading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Icon name="Loader2" className="mr-2 h-4 w-4 animate-spin" />
                   Creating...
                 </>
               ) : (

@@ -15,7 +15,10 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </div>
 
         <div className="flex flex-1 items-center justify-center py-10">
-          <div className="w-full max-w-sm">{children}</div>
+          {/* max-w-md, not max-w-sm: the signup forms lay first/last name out as
+              `sm:grid-cols-2`, which needs the wider column to avoid two cramped
+              ~180px fields. Login is comfortable at this width too. */}
+          <div className="w-full max-w-md">{children}</div>
         </div>
       </main>
 
