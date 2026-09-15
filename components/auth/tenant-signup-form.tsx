@@ -4,7 +4,9 @@ import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Icon } from '@/components/ui/icon'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { AUTH_BUTTON_PRIMARY, AUTH_BUTTON_OUTLINE } from '@/components/auth/auth-button-styles'
 import { AuthInput } from '@/components/auth/auth-input'
 import { AuthPasswordInput } from '@/components/auth/auth-password-input'
 import { Label } from '@/components/ui/label'
@@ -159,7 +161,7 @@ export function TenantSignupForm({ step, onStepChange }: TenantSignupFormProps) 
             </div>
           </div>
           <PasswordStrengthIndicator password={password || ''} />
-          <Button type="button" onClick={goToStepTwo} className="h-12 rounded-xl text-[15px] w-full">
+          <Button type="button" onClick={goToStepTwo} className={cn(AUTH_BUTTON_PRIMARY, 'w-full')}>
             Continue
             <Icon name="ChevronRight" className="ml-2 h-4 w-4" />
           </Button>
@@ -231,13 +233,13 @@ export function TenantSignupForm({ step, onStepChange }: TenantSignupFormProps) 
               type="button"
               variant="outline"
               onClick={() => onStepChange(1)}
-              className="h-12 rounded-xl text-[15px] flex-1"
+              className={cn(AUTH_BUTTON_OUTLINE, 'flex-1')}
               disabled={isLoading}
             >
               <Icon name="ChevronLeft" className="mr-2 h-4 w-4" />
               Back
             </Button>
-            <Button type="submit" className="h-12 rounded-xl text-[15px] flex-1" disabled={isLoading}>
+            <Button type="submit" className={cn(AUTH_BUTTON_PRIMARY, 'flex-1')} disabled={isLoading}>
               {isLoading ? (
                 <>
                   <Icon name="Loader2" className="mr-2 h-4 w-4 animate-spin" />

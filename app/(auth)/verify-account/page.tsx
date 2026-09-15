@@ -5,7 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { AUTH_BUTTON_PRIMARY, AUTH_BUTTON_OUTLINE } from '@/components/auth/auth-button-styles'
 import { AuthInput } from '@/components/auth/auth-input'
 import { AuthHeading } from '@/components/auth/auth-heading'
 import { Icon } from '@/components/ui/icon'
@@ -94,7 +96,7 @@ function VerifyAccountContent() {
           </div>
         </div>
 
-        <Button type="submit" className="h-12 w-full rounded-xl text-[15px]" disabled={isLoading}>
+        <Button type="submit" className={cn(AUTH_BUTTON_PRIMARY, 'w-full')} disabled={isLoading}>
           {isLoading ? (
             <>
               <Icon name="Loader2" className="mr-2 h-4 w-4 animate-spin" />
