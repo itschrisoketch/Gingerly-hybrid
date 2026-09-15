@@ -45,6 +45,7 @@ export function DashboardMetrics({
         period="Past 12 months"
         periodOptions={MONTH_PERIODS}
         total={formatKes(latestCollected)}
+        totalCaption="This month"
         deltaLabel="vs last month"
         valueFormatter={formatKes}
       />
@@ -57,6 +58,7 @@ export function DashboardMetrics({
         period="Past 12 months"
         periodOptions={MONTH_PERIODS}
         total={`${occupied} of ${units}`}
+        totalCaption="Units let this month"
         deltaLabel="vs last month"
         valueFormatter={(n) => `${Math.round(n)}`}
       />

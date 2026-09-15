@@ -21,7 +21,10 @@ export type CardSize = 'sm' | 'md' | 'lg'
 
 export interface ProgressMetricCardProps {
   title: string
+  /** Overrides the resting headline. Hovering a point still replaces it. */
   total?: string | number
+  /** Small label under the headline when no point is being inspected. */
+  totalCaption?: string
   delta?: string
   deltaLabel?: string
   percent?: string
@@ -32,13 +35,9 @@ export interface ProgressMetricCardProps {
   onPeriodChange?: (option: PeriodOption) => void
   defaultView?: ChartView
   accent?: MetricAccent
-  /** A single series. Provide this, or `series`. */
   data?: SeriesPoint[]
-  /** Several named series. Takes precedence over `data`. */
   series?: MetricSeries[]
-  defaultIndex?: number
   size?: CardSize
-  /** Secondary peak / low / average figures in the footer. */
   showStats?: boolean
   valueFormatter?: (value: number) => string
   dateFormatter?: (date: string) => string
@@ -52,18 +51,15 @@ const DEFAULT_PERIODS: PeriodOption[] = [
   { label: 'Past 30 days' },
 ]
 
-/** Share of the card, from the right, given over to the chart. */
-const REGION_W = 62
-/** Movement below this percentage reads as flat, not as a direction. */
 const NEUTRAL_PCT = 0.5
 
 const SIZES: Record<
   CardSize,
-  { minH: string; pad: string; footer: string; title: string; headline: string }
+  { pad: string; footer: string; title: string; headline: string; chart: string }
 > = {
-  sm: { minH: 'min-h-[220px]', pad: 'px-5 pt-5', footer: 'px-5 py-3', title: 'text-[15px]', headline: 'text-[34px] sm:text-[40px]' },
-  md: { minH: 'min-h-[300px]', pad: 'px-6 pt-6', footer: 'px-6 py-4', title: 'text-[16px]', headline: 'text-[44px] sm:text-[56px]' },
-  lg: { minH: 'min-h-[360px]', pad: 'px-7 pt-7', footer: 'px-7 py-5', title: 'text-[17px]', headline: 'text-[52px] sm:text-[68px]' },
+  sm: { pad: 'px-5 pt-5', footer: 'px-5 py-3', title: 'text-[15px]', headline: 'text-[30px] sm:text-[34px]', chart: 'h-28' },
+  md: { pad: 'px-6 pt-6', footer: 'px-6 py-4', title: 'text-base', headline: 'text-[36px] sm:text-[44px]', chart: 'h-36' },
+  lg: { pad: 'px-7 pt-7', footer: 'px-7 py-5', title: 'text-[17px]', headline: 'text-[44px] sm:text-[52px]', chart: 'h-44' },
 }
 
 const sliceWindow = (points: SeriesPoint[], n?: number) =>
@@ -72,19 +68,28 @@ const sliceWindow = (points: SeriesPoint[], n?: number) =>
 /**
  * A metric with its own trend chart.
  *
- * Adapted from the supplied component. Three changes were required to run here:
- * its `./metric-chart` and `./metric-controls` imports were not included with it
- * and are written alongside this file; lucide arrows became Material Symbols via
- * the project's Icon wrapper; and the headline sizes were reduced, since 72-88px
- * numerals overflow a 42-unit rent figure inside a dashboard column.
+ * Adapted from the supplied component, then restructured after the original
+ * layout proved unreadable in use.
  *
- * Accent colours come from the project's semantic tokens, so the trend figure
- * uses the contrast-checked `-text` variants rather than a fill colour that
- * measures under 4:1 as text.
+ * As supplied, the chart was an absolutely positioned layer filling the right
+ * 62% of the card, with its own tooltip pinned top-right — directly underneath
+ * the header's period select and trend figure. Those two always collide, at
+ * every card width, because they are given the same corner by construction. No
+ * amount of offsetting fixes a layout where two elements are told to occupy one
+ * space.
+ *
+ * The chart now owns a row of its own beneath the headline. Nothing overlaps,
+ * because nothing shares space. The floating tooltip is gone: inspecting a point
+ * updates the headline and its caption instead, which makes hovering worth doing
+ * rather than something that obscures the card.
+ *
+ * Also adapted: lucide arrows became Material Symbols, and accents resolve to
+ * project tokens so the trend figure uses contrast-checked `-text` values.
  */
 export default function ProgressMetricCard({
   title,
   total,
+  totalCaption,
   delta,
   deltaLabel = 'today',
   percent,
@@ -97,7 +102,6 @@ export default function ProgressMetricCard({
   accent,
   data,
   series,
-  defaultIndex,
   size = 'md',
   showStats = true,
   valueFormatter,
@@ -107,11 +111,13 @@ export default function ProgressMetricCard({
 }: ProgressMetricCardProps) {
   const gridId = `grid-${useId().replace(/:/g, '')}`
   const sz = SIZES[size]
-  const shell = `relative flex ${sz.minH} w-full flex-col overflow-hidden rounded-2xl border border-border bg-card ${className}`
+  const shell = `flex w-full flex-col overflow-hidden rounded-2xl border border-border bg-card ${className}`
 
   const periods = periodOptions ?? DEFAULT_PERIODS
   const [selectedLabel, setSelectedLabel] = useState(period)
   const [view, setView] = useState<ChartView>(defaultView)
+  /** Index being inspected; null means "at rest, show the latest". */
+  const [inspecting, setInspecting] = useState<number | null>(null)
 
   const baseSeries: MetricSeries[] = useMemo(
     () => (series?.length ? series : [{ name: title, data: data ?? [], accent }]),
@@ -130,8 +136,6 @@ export default function ProgressMetricCard({
   const isMulti = visibleSeries.length > 1
   const hasData = (primary?.data.length ?? 0) >= 2
 
-  // Every figure derives from the primary series, so the card stays internally
-  // consistent and reacts to a period change. Explicit props still win.
   const stats = useMemo(() => {
     const vals = primary?.data.map((d) => d.value) ?? []
     const sum = vals.reduce((a, b) => a + b, 0)
@@ -155,16 +159,29 @@ export default function ProgressMetricCard({
   const resolvedAccent: MetricAccent =
     accent ?? (resolvedTrend === 'up' ? 'emerald' : resolvedTrend === 'down' ? 'rose' : 'neutral')
   const color = ACCENTS[resolvedAccent]
-  const trendIcon = resolvedTrend === 'flat' ? 'ArrowRight' : resolvedTrend === 'down' ? 'ArrowDown' : 'ArrowUp'
+  const trendIcon =
+    resolvedTrend === 'flat' ? 'ArrowRight' : resolvedTrend === 'down' ? 'ArrowDown' : 'ArrowUp'
   const trendWord = resolvedTrend === 'flat' ? 'flat' : resolvedTrend === 'down' ? 'down' : 'up'
 
-  const fmtCompact = valueFormatter ?? formatCompact
-  const fmtFull = valueFormatter ?? ((n: number) => n.toLocaleString() + (unit ? ` ${unit}` : ''))
+  const fmtValue = valueFormatter ?? formatCompact
   const fmtDate = dateFormatter ?? ((d: string) => d)
-  const sign = (n: number) => (n >= 0 ? '+' : '−') + fmtCompact(Math.abs(n))
 
-  const displayTotal = total ?? fmtCompact(stats.sum)
-  const displayDelta = delta ?? sign(stats.step)
+  const lastIndex = (primary?.data.length ?? 1) - 1
+  const activeIndex = inspecting ?? lastIndex
+  const activePoint = primary?.data[activeIndex]
+
+  // At rest the card shows whatever the caller asked for; inspecting a point
+  // replaces it, so hovering answers a question instead of hiding the card.
+  const headline =
+    inspecting !== null && activePoint
+      ? fmtValue(activePoint.value)
+      : (total ?? (activePoint ? fmtValue(activePoint.value) : '—'))
+  const caption =
+    inspecting !== null && activePoint ? fmtDate(activePoint.date) : (totalCaption ?? unit)
+
+  const signed = (n: number) =>
+    n === 0 ? 'No change' : (n > 0 ? '+' : '−') + fmtValue(Math.abs(n))
+  const displayDelta = delta ?? signed(stats.step)
   const displayPercent = percent ?? `${Math.abs(stats.pct).toFixed(1)}%`
 
   const chartSeries: ChartSeries[] = visibleSeries.map((s, i) => ({
@@ -177,24 +194,22 @@ export default function ProgressMetricCard({
         : color.stroke,
   }))
 
-  const lastIndex = (primary?.data.length ?? 1) - 1
-  const fallback = Math.min(defaultIndex ?? lastIndex, lastIndex)
-
   const handlePeriodChange = (option: PeriodOption) => {
     setSelectedLabel(option.label)
+    setInspecting(null)
     onPeriodChange?.(option)
   }
 
   if (loading) {
     return (
       <div className={shell} aria-busy="true">
-        <div className={`flex flex-1 flex-col ${sz.pad}`}>
+        <div className={`flex flex-col gap-5 ${sz.pad} pb-5`}>
           <div className="flex items-center justify-between">
             <div className="h-5 w-32 animate-pulse rounded bg-muted" />
             <div className="h-5 w-24 animate-pulse rounded bg-muted" />
           </div>
-          <div className="mt-6 h-12 w-48 animate-pulse rounded-lg bg-muted" />
-          <div className="mt-auto h-24 w-full animate-pulse rounded-lg bg-muted/50" />
+          <div className="h-9 w-44 animate-pulse rounded-lg bg-muted" />
+          <div className={`${sz.chart} w-full animate-pulse rounded-lg bg-muted/60`} />
         </div>
         <div className={`border-t border-border ${sz.footer}`}>
           <div className="h-4 w-40 animate-pulse rounded bg-muted" />
@@ -206,9 +221,9 @@ export default function ProgressMetricCard({
   if (!hasData) {
     return (
       <div className={shell}>
-        <div className={`flex flex-1 flex-col ${sz.pad}`}>
+        <div className={`${sz.pad} pb-6`}>
           <h3 className={`${sz.title} font-semibold tracking-tight text-foreground`}>{title}</h3>
-          <div className="flex flex-1 flex-col items-center justify-center gap-1 py-10 text-center">
+          <div className="flex flex-col items-center gap-1 py-10 text-center">
             <p className="text-sm font-medium text-foreground">Nothing to chart yet</p>
             <p className="max-w-[34ch] text-sm text-muted-foreground">
               This fills in once there are at least two periods of history.
@@ -221,23 +236,74 @@ export default function ProgressMetricCard({
 
   return (
     <div className={shell}>
-      {/* Chart region, behind the text */}
-      <div className="absolute inset-y-0 right-0 z-0" style={{ width: `${REGION_W}%` }}>
+      <div className={`${sz.pad} pb-4`}>
+        {/* Row 1: identity and controls. Nothing else is ever drawn here. */}
+        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <h3 className={`${sz.title} truncate font-semibold tracking-tight text-foreground`}>
+              {title}
+            </h3>
+            <ViewToggle value={view} onChange={setView} />
+          </div>
+          <PeriodSelect
+            value={selectedLabel}
+            options={periods}
+            onChange={handlePeriodChange}
+            accentText={color.text}
+          />
+        </div>
+
+        {/* Row 2: the figure, with the trend beside it rather than above it. */}
+        <div className="mt-4 flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
+          <div className="min-w-0">
+            <p
+              className={`${sz.headline} font-medium leading-none tracking-tight text-foreground tabular-nums`}
+            >
+              {headline}
+            </p>
+            {caption ? (
+              <p className="mt-1.5 truncate text-sm text-muted-foreground">{caption}</p>
+            ) : null}
+          </div>
+
+          <span
+            className="flex shrink-0 items-center gap-1 pb-1 text-sm font-medium tabular-nums"
+            style={{ color: color.text }}
+          >
+            <Icon name={trendIcon} className="h-4 w-4" />
+            <span>
+              {displayPercent}
+              <span className="sr-only"> {trendWord}</span>
+            </span>
+          </span>
+        </div>
+
+        {isMulti ? (
+          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1">
+            {chartSeries.map((s) => (
+              <span key={s.name} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <span
+                  aria-hidden="true"
+                  className="h-2 w-2 rounded-full"
+                  style={{ background: s.color }}
+                />
+                {s.name}
+              </span>
+            ))}
+          </div>
+        ) : null}
+      </div>
+
+      {/* Row 3: the chart, in a band of its own. */}
+      <div className={`relative ${sz.chart} w-full`}>
         <div
           aria-hidden="true"
           className="absolute inset-0"
           style={{
-            background: `linear-gradient(to left, color-mix(in srgb, ${color.stroke} 12%, transparent), transparent 75%)`,
+            background: `linear-gradient(to top, color-mix(in srgb, ${color.stroke} 10%, transparent), transparent 80%)`,
           }}
         />
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 text-foreground/[0.10]"
-          style={{
-            WebkitMaskImage: 'linear-gradient(to right, transparent, black 55%)',
-            maskImage: 'linear-gradient(to right, transparent, black 55%)',
-          }}
-        >
+        <div aria-hidden="true" className="absolute inset-0 text-foreground/[0.08]">
           <svg className="h-full w-full" aria-hidden="true">
             <defs>
               <pattern id={gridId} width="14" height="14" patternUnits="userSpaceOnUse">
@@ -251,61 +317,15 @@ export default function ProgressMetricCard({
         <MetricChart
           series={chartSeries}
           view={view}
-          defaultIndex={fallback}
-          valueFormatter={fmtFull}
+          activeIndex={activeIndex}
+          onInspect={setInspecting}
+          valueFormatter={fmtValue}
           dateFormatter={fmtDate}
         />
       </div>
 
-      <div className={`pointer-events-none relative z-10 flex flex-1 flex-col ${sz.pad}`}>
-        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-          <div className="flex items-center gap-3">
-            <h3 className={`${sz.title} font-semibold tracking-tight text-foreground`}>{title}</h3>
-            <ViewToggle value={view} onChange={setView} />
-          </div>
-          <div className="flex items-center gap-3 text-sm">
-            {/* The direction is named in text, not carried by the arrow and
-                colour alone. */}
-            <span className="flex items-center gap-1 font-medium" style={{ color: color.text }}>
-              <Icon name={trendIcon} className="h-4 w-4" />
-              <span>
-                {displayPercent}
-                <span className="sr-only"> {trendWord}</span>
-              </span>
-            </span>
-            <PeriodSelect
-              value={selectedLabel}
-              options={periods}
-              onChange={handlePeriodChange}
-              accentText={color.text}
-            />
-          </div>
-        </div>
-
-        {isMulti ? (
-          <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1">
-            {chartSeries.map((s) => (
-              <span key={s.name} className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <span
-                  aria-hidden="true"
-                  className="h-2 w-2 rounded-full"
-                  style={{ background: s.color }}
-                />
-                {s.name}
-              </span>
-            ))}
-          </div>
-        ) : null}
-
-        <p
-          className={`mt-5 ${sz.headline} font-medium leading-none tracking-tight text-foreground tabular-nums`}
-        >
-          {displayTotal}
-        </p>
-      </div>
-
       <div
-        className={`relative z-10 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-border bg-card ${sz.footer} text-sm`}
+        className={`flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-border ${sz.footer} text-sm`}
       >
         <p>
           <span className="font-medium tabular-nums" style={{ color: color.text }}>
@@ -317,7 +337,7 @@ export default function ProgressMetricCard({
           <p className="flex items-center gap-2.5 text-xs text-muted-foreground">
             <span>
               <span className="font-medium text-foreground tabular-nums">
-                {fmtCompact(stats.peak)}
+                {fmtValue(stats.peak)}
               </span>{' '}
               peak
             </span>
@@ -326,18 +346,9 @@ export default function ProgressMetricCard({
             </span>
             <span>
               <span className="font-medium text-foreground tabular-nums">
-                {fmtCompact(stats.low)}
+                {fmtValue(stats.low)}
               </span>{' '}
               low
-            </span>
-            <span aria-hidden="true" className="opacity-40">
-              &middot;
-            </span>
-            <span>
-              <span className="font-medium text-foreground tabular-nums">
-                {fmtCompact(Math.round(stats.avg))}
-              </span>{' '}
-              avg
             </span>
           </p>
         ) : null}
