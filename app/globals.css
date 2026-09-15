@@ -224,9 +224,11 @@
     font-family: var(--font-sans);
   }
 
-  /* The auth shell opts out of the global Jost element rules above. Specificity
+  /* Brand-font scope. Any subtree carrying data-brand-font opts out of the global
+     Jost element rules above and renders in Inter Tight — currently the auth shell
+     and the dashboard shell. Specificity
      (0,1,1) beats the bare element selectors (0,0,1), so these win without !important. */
-  [data-auth-shell] :is(h1, h2, h3, h4, h5, h6, p, input, textarea, select, button, label, a, span, div, nav, header, footer) {
+  [data-brand-font] :is(h1, h2, h3, h4, h5, h6, p, input, textarea, select, button, label, a, span, div, nav, header, footer) {
     font-family: var(--font-body);
   }
 
@@ -236,15 +238,15 @@
      forms. Stateful styling (the focus and aria-invalid treatments) lives in
      components/auth/auth-input.tsx instead, where it belongs.
      Specificity (0,1,1) beats the utility classes shadcn's Label emits (0,1,0). */
-  [data-auth-shell] label {
+  [data-brand-font] label {
     font-size: 0.8125rem;
     font-weight: 500;
     letter-spacing: -0.006em;
     color: hsl(var(--foreground) / 0.75);
   }
 
-  [data-auth-shell] .font-display,
-  [data-auth-shell] :is(h1, h2, h3, h4, h5, h6) .font-display {
+  [data-brand-font] .font-display,
+  [data-brand-font] :is(h1, h2, h3, h4, h5, h6) .font-display {
     font-family: var(--font-display);
   }
 
@@ -254,7 +256,7 @@
      win — this is the only way to override those legacy rules without changing dashboard
      behaviour by editing them directly. Radix primitives (e.g. Tabs) rendered inside the
      auth shell would otherwise stay in Jost. Do not add !important anywhere else. */
-  [data-auth-shell] :is([data-radix-root], [role="button"], [role="menuitem"], [role="tab"], [role="dialog"]) {
+  [data-brand-font] :is([data-radix-root], [role="button"], [role="menuitem"], [role="tab"], [role="dialog"]) {
     font-family: var(--font-body) !important;
   }
 }

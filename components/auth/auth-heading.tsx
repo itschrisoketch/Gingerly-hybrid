@@ -14,7 +14,7 @@ export const HEADLINE_CLASS = 'font-light leading-[1.08] tracking-[-0.025em] [te
  * The accent word.
  *
  * `font-display` is repeated wherever this is used rather than inherited: the
- * scoped `[data-auth-shell] :is(…span…)` rule in globals.css sets spans to the
+ * scoped `[data-brand-font] :is(…span…)` rule in globals.css sets spans to the
  * body font at specificity (0,1,1), and only a class-level rule at (0,2,0)
  * outranks it. Without the class the italic word silently drops back to sans.
  */

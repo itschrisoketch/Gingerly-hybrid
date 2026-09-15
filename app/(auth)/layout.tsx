@@ -4,7 +4,7 @@ import { Wordmark } from '@/components/wordmark'
 /**
  * Shell for /login, /signup and /verify-account.
  *
- * `data-auth-shell` is load-bearing, not decorative: globals.css sets an
+ * `data-brand-font` is load-bearing, not decorative: globals.css sets an
  * explicit `font-family: var(--font-sans)` on h1-h6, p, a, span, div, input and
  * button inside @layer base, which a class on this element cannot override.
  * A scoped rule keyed to this attribute is what puts the auth flow in Inter
@@ -21,7 +21,7 @@ import { Wordmark } from '@/components/wordmark'
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div
-      data-auth-shell
+      data-brand-font
       className="min-h-screen bg-muted/40 font-body lg:p-3"
     >
       <div className="grid min-h-screen gap-3 lg:min-h-[calc(100vh-1.5rem)] lg:grid-cols-[1fr_minmax(420px,45%)]">
