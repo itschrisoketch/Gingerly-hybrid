@@ -6,17 +6,26 @@ import { HEADLINE_CLASS, HEADLINE_ACCENT_CLASS } from '@/components/auth/auth-he
 import { cn } from '@/lib/utils'
 
 /**
- * The dark brand panel beside the auth form.
+ * The brand panel beside the auth form: a photograph with the headline set over it.
  *
- * Depth is built from two cheap layers rather than a shader: a navy gradient
- * ground and an off-centre teal glow. Both are CSS, so the panel costs nothing
- * to render and nothing to download — a WebGL canvas would be a poor trade on
- * the page standing between a user and their account.
+ * The image is self-hosted in /public rather than hotlinked from Unsplash's CDN.
+ * This is the page between a user and their account, and it already refuses a
+ * third-party request for its icons; taking one for a 293KB hero would be
+ * inconsistent. Self-hosting also means no referrer leaks to a third party and
+ * no dependency on their uptime.
  *
- * Copy is the landing site's own line. There are deliberately no security
- * badges, payment-rail logos or customer quotes here: none of them could be
- * substantiated from the codebase, and inventing them on a payments signup is
- * not a design decision to make on a user's behalf.
+ * Photo: Hassan Kibwana (@kb_photographic) on Unsplash, cropped to 2:3 with
+ * imgix face detection so the subject survives the portrait crop. The Unsplash
+ * Licence covers commercial use and does not require attribution, so the credit
+ * lives here rather than on the page. Keep this line if the file is replaced by
+ * another Unsplash image — it is the only record of where the asset came from.
+ *
+ * Legibility over a photograph cannot be left to chance, so the text sits on a
+ * navy scrim that is near-opaque behind the copy and clears at the top. White on
+ * that base clears 4.5:1 regardless of what the photo does underneath — swapping
+ * the image cannot silently break contrast.
+ *
+ * Purely decorative: nothing here is clickable or expandable.
  */
 export function AuthBrandPanel() {
   const reduceMotion = useReducedMotion()
@@ -29,34 +38,48 @@ export function AuthBrandPanel() {
 
   return (
     <aside className="relative hidden overflow-hidden rounded-2xl bg-navy-500 lg:flex lg:flex-col lg:justify-between lg:p-12">
-      {/* Ground: a slow vertical lift out of the flat navy. */}
-      <div
+      <img
+        src="/auth-panel.jpg"
+        alt=""
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/[0.07] via-transparent to-black/25"
+        // Decorative, so it carries an empty alt and is hidden from the
+        // accessibility tree — the headline beside it says everything a
+        // screen-reader user needs.
+        className="absolute inset-0 h-full w-full object-cover object-[center_20%]"
       />
 
-      {/* Glow: pushed off-centre so the panel is not symmetrical about its own middle. */}
+      {/* Scrim: dense navy under the copy, easing towards the top so the
+          photograph still reads. The top stop is 50%, not a lighter value that
+          would look better on this particular image: combined with the flat
+          wash below it that is 0.625 effective opacity, which puts white text on
+          a worst-case blown-out highlight at 4.81:1 — past the 4.5:1 floor. At
+          the 25% I first used it measured 3.14:1 and failed. Anything lighter
+          makes the wordmark's legibility depend on which photo is loaded. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -right-24 top-1/4 h-[28rem] w-[28rem] rounded-full bg-accent/20 blur-[120px]"
+        className="absolute inset-0 bg-gradient-to-t from-navy-500 via-navy-500/85 to-navy-500/50"
       />
+
+      {/* Flat wash carrying the rest of that budget, so the upper third cannot
+          blow out behind the wordmark. */}
+      <div aria-hidden="true" className="absolute inset-0 bg-navy-500/25" />
 
       <motion.div {...rise(0)} className="relative flex items-center gap-2 text-white">
         <Icon name="Building2" className="h-6 w-6" />
         <span className="text-lg font-medium tracking-tight">Gingerly</span>
       </motion.div>
 
-      <motion.div {...rise(0.1)} className="relative space-y-5">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-100/80">
+      <motion.div {...rise(0.1)} className="relative space-y-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-100/90">
           Rental payments
         </p>
-        <p className={cn('max-w-[16ch] text-[2.75rem] text-white', HEADLINE_CLASS)}>
+        <p className={cn('max-w-[15ch] text-[2.6rem] text-white', HEADLINE_CLASS)}>
           Collect Recurring Payments{' '}
           <span className={HEADLINE_ACCENT_CLASS}>Automatically</span>
         </p>
       </motion.div>
 
-      <motion.p {...rise(0.2)} className="relative text-xs text-white/40">
+      <motion.p {...rise(0.2)} className="relative text-[11px] text-white/60">
         &copy; {new Date().getFullYear()} Gingerly
       </motion.p>
     </aside>
