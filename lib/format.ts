@@ -27,3 +27,25 @@ const SHORT_DATE = new Intl.DateTimeFormat('en-GB', {
 export function formatShortDate(iso: string): string {
   return SHORT_DATE.format(new Date(iso))
 }
+
+/**
+ * "Today, 09:12" / "Yesterday, 16:20" / "13 Sep, 18:55".
+ *
+ * Recent activity is read relative to now, so the two most common cases are
+ * named rather than dated. `en-GB` gives a 24-hour clock, which is what Kenyan
+ * bank and M-Pesa statements use.
+ */
+export function formatRelativeTime(iso: string, now = new Date()): string {
+  const d = new Date(iso)
+  const time = new Intl.DateTimeFormat('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(d)
+
+  const startOfDay = (x: Date) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime()
+  const days = Math.round((startOfDay(now) - startOfDay(d)) / 86_400_000)
+
+  if (days === 0) return `Today, ${time}`
+  if (days === 1) return `Yesterday, ${time}`
+  return `${SHORT_DATE.format(d)}, ${time}`
+}
