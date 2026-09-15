@@ -1,9 +1,8 @@
 import Link from 'next/link'
 import { Icon } from '@/components/ui/icon'
-import ProgressMetricCard from '@/components/ui/progress-metric-card'
 import { CollectionSummary } from '@/components/dashboard/collection-summary'
 import { ArrearsList } from '@/components/dashboard/arrears-list'
-import { formatKes } from '@/lib/format'
+import { DashboardMetrics } from '@/components/dashboard/dashboard-metrics'
 import {
   IS_SAMPLE_DATA,
   sampleArrears,
@@ -12,11 +11,6 @@ import {
   sampleOccupancyTrend,
   samplePortfolio,
 } from '@/lib/dashboard/sample-data'
-
-const MONTH_PERIODS = [
-  { label: 'Past 6 months', points: 6 },
-  { label: 'Past 12 months' },
-]
 
 /**
  * Agent dashboard.
@@ -67,34 +61,12 @@ export default function LandlordDashboard() {
 
       <ArrearsList rows={sampleArrears} />
 
-      {/* Two metrics, not four. Each earns a chart because each has a history
-          worth reading; a tile with a number and no trend is a table row that
-          took up a quarter of the screen. */}
-      <div className="grid gap-6 xl:grid-cols-2">
-        <ProgressMetricCard
-          title="Rent collected"
-          size="sm"
-          unit="KES"
-          data={sampleCollectionTrend}
-          period="Past 12 months"
-          periodOptions={MONTH_PERIODS}
-          total={formatKes(sampleCollectionTrend[sampleCollectionTrend.length - 1].value)}
-          deltaLabel="vs last month"
-          valueFormatter={formatKes}
-        />
-        <ProgressMetricCard
-          title="Units occupied"
-          size="sm"
-          unit="units"
-          accent="teal"
-          data={sampleOccupancyTrend}
-          period="Past 12 months"
-          periodOptions={MONTH_PERIODS}
-          total={`${occupied} of ${units}`}
-          deltaLabel="vs last month"
-          valueFormatter={(n) => `${Math.round(n)}`}
-        />
-      </div>
+      <DashboardMetrics
+        collectionTrend={sampleCollectionTrend}
+        occupancyTrend={sampleOccupancyTrend}
+        occupied={occupied}
+        units={units}
+      />
 
       {/* Portfolio reads as one strip rather than four matching tiles. These are
           reference figures, not decisions; a bordered card each would claim a
