@@ -3,9 +3,12 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Building2, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { AuthHeading } from '@/components/auth/auth-heading'
+import { RoleToggle } from '@/components/auth/role-toggle'
+import { FieldError } from '@/components/auth/field-error'
+import { Icon } from '@/components/ui/icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -53,112 +56,84 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <div className="w-full max-w-sm space-y-8">
-        {/* Logo and header */}
-        <div className="space-y-3">
-          <Building2 className="h-8 w-8 text-foreground" />
-          <div>
-            <h1 className="text-2xl font-semibold">Welcome back</h1>
-            <p className="text-sm text-muted-foreground mt-1">Sign in to your account</p>
+    <div className="space-y-8">
+      <AuthHeading accent="back" description="Sign in to your account">
+        Welcome
+      </AuthHeading>
+
+      <RoleToggle value={loginType} onChange={handleLoginTypeChange} />
+
+      {/* Form */}
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              autoComplete="email"
+              placeholder="name@example.com"
+              aria-invalid={errors.email ? true : undefined}
+              aria-describedby={errors.email ? 'email-error' : undefined}
+              {...register('email')}
+              disabled={isLoading}
+            />
+            <FieldError id="email-error" message={errors.email?.message} />
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password">Password</Label>
+              <Link
+                href="/forgot-password"
+                className="text-xs text-muted-foreground hover:text-foreground"
+              >
+                Forgot password?
+              </Link>
+            </div>
+            <Input
+              id="password"
+              type="password"
+              autoComplete="current-password"
+              placeholder="Enter your password"
+              aria-invalid={errors.password ? true : undefined}
+              aria-describedby={errors.password ? 'password-error' : undefined}
+              {...register('password')}
+              disabled={isLoading}
+            />
+            <FieldError id="password-error" message={errors.password?.message} />
           </div>
         </div>
 
-        {/* Login Type Selector */}
-        <div className="flex gap-2 p-1 bg-muted rounded-lg">
-          <button
-            type="button"
-            onClick={() => handleLoginTypeChange('customer')}
-            className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors ${
-              loginType === 'customer'
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            Tenant
-          </button>
-          <button
-            type="button"
-            onClick={() => handleLoginTypeChange('merchant')}
-            className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors ${
-              loginType === 'merchant'
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            Landlord
-          </button>
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          {isLoading ? (
+            <>
+              <Icon name="Loader2" className="mr-2 h-4 w-4 animate-spin" />
+              Signing in...
+            </>
+          ) : (
+            'Sign In'
+          )}
+        </Button>
+
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <Separator />
+          </div>
+          <div className="relative flex justify-center text-xs">
+            <span className="bg-background px-2 text-muted-foreground">Or create an account</span>
+          </div>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="name@example.com"
-                {...register('email')}
-                disabled={isLoading}
-              />
-              {errors.email && (
-                <p className="text-sm text-destructive">{errors.email.message}</p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                <Link
-                  href="/forgot-password"
-                  className="text-xs text-muted-foreground hover:text-foreground"
-                >
-                  Forgot password?
-                </Link>
-              </div>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Enter your password"
-                {...register('password')}
-                disabled={isLoading}
-              />
-              {errors.password && (
-                <p className="text-sm text-destructive">{errors.password.message}</p>
-              )}
-            </div>
-          </div>
-
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Signing in...
-              </>
-            ) : (
-              'Sign In'
-            )}
+        <div className="grid grid-cols-2 gap-3">
+          <Button variant="outline" asChild>
+            <Link href="/signup?type=tenant">As Tenant</Link>
           </Button>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <Separator />
-            </div>
-            <div className="relative flex justify-center text-xs">
-              <span className="bg-background px-2 text-muted-foreground">Or create an account</span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <Button variant="outline" asChild>
-              <Link href="/signup?type=tenant">As Tenant</Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link href="/signup?type=landlord">As Landlord</Link>
-            </Button>
-          </div>
-        </form>
-      </div>
+          <Button variant="outline" asChild>
+            <Link href="/signup?type=landlord">As Landlord</Link>
+          </Button>
+        </div>
+      </form>
     </div>
   )
 }
