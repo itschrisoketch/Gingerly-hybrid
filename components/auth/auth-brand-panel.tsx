@@ -6,11 +6,10 @@ import { Icon } from '@/components/ui/icon'
 /**
  * The dark brand panel beside the auth form.
  *
- * Depth is built from three cheap layers rather than a shader: a navy gradient
- * ground, a fluted vertical banding, and an off-centre teal glow. All three are
- * CSS, so the panel costs nothing to render and nothing to download — a WebGL
- * canvas would be a poor trade on the page standing between a user and their
- * account.
+ * Depth is built from two cheap layers rather than a shader: a navy gradient
+ * ground and an off-centre teal glow. Both are CSS, so the panel costs nothing
+ * to render and nothing to download — a WebGL canvas would be a poor trade on
+ * the page standing between a user and their account.
  *
  * Copy is the landing site's own line. There are deliberately no security
  * badges, payment-rail logos or customer quotes here: none of them could be
@@ -32,16 +31,6 @@ export function AuthBrandPanel() {
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/[0.07] via-transparent to-black/25"
-      />
-
-      {/* Fluting: fine vertical banding, the CSS reading of ribbed glass. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-[0.55]"
-        style={{
-          backgroundImage:
-            'repeating-linear-gradient(90deg, rgba(255,255,255,0.045) 0px, rgba(255,255,255,0.045) 1px, transparent 1px, transparent 9px)',
-        }}
       />
 
       {/* Glow: pushed off-centre so the panel is not symmetrical about its own middle. */}

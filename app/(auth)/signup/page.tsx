@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { AuthHeading } from '@/components/auth/auth-heading'
 import { StepProgress } from '@/components/auth/step-progress'
+import { AuthDivider } from '@/components/auth/auth-divider'
+import { SocialAuthButtons } from '@/components/auth/social-auth-buttons'
 import { TenantSignupForm } from '@/components/auth/tenant-signup-form'
 import { LandlordSignupForm } from '@/components/auth/landlord-signup-form'
 
@@ -34,6 +36,12 @@ function SignupContent() {
   return (
     <div className="space-y-8">
       <AuthHeading accent="account">Create your</AuthHeading>
+
+      {/* Social options sit above the step indicator: they are a way past the
+          multi-step form entirely, not a step within it. */}
+      <SocialAuthButtons action="Sign up" />
+
+      <AuthDivider>or sign up with email</AuthDivider>
 
       <StepProgress current={step} total={TOTAL_STEPS[tab]} />
 

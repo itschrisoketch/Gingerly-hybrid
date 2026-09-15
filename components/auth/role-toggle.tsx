@@ -36,8 +36,10 @@ export function RoleToggle({ value, onChange }: RoleToggleProps) {
               'transition-[background-color,color,box-shadow] duration-200 ease-out',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 focus-visible:ring-offset-0',
               selected
-                ? 'bg-background text-foreground shadow-sm ring-1 ring-border/50'
-                : 'text-muted-foreground hover:text-foreground',
+                // Brand teal carries the selected state. accent-foreground is
+                // white, which clears 4.5:1 on this teal in both themes.
+                ? 'bg-accent text-accent-foreground shadow-sm'
+                : 'text-muted-foreground hover:bg-background/60 hover:text-foreground',
             )}
           >
             {option.label}
