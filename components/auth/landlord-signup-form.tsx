@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Icon } from '@/components/ui/icon'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { AuthInput } from '@/components/auth/auth-input'
 import { Label } from '@/components/ui/label'
 import { PasswordStrengthIndicator } from '@/components/password-strength-indicator'
 import { FieldError } from '@/components/auth/field-error'
@@ -83,7 +83,7 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="landlord-name">Full Name</Label>
-            <Input
+            <AuthInput
               id="landlord-name"
               placeholder="John Doe"
               autoComplete="name"
@@ -95,7 +95,7 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
           </div>
           <div className="space-y-2">
             <Label htmlFor="landlord-business-name">Business Name</Label>
-            <Input
+            <AuthInput
               id="landlord-business-name"
               placeholder="Sunset Properties LLC"
               autoComplete="organization"
@@ -107,7 +107,7 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
           </div>
           <div className="space-y-2">
             <Label htmlFor="landlord-email">Email</Label>
-            <Input
+            <AuthInput
               id="landlord-email"
               type="email"
               placeholder="john@example.com"
@@ -120,7 +120,7 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
           </div>
           <div className="space-y-2">
             <Label htmlFor="landlord-phone">Phone</Label>
-            <Input
+            <AuthInput
               id="landlord-phone"
               placeholder="254700000000"
               autoComplete="tel"
@@ -132,7 +132,7 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
           </div>
           <div className="space-y-2">
             <Label htmlFor="landlord-password">Password</Label>
-            <Input
+            <AuthInput
               id="landlord-password"
               type="password"
               placeholder="Create a password"
@@ -146,7 +146,7 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
           </div>
           <div className="space-y-2">
             <Label htmlFor="landlord-confirm-password">Confirm Password</Label>
-            <Input
+            <AuthInput
               id="landlord-confirm-password"
               type="password"
               placeholder="Re-enter your password"
@@ -157,7 +157,7 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
             />
             <FieldError id="confirm_password-error" message={errors.confirm_password?.message} />
           </div>
-          <Button type="button" onClick={goToStepTwo} className="w-full">
+          <Button type="button" onClick={goToStepTwo} className="h-12 rounded-xl text-[15px] w-full">
             Continue
             <Icon name="ChevronRight" className="ml-2 h-4 w-4" />
           </Button>
@@ -169,7 +169,7 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="landlord-property-name">Property Name</Label>
-              <Input
+              <AuthInput
                 id="landlord-property-name"
                 placeholder="Sunset Apartments"
                 autoComplete="off"
@@ -181,7 +181,7 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
             </div>
             <div className="space-y-2">
               <Label htmlFor="landlord-units">Number of Units</Label>
-              <Input
+              <AuthInput
                 id="landlord-units"
                 type="number"
                 min="0"
@@ -196,7 +196,7 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
           </div>
           <div className="space-y-2">
             <Label htmlFor="landlord-address">Property Address</Label>
-            <Input
+            <AuthInput
               id="landlord-address"
               placeholder="123 Main Street"
               autoComplete="street-address"
@@ -209,7 +209,7 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="landlord-city">City</Label>
-              <Input
+              <AuthInput
                 id="landlord-city"
                 placeholder="Nairobi"
                 autoComplete="address-level2"
@@ -221,7 +221,7 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
             </div>
             <div className="space-y-2">
               <Label htmlFor="landlord-state">State / County</Label>
-              <Input
+              <AuthInput
                 id="landlord-state"
                 placeholder="Nairobi County"
                 autoComplete="address-level1"
@@ -234,7 +234,7 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
           </div>
           <div className="space-y-2">
             <Label htmlFor="landlord-zip">Postal Code</Label>
-            <Input
+            <AuthInput
               id="landlord-zip"
               placeholder="00100"
               autoComplete="postal-code"
@@ -249,12 +249,12 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
               type="button"
               variant="outline"
               onClick={() => onStepChange(1)}
-              className="flex-1"
+              className="h-12 rounded-xl text-[15px] flex-1"
             >
               <Icon name="ChevronLeft" className="mr-2 h-4 w-4" />
               Back
             </Button>
-            <Button type="button" onClick={() => onStepChange(3)} className="flex-1">
+            <Button type="button" onClick={() => onStepChange(3)} className="h-12 rounded-xl text-[15px] flex-1">
               Continue
               <Icon name="ChevronRight" className="ml-2 h-4 w-4" />
             </Button>
@@ -269,7 +269,7 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
           </p>
           <div className="space-y-2">
             <Label htmlFor="landlord-bank-name">Bank Name</Label>
-            <Input
+            <AuthInput
               id="landlord-bank-name"
               placeholder="Example Bank"
               autoComplete="off"
@@ -281,7 +281,7 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
           </div>
           <div className="space-y-2">
             <Label htmlFor="landlord-account-name">Account Holder Name</Label>
-            <Input
+            <AuthInput
               id="landlord-account-name"
               placeholder="John Doe or Business Name"
               autoComplete="off"
@@ -294,7 +294,7 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="landlord-account-number">Account Number</Label>
-              <Input
+              <AuthInput
                 id="landlord-account-number"
                 placeholder="000000000"
                 autoComplete="off"
@@ -306,7 +306,7 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
             </div>
             <div className="space-y-2">
               <Label htmlFor="landlord-routing-number">Routing Number</Label>
-              <Input
+              <AuthInput
                 id="landlord-routing-number"
                 placeholder="000000000"
                 autoComplete="off"
@@ -322,13 +322,13 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
               type="button"
               variant="outline"
               onClick={() => onStepChange(2)}
-              className="flex-1"
+              className="h-12 rounded-xl text-[15px] flex-1"
               disabled={isLoading}
             >
               <Icon name="ChevronLeft" className="mr-2 h-4 w-4" />
               Back
             </Button>
-            <Button type="submit" className="flex-1" disabled={isLoading}>
+            <Button type="submit" className="h-12 rounded-xl text-[15px] flex-1" disabled={isLoading}>
               {isLoading ? (
                 <>
                   <Icon name="Loader2" className="mr-2 h-4 w-4 animate-spin" />

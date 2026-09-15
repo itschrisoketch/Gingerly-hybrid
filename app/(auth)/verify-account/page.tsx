@@ -7,7 +7,7 @@ import { Building2, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { AuthInput } from '@/components/auth/auth-input'
 import { Label } from '@/components/ui/label'
 import { FieldError } from '@/components/auth/field-error'
 import { useVerifyAccount, useResendVerificationOtp } from '@/lib/hooks/api'
@@ -70,12 +70,12 @@ function VerifyAccountContent() {
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="msisdn">Phone number</Label>
-              <Input id="msisdn" placeholder="254700000000" {...register('msisdn')} />
+              <AuthInput id="msisdn" placeholder="254700000000" {...register('msisdn')} />
               <FieldError id="msisdn-error" message={errors.msisdn?.message} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="otp">Verification code</Label>
-              <Input
+              <AuthInput
                 id="otp"
                 inputMode="numeric"
                 autoComplete="one-time-code"
@@ -87,7 +87,7 @@ function VerifyAccountContent() {
             </div>
           </div>
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <Button type="submit" className="h-12 rounded-xl text-[15px] w-full" disabled={isLoading}>
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
