@@ -30,7 +30,7 @@
     --muted-foreground: 209 20% 45%;
 
     /* Accent - Sophisticated Teal #0E7C86 */
-    --accent: 187 81% 29%;
+    --accent: 185 81% 29%;
     --accent-foreground: 0 0% 100%;
 
     /* Modern destructive state */
@@ -40,10 +40,10 @@
     /* Enhanced borders and inputs */
     --border: 209 20% 90%;
     --input: 209 20% 90%;
-    --ring: 187 81% 29%;
+    --ring: 185 81% 29%;
 
     /* Professional chart colors */
-    --chart-1: 187 81% 29%;
+    --chart-1: 185 81% 29%;
     --chart-2: 209 71% 15%;
     --chart-3: 142 76% 36%;
     --chart-4: 25 95% 53%;
@@ -54,7 +54,7 @@
     --success-foreground: 0 0% 100%;
     --warning: 25 95% 53%;
     --warning-foreground: 0 0% 100%;
-    --info: 187 81% 29%;
+    --info: 185 81% 29%;
     --info-foreground: 0 0% 100%;
 
     /* Brand color tints for better visibility */
@@ -65,8 +65,8 @@
 
     --teal-50: 187 100% 95%;
     --teal-100: 187 100% 85%;
-    --teal-500: 187 81% 29%;
-    --teal-600: 187 81% 24%;
+    --teal-500: 185 81% 29%;
+    --teal-600: 185 81% 24%;
 
     /* Border radius for modern feel */
     --radius: 0.75rem;
@@ -226,13 +226,23 @@
 
   /* The auth shell opts out of the global Jost element rules above. Specificity
      (0,1,1) beats the bare element selectors (0,0,1), so these win without !important. */
-  [data-auth-shell] :is(h1, h2, h3, h4, h5, h6, p, input, textarea, select, button, label) {
+  [data-auth-shell] :is(h1, h2, h3, h4, h5, h6, p, input, textarea, select, button, label, a, span, div, nav, header, footer) {
     font-family: var(--font-body);
   }
 
   [data-auth-shell] .font-display,
   [data-auth-shell] :is(h1, h2, h3, h4, h5, h6) .font-display {
     font-family: var(--font-display);
+  }
+
+  /* globals.css sets font-family: var(--font-sans) !important on [data-radix-root] and on
+     [role="button"|"menuitem"|"tab"|"dialog"] (below, in the component-specific block).
+     !important beats any specificity, so the auth shell needs its own !important here to
+     win — this is the only way to override those legacy rules without changing dashboard
+     behaviour by editing them directly. Radix primitives (e.g. Tabs) rendered inside the
+     auth shell would otherwise stay in Jost. Do not add !important anywhere else. */
+  [data-auth-shell] :is([data-radix-root], [role="button"], [role="menuitem"], [role="tab"], [role="dialog"]) {
+    font-family: var(--font-body) !important;
   }
 }
 
