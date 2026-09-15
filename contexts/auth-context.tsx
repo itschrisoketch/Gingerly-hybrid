@@ -179,6 +179,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     if (state.isLoading) return
 
+    // Local development escape hatch, for working on dashboard UI without
+    // re-authenticating every time a token expires.
+    //
+    // Gated on NODE_ENV as well as the flag, deliberately. NODE_ENV is fixed to
+    // 'production' by `next build`, so this branch is unreachable in a
+    // production bundle even if NEXT_PUBLIC_DISABLE_AUTH_GUARD is set in the
+    // deploy environment by mistake. The flag alone would not be safe: anything
+    // NEXT_PUBLIC_ is inlined into client JS and would ship.
+    if (
+      process.env.NODE_ENV === 'development' &&
+      process.env.NEXT_PUBLIC_DISABLE_AUTH_GUARD === 'true'
+    ) {
+      return
+    }
+
     const isProtectedRoute = PROTECTED_ROUTES.some((route) =>
       pathname.startsWith(route)
     )

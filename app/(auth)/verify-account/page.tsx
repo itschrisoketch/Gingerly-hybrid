@@ -3,12 +3,13 @@
 import { Suspense, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { AUTH_BUTTON_PRIMARY, AUTH_BUTTON_OUTLINE } from '@/components/auth/auth-button-styles'
 import { AuthInput } from '@/components/auth/auth-input'
+import { OtpField } from '@/components/auth/otp-field'
 import { AuthHeading } from '@/components/auth/auth-heading'
 import { Icon } from '@/components/ui/icon'
 import { Label } from '@/components/ui/label'
@@ -31,6 +32,7 @@ function VerifyAccountContent() {
 
   const {
     register,
+    control,
     handleSubmit,
     watch,
     formState: { errors },
@@ -81,16 +83,19 @@ function VerifyAccountContent() {
 
           <div className="space-y-2">
             <Label htmlFor="otp">Verification code</Label>
-            <AuthInput
-              id="otp"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              maxLength={6}
-              placeholder="123456"
-              className="tracking-[0.35em]"
-              aria-invalid={errors.otp ? true : undefined}
-              aria-describedby={errors.otp ? 'otp-error' : undefined}
-              {...register('otp')}
+            {/* Controller, not register: InputOTP is a controlled component. */}
+            <Controller
+              name="otp"
+              control={control}
+              render={({ field }) => (
+                <OtpField
+                  value={field.value ?? ''}
+                  onChange={field.onChange}
+                  disabled={isLoading}
+                  invalid={Boolean(errors.otp)}
+                  describedBy={errors.otp ? 'otp-error' : undefined}
+                />
+              )}
             />
             <FieldError id="otp-error" message={errors.otp?.message} />
           </div>
