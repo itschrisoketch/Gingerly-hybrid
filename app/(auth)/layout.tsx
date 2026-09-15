@@ -1,5 +1,5 @@
 import { AuthBrandPanel } from '@/components/auth/auth-brand-panel'
-import { Icon } from '@/components/ui/icon'
+import { Wordmark } from '@/components/wordmark'
 
 /**
  * Shell for /login, /signup and /verify-account.
@@ -27,9 +27,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div className="grid min-h-screen gap-3 lg:min-h-[calc(100vh-1.5rem)] lg:grid-cols-[1fr_minmax(420px,45%)]">
         <main className="flex flex-col rounded-none border-border/60 bg-background px-6 py-10 sm:px-10 lg:rounded-2xl lg:border lg:px-14 lg:py-14">
           {/* Wordmark for the widths where the brand panel is not rendered. */}
-          <div className="flex items-center gap-2 lg:hidden">
-            <Icon name="Building2" className="h-6 w-6 text-foreground" />
-            <span className="text-lg font-medium tracking-tight text-foreground">Gingerly</span>
+          <div className="text-foreground lg:hidden">
+            <Wordmark className="h-7" />
           </div>
 
           <div className="flex flex-1 items-center justify-center py-10">

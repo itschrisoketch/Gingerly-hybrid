@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, useReducedMotion } from 'framer-motion'
-import { Icon } from '@/components/ui/icon'
+import { Wordmark } from '@/components/wordmark'
 import { HEADLINE_ACCENT_CLASS } from '@/components/auth/auth-heading'
 
 /**
@@ -66,9 +66,8 @@ export function AuthBrandPanel() {
       />
       <div aria-hidden="true" className="absolute inset-0 bg-navy-500/25" />
 
-      <motion.div {...rise(0)} className="relative flex items-center gap-2 text-white">
-        <Icon name="Building2" className="h-6 w-6" />
-        <span className="text-lg font-medium tracking-tight">Gingerly</span>
+      <motion.div {...rise(0)} className="relative text-white">
+        <Wordmark className="h-8" />
       </motion.div>
 
       {/* pb-12 lifts the quote clear of the panel's bottom edge so it sits in the
