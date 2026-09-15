@@ -48,6 +48,7 @@ export const ICON_MAP = {
   Edit: 'edit-outline-rounded',
   ExternalLink: 'open-in-new-outline-rounded',
   Eye: 'visibility-outline-rounded',
+  EyeOff: 'visibility-off-outline-rounded',
   FileCheck: 'fact-check-outline-rounded',
   FileText: 'description-outline-rounded',
   Filter: 'filter-alt-outline-rounded',

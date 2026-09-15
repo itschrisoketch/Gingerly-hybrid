@@ -88,6 +88,7 @@ import TrendingDownOutlineRoundedIcon from '@iconify-icons/material-symbols/tren
 import TrendingUpOutlineRoundedIcon from '@iconify-icons/material-symbols/trending-up-outline-rounded'
 import UploadOutlineRoundedIcon from '@iconify-icons/material-symbols/upload-outline-rounded'
 import VideocamOutlineRoundedIcon from '@iconify-icons/material-symbols/videocam-outline-rounded'
+import VisibilityOffOutlineRoundedIcon from '@iconify-icons/material-symbols/visibility-off-outline-rounded'
 import VisibilityOutlineRoundedIcon from '@iconify-icons/material-symbols/visibility-outline-rounded'
 import WarningOutlineRoundedIcon from '@iconify-icons/material-symbols/warning-outline-rounded'
 import WaterDropOutlineRoundedIcon from '@iconify-icons/material-symbols/water-drop-outline-rounded'
@@ -180,6 +181,7 @@ const icons: Record<string, unknown> = {
   'trending-up-outline-rounded': TrendingUpOutlineRoundedIcon,
   'upload-outline-rounded': UploadOutlineRoundedIcon,
   'videocam-outline-rounded': VideocamOutlineRoundedIcon,
+  'visibility-off-outline-rounded': VisibilityOffOutlineRoundedIcon,
   'visibility-outline-rounded': VisibilityOutlineRoundedIcon,
   'warning-outline-rounded': WarningOutlineRoundedIcon,
   'water-drop-outline-rounded': WaterDropOutlineRoundedIcon,

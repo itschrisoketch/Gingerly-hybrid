@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Icon } from '@/components/ui/icon'
 import { Button } from '@/components/ui/button'
 import { AuthInput } from '@/components/auth/auth-input'
+import { AuthPasswordInput } from '@/components/auth/auth-password-input'
 import { Label } from '@/components/ui/label'
 import { PasswordStrengthIndicator } from '@/components/password-strength-indicator'
 import { FieldError } from '@/components/auth/field-error'
@@ -131,9 +132,8 @@ export function TenantSignupForm({ step, onStepChange }: TenantSignupFormProps) 
           </div>
           <div className="space-y-2">
             <Label htmlFor="tenant-password">Password</Label>
-            <AuthInput
+            <AuthPasswordInput
               id="tenant-password"
-              type="password"
               placeholder="Create a password"
               autoComplete="new-password"
               aria-invalid={errors.password ? true : undefined}
@@ -145,9 +145,8 @@ export function TenantSignupForm({ step, onStepChange }: TenantSignupFormProps) 
           </div>
           <div className="space-y-2">
             <Label htmlFor="tenant-confirm-password">Confirm Password</Label>
-            <AuthInput
+            <AuthPasswordInput
               id="tenant-confirm-password"
-              type="password"
               placeholder="Re-enter your password"
               autoComplete="new-password"
               aria-invalid={errors.confirm_password ? true : undefined}
