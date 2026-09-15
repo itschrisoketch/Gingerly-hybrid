@@ -2,6 +2,8 @@
 
 import { motion, useReducedMotion } from 'framer-motion'
 import { Icon } from '@/components/ui/icon'
+import { HEADLINE_CLASS, HEADLINE_ACCENT_CLASS } from '@/components/auth/auth-heading'
+import { cn } from '@/lib/utils'
 
 /**
  * The dark brand panel beside the auth form.
@@ -48,9 +50,9 @@ export function AuthBrandPanel() {
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-100/80">
           Rental payments
         </p>
-        <p className="max-w-[16ch] text-[2.75rem] font-light leading-[1.08] tracking-[-0.03em] text-white [text-wrap:balance]">
+        <p className={cn('max-w-[16ch] text-[2.75rem] text-white', HEADLINE_CLASS)}>
           Collect Recurring Payments{' '}
-          <span className="font-display italic font-normal">Automatically</span>
+          <span className={HEADLINE_ACCENT_CLASS}>Automatically</span>
         </p>
       </motion.div>
 

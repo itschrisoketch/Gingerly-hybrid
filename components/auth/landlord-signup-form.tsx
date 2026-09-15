@@ -82,79 +82,85 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {step === 1 && (
         <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="landlord-name">Full Name</Label>
-            <AuthInput
-              id="landlord-name"
-              placeholder="John Doe"
-              autoComplete="name"
-              aria-invalid={errors.full_name ? true : undefined}
-              aria-describedby={errors.full_name ? 'full_name-error' : undefined}
-              {...register('full_name')}
-            />
-            <FieldError id="full_name-error" message={errors.full_name?.message} />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="landlord-name">Full Name</Label>
+              <AuthInput
+                id="landlord-name"
+                placeholder="John Doe"
+                autoComplete="name"
+                aria-invalid={errors.full_name ? true : undefined}
+                aria-describedby={errors.full_name ? 'full_name-error' : undefined}
+                {...register('full_name')}
+              />
+              <FieldError id="full_name-error" message={errors.full_name?.message} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="landlord-business-name">Business Name</Label>
+              <AuthInput
+                id="landlord-business-name"
+                placeholder="Sunset Properties LLC"
+                autoComplete="organization"
+                aria-invalid={errors.business_name ? true : undefined}
+                aria-describedby={errors.business_name ? 'business_name-error' : undefined}
+                {...register('business_name')}
+              />
+              <FieldError id="business_name-error" message={errors.business_name?.message} />
+            </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="landlord-business-name">Business Name</Label>
-            <AuthInput
-              id="landlord-business-name"
-              placeholder="Sunset Properties LLC"
-              autoComplete="organization"
-              aria-invalid={errors.business_name ? true : undefined}
-              aria-describedby={errors.business_name ? 'business_name-error' : undefined}
-              {...register('business_name')}
-            />
-            <FieldError id="business_name-error" message={errors.business_name?.message} />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="landlord-email">Email</Label>
+              <AuthInput
+                id="landlord-email"
+                type="email"
+                placeholder="john@example.com"
+                autoComplete="email"
+                aria-invalid={errors.email ? true : undefined}
+                aria-describedby={errors.email ? 'email-error' : undefined}
+                {...register('email')}
+              />
+              <FieldError id="email-error" message={errors.email?.message} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="landlord-phone">Phone</Label>
+              <AuthInput
+                id="landlord-phone"
+                placeholder="254700000000"
+                autoComplete="tel"
+                aria-invalid={errors.msisdn ? true : undefined}
+                aria-describedby={errors.msisdn ? 'msisdn-error' : undefined}
+                {...register('msisdn')}
+              />
+              <FieldError id="msisdn-error" message={errors.msisdn?.message} />
+            </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="landlord-email">Email</Label>
-            <AuthInput
-              id="landlord-email"
-              type="email"
-              placeholder="john@example.com"
-              autoComplete="email"
-              aria-invalid={errors.email ? true : undefined}
-              aria-describedby={errors.email ? 'email-error' : undefined}
-              {...register('email')}
-            />
-            <FieldError id="email-error" message={errors.email?.message} />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="landlord-phone">Phone</Label>
-            <AuthInput
-              id="landlord-phone"
-              placeholder="254700000000"
-              autoComplete="tel"
-              aria-invalid={errors.msisdn ? true : undefined}
-              aria-describedby={errors.msisdn ? 'msisdn-error' : undefined}
-              {...register('msisdn')}
-            />
-            <FieldError id="msisdn-error" message={errors.msisdn?.message} />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="landlord-password">Password</Label>
-            <AuthPasswordInput
-              id="landlord-password"
-              placeholder="Create a password"
-              autoComplete="new-password"
-              aria-invalid={errors.password ? true : undefined}
-              aria-describedby={errors.password ? 'password-error' : undefined}
-              {...register('password')}
-            />
-            <PasswordStrengthIndicator password={password || ''} />
-            <FieldError id="password-error" message={errors.password?.message} />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="landlord-confirm-password">Confirm Password</Label>
-            <AuthPasswordInput
-              id="landlord-confirm-password"
-              placeholder="Re-enter your password"
-              autoComplete="new-password"
-              aria-invalid={errors.confirm_password ? true : undefined}
-              aria-describedby={errors.confirm_password ? 'confirm_password-error' : undefined}
-              {...register('confirm_password')}
-            />
-            <FieldError id="confirm_password-error" message={errors.confirm_password?.message} />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="landlord-password">Password</Label>
+              <AuthPasswordInput
+                id="landlord-password"
+                placeholder="Create a password"
+                autoComplete="new-password"
+                aria-invalid={errors.password ? true : undefined}
+                aria-describedby={errors.password ? 'password-error' : undefined}
+                {...register('password')}
+              />
+              <PasswordStrengthIndicator password={password || ''} />
+              <FieldError id="password-error" message={errors.password?.message} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="landlord-confirm-password">Confirm Password</Label>
+              <AuthPasswordInput
+                id="landlord-confirm-password"
+                placeholder="Re-enter your password"
+                autoComplete="new-password"
+                aria-invalid={errors.confirm_password ? true : undefined}
+                aria-describedby={errors.confirm_password ? 'confirm_password-error' : undefined}
+                {...register('confirm_password')}
+              />
+              <FieldError id="confirm_password-error" message={errors.confirm_password?.message} />
+            </div>
           </div>
           <Button type="button" onClick={goToStepTwo} className="h-12 rounded-xl text-[15px] w-full">
             Continue
@@ -205,7 +211,7 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
             />
             <FieldError id="address-error" message={errors.address?.message} />
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-3">
             <div className="space-y-2">
               <Label htmlFor="landlord-city">City</Label>
               <AuthInput
@@ -230,18 +236,18 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
               />
               <FieldError id="state-error" message={errors.state?.message} />
             </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="landlord-zip">Postal Code</Label>
-            <AuthInput
-              id="landlord-zip"
-              placeholder="00100"
-              autoComplete="postal-code"
-              aria-invalid={errors.zip_code ? true : undefined}
-              aria-describedby={errors.zip_code ? 'zip_code-error' : undefined}
-              {...register('zip_code')}
-            />
-            <FieldError id="zip_code-error" message={errors.zip_code?.message} />
+            <div className="space-y-2">
+              <Label htmlFor="landlord-zip">Postal Code</Label>
+              <AuthInput
+                id="landlord-zip"
+                placeholder="00100"
+                autoComplete="postal-code"
+                aria-invalid={errors.zip_code ? true : undefined}
+                aria-describedby={errors.zip_code ? 'zip_code-error' : undefined}
+                {...register('zip_code')}
+              />
+              <FieldError id="zip_code-error" message={errors.zip_code?.message} />
+            </div>
           </div>
           <div className="flex gap-3 pt-2">
             <Button
@@ -266,29 +272,31 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
           <p className="text-sm text-muted-foreground">
             Where should we send your rent payouts? You can add this later.
           </p>
-          <div className="space-y-2">
-            <Label htmlFor="landlord-bank-name">Bank Name</Label>
-            <AuthInput
-              id="landlord-bank-name"
-              placeholder="Example Bank"
-              autoComplete="off"
-              aria-invalid={errors.bank_name ? true : undefined}
-              aria-describedby={errors.bank_name ? 'bank_name-error' : undefined}
-              {...register('bank_name')}
-            />
-            <FieldError id="bank_name-error" message={errors.bank_name?.message} />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="landlord-account-name">Account Holder Name</Label>
-            <AuthInput
-              id="landlord-account-name"
-              placeholder="John Doe or Business Name"
-              autoComplete="off"
-              aria-invalid={errors.account_holder_name ? true : undefined}
-              aria-describedby={errors.account_holder_name ? 'account_holder_name-error' : undefined}
-              {...register('account_holder_name')}
-            />
-            <FieldError id="account_holder_name-error" message={errors.account_holder_name?.message} />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="landlord-bank-name">Bank Name</Label>
+              <AuthInput
+                id="landlord-bank-name"
+                placeholder="Example Bank"
+                autoComplete="off"
+                aria-invalid={errors.bank_name ? true : undefined}
+                aria-describedby={errors.bank_name ? 'bank_name-error' : undefined}
+                {...register('bank_name')}
+              />
+              <FieldError id="bank_name-error" message={errors.bank_name?.message} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="landlord-account-name">Account Holder Name</Label>
+              <AuthInput
+                id="landlord-account-name"
+                placeholder="John Doe or Business Name"
+                autoComplete="off"
+                aria-invalid={errors.account_holder_name ? true : undefined}
+                aria-describedby={errors.account_holder_name ? 'account_holder_name-error' : undefined}
+                {...register('account_holder_name')}
+              />
+              <FieldError id="account_holder_name-error" message={errors.account_holder_name?.message} />
+            </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
