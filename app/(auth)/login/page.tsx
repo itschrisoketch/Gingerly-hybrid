@@ -11,8 +11,9 @@ import { FieldError } from '@/components/auth/field-error'
 import { Icon } from '@/components/ui/icon'
 import { Button } from '@/components/ui/button'
 import { AuthInput } from '@/components/auth/auth-input'
+import { AuthPasswordInput } from '@/components/auth/auth-password-input'
 import { Label } from '@/components/ui/label'
-import { Separator } from '@/components/ui/separator'
+import { AuthDivider } from '@/components/auth/auth-divider'
 import { loginSchema, type LoginFormData } from '@/lib/validations'
 import { useLogin } from '@/lib/hooks/api'
 import type { LoginType } from '@/lib/api/types'
@@ -91,9 +92,8 @@ export default function LoginPage() {
                 Forgot password?
               </Link>
             </div>
-            <AuthInput
+            <AuthPasswordInput
               id="password"
-              type="password"
               autoComplete="current-password"
               placeholder="Enter your password"
               aria-invalid={errors.password ? true : undefined}
@@ -116,14 +116,7 @@ export default function LoginPage() {
           )}
         </Button>
 
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <Separator />
-          </div>
-          <div className="relative flex justify-center text-xs">
-            <span className="bg-background px-2 text-muted-foreground">Or create an account</span>
-          </div>
-        </div>
+        <AuthDivider>or create an account</AuthDivider>
 
         <div className="grid grid-cols-2 gap-3">
           <Button variant="outline" asChild className="h-12 rounded-xl text-[15px]">
