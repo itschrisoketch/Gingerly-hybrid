@@ -84,7 +84,7 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
           <div className="space-y-2">
             <Label htmlFor="landlord-name">Full Name</Label>
             <Input id="landlord-name" placeholder="John Doe" {...register('full_name')} />
-            <FieldError message={errors.full_name?.message} />
+            <FieldError id="full_name-error" message={errors.full_name?.message} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="landlord-business-name">Business Name</Label>
@@ -93,7 +93,7 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
               placeholder="Sunset Properties LLC"
               {...register('business_name')}
             />
-            <FieldError message={errors.business_name?.message} />
+            <FieldError id="business_name-error" message={errors.business_name?.message} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="landlord-email">Email</Label>
@@ -103,12 +103,12 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
               placeholder="john@example.com"
               {...register('email')}
             />
-            <FieldError message={errors.email?.message} />
+            <FieldError id="email-error" message={errors.email?.message} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="landlord-phone">Phone</Label>
             <Input id="landlord-phone" placeholder="254700000000" {...register('msisdn')} />
-            <FieldError message={errors.msisdn?.message} />
+            <FieldError id="msisdn-error" message={errors.msisdn?.message} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="landlord-password">Password</Label>
@@ -119,7 +119,7 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
               {...register('password')}
             />
             <PasswordStrengthIndicator password={password || ''} />
-            <FieldError message={errors.password?.message} />
+            <FieldError id="password-error" message={errors.password?.message} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="landlord-confirm-password">Confirm Password</Label>
@@ -129,7 +129,7 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
               placeholder="Re-enter your password"
               {...register('confirm_password')}
             />
-            <FieldError message={errors.confirm_password?.message} />
+            <FieldError id="confirm_password-error" message={errors.confirm_password?.message} />
           </div>
           <Button type="button" onClick={goToStepTwo} className="w-full">
             Continue
@@ -148,7 +148,7 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
                 placeholder="Sunset Apartments"
                 {...register('property_name')}
               />
-              <FieldError message={errors.property_name?.message} />
+              <FieldError id="property_name-error" message={errors.property_name?.message} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="landlord-units">Number of Units</Label>
@@ -159,7 +159,7 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
                 placeholder="12"
                 {...register('num_units')}
               />
-              <FieldError message={errors.num_units?.message} />
+              <FieldError id="num_units-error" message={errors.num_units?.message} />
             </div>
           </div>
           <div className="space-y-2">
@@ -169,24 +169,24 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
               placeholder="123 Main Street"
               {...register('address')}
             />
-            <FieldError message={errors.address?.message} />
+            <FieldError id="address-error" message={errors.address?.message} />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="landlord-city">City</Label>
               <Input id="landlord-city" placeholder="Nairobi" {...register('city')} />
-              <FieldError message={errors.city?.message} />
+              <FieldError id="city-error" message={errors.city?.message} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="landlord-state">State / County</Label>
               <Input id="landlord-state" placeholder="Nairobi County" {...register('state')} />
-              <FieldError message={errors.state?.message} />
+              <FieldError id="state-error" message={errors.state?.message} />
             </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="landlord-zip">Postal Code</Label>
             <Input id="landlord-zip" placeholder="00100" {...register('zip_code')} />
-            <FieldError message={errors.zip_code?.message} />
+            <FieldError id="zip_code-error" message={errors.zip_code?.message} />
           </div>
           <div className="flex gap-3 pt-2">
             <Button
@@ -218,7 +218,7 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
               placeholder="Example Bank"
               {...register('bank_name')}
             />
-            <FieldError message={errors.bank_name?.message} />
+            <FieldError id="bank_name-error" message={errors.bank_name?.message} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="landlord-account-name">Account Holder Name</Label>
@@ -227,7 +227,7 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
               placeholder="John Doe or Business Name"
               {...register('account_holder_name')}
             />
-            <FieldError message={errors.account_holder_name?.message} />
+            <FieldError id="account_holder_name-error" message={errors.account_holder_name?.message} />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
@@ -237,7 +237,7 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
                 placeholder="000000000"
                 {...register('account_no')}
               />
-              <FieldError message={errors.account_no?.message} />
+              <FieldError id="account_no-error" message={errors.account_no?.message} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="landlord-routing-number">Routing Number</Label>
@@ -246,7 +246,7 @@ export function LandlordSignupForm({ step, onStepChange }: LandlordSignupFormPro
                 placeholder="000000000"
                 {...register('routing_number')}
               />
-              <FieldError message={errors.routing_number?.message} />
+              <FieldError id="routing_number-error" message={errors.routing_number?.message} />
             </div>
           </div>
           <div className="flex gap-3 pt-2">
