@@ -196,7 +196,7 @@ function SidebarFooter({
           onClick={onLogout}
           aria-label="Log out"
           title="Log out"
-          className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors duration-200 hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+          className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors duration-200 hover:bg-destructive/10 hover:text-destructive-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
         >
           <Icon name="LogOut" className="h-[18px] w-[18px]" />
         </button>
