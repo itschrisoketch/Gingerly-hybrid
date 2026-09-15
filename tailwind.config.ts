@@ -60,7 +60,27 @@ const config: Config = {
   				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
   				border: 'hsl(var(--sidebar-border))',
   				ring: 'hsl(var(--sidebar-ring))'
+  			},
+  			navy: {
+  				'50': 'hsl(var(--navy-50))',
+  				'100': 'hsl(var(--navy-100))',
+  				'500': 'hsl(var(--navy-500))',
+  				'600': 'hsl(var(--navy-600))'
+  			},
+  			teal: {
+  				'50': 'hsl(var(--teal-50))',
+  				'100': 'hsl(var(--teal-100))',
+  				'500': 'hsl(var(--teal-500))',
+  				'600': 'hsl(var(--teal-600))'
   			}
+  		},
+  		fontFamily: {
+  			// `sans` is intentionally absent. With no fontFamily.sans defined, Tailwind's
+  			// `font-sans` resolves to its default system stack, which is what the dashboard
+  			// renders today. Adding `sans: var(--font-sans)` here would switch the whole
+  			// dashboard to Jost — a change this work must not make.
+  			body: ["var(--font-body)", "system-ui", "sans-serif"],
+  			display: ["var(--font-display)", "Georgia", "serif"]
   		},
   		borderRadius: {
   			lg: 'var(--radius)',
