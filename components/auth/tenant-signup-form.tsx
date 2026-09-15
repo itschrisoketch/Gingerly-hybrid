@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Icon } from '@/components/ui/icon'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { AuthInput } from '@/components/auth/auth-input'
 import { Label } from '@/components/ui/label'
 import { PasswordStrengthIndicator } from '@/components/password-strength-indicator'
 import { FieldError } from '@/components/auth/field-error'
@@ -81,7 +81,7 @@ export function TenantSignupForm({ step, onStepChange }: TenantSignupFormProps) 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="tenant-first-name">First Name</Label>
-              <Input
+              <AuthInput
                 id="tenant-first-name"
                 placeholder="John"
                 autoComplete="given-name"
@@ -93,7 +93,7 @@ export function TenantSignupForm({ step, onStepChange }: TenantSignupFormProps) 
             </div>
             <div className="space-y-2">
               <Label htmlFor="tenant-last-name">Last Name</Label>
-              <Input
+              <AuthInput
                 id="tenant-last-name"
                 placeholder="Doe"
                 autoComplete="family-name"
@@ -106,7 +106,7 @@ export function TenantSignupForm({ step, onStepChange }: TenantSignupFormProps) 
           </div>
           <div className="space-y-2">
             <Label htmlFor="tenant-email">Email</Label>
-            <Input
+            <AuthInput
               id="tenant-email"
               type="email"
               placeholder="john@example.com"
@@ -119,7 +119,7 @@ export function TenantSignupForm({ step, onStepChange }: TenantSignupFormProps) 
           </div>
           <div className="space-y-2">
             <Label htmlFor="tenant-phone">Phone</Label>
-            <Input
+            <AuthInput
               id="tenant-phone"
               placeholder="254700000000"
               autoComplete="tel"
@@ -131,7 +131,7 @@ export function TenantSignupForm({ step, onStepChange }: TenantSignupFormProps) 
           </div>
           <div className="space-y-2">
             <Label htmlFor="tenant-password">Password</Label>
-            <Input
+            <AuthInput
               id="tenant-password"
               type="password"
               placeholder="Create a password"
@@ -145,7 +145,7 @@ export function TenantSignupForm({ step, onStepChange }: TenantSignupFormProps) 
           </div>
           <div className="space-y-2">
             <Label htmlFor="tenant-confirm-password">Confirm Password</Label>
-            <Input
+            <AuthInput
               id="tenant-confirm-password"
               type="password"
               placeholder="Re-enter your password"
@@ -156,7 +156,7 @@ export function TenantSignupForm({ step, onStepChange }: TenantSignupFormProps) 
             />
             <FieldError id="confirm_password-error" message={errors.confirm_password?.message} />
           </div>
-          <Button type="button" onClick={goToStepTwo} className="w-full">
+          <Button type="button" onClick={goToStepTwo} className="h-12 rounded-xl text-[15px] w-full">
             Continue
             <Icon name="ChevronRight" className="ml-2 h-4 w-4" />
           </Button>
@@ -170,7 +170,7 @@ export function TenantSignupForm({ step, onStepChange }: TenantSignupFormProps) 
           </p>
           <div className="space-y-2">
             <Label htmlFor="tenant-apartment">Apartment Name</Label>
-            <Input
+            <AuthInput
               id="tenant-apartment"
               placeholder="Sunset Apartments"
               autoComplete="off"
@@ -182,7 +182,7 @@ export function TenantSignupForm({ step, onStepChange }: TenantSignupFormProps) 
           </div>
           <div className="space-y-2">
             <Label htmlFor="tenant-unit">Unit Number</Label>
-            <Input
+            <AuthInput
               id="tenant-unit"
               placeholder="3B"
               autoComplete="off"
@@ -195,7 +195,7 @@ export function TenantSignupForm({ step, onStepChange }: TenantSignupFormProps) 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="tenant-rent">Monthly Rent</Label>
-              <Input
+              <AuthInput
                 id="tenant-rent"
                 type="number"
                 min="0"
@@ -210,7 +210,7 @@ export function TenantSignupForm({ step, onStepChange }: TenantSignupFormProps) 
             </div>
             <div className="space-y-2">
               <Label htmlFor="tenant-billing-date">Billing Date</Label>
-              <Input
+              <AuthInput
                 id="tenant-billing-date"
                 type="date"
                 autoComplete="off"
@@ -226,13 +226,13 @@ export function TenantSignupForm({ step, onStepChange }: TenantSignupFormProps) 
               type="button"
               variant="outline"
               onClick={() => onStepChange(1)}
-              className="flex-1"
+              className="h-12 rounded-xl text-[15px] flex-1"
               disabled={isLoading}
             >
               <Icon name="ChevronLeft" className="mr-2 h-4 w-4" />
               Back
             </Button>
-            <Button type="submit" className="flex-1" disabled={isLoading}>
+            <Button type="submit" className="h-12 rounded-xl text-[15px] flex-1" disabled={isLoading}>
               {isLoading ? (
                 <>
                   <Icon name="Loader2" className="mr-2 h-4 w-4 animate-spin" />

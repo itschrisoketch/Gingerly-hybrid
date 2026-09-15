@@ -10,7 +10,7 @@ import { RoleToggle } from '@/components/auth/role-toggle'
 import { FieldError } from '@/components/auth/field-error'
 import { Icon } from '@/components/ui/icon'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { AuthInput } from '@/components/auth/auth-input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { loginSchema, type LoginFormData } from '@/lib/validations'
@@ -68,7 +68,7 @@ export default function LoginPage() {
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input
+            <AuthInput
               id="email"
               type="email"
               autoComplete="email"
@@ -91,7 +91,7 @@ export default function LoginPage() {
                 Forgot password?
               </Link>
             </div>
-            <Input
+            <AuthInput
               id="password"
               type="password"
               autoComplete="current-password"
@@ -105,7 +105,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button type="submit" className="h-12 rounded-xl text-[15px] w-full" disabled={isLoading}>
           {isLoading ? (
             <>
               <Icon name="Loader2" className="mr-2 h-4 w-4 animate-spin" />
@@ -126,10 +126,10 @@ export default function LoginPage() {
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <Button variant="outline" asChild>
+          <Button variant="outline" asChild className="h-12 rounded-xl text-[15px]">
             <Link href="/signup?type=tenant">As Tenant</Link>
           </Button>
-          <Button variant="outline" asChild>
+          <Button variant="outline" asChild className="h-12 rounded-xl text-[15px]">
             <Link href="/signup?type=landlord">As Landlord</Link>
           </Button>
         </div>
