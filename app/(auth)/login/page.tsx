@@ -9,7 +9,9 @@ import { AuthHeading } from '@/components/auth/auth-heading'
 import { RoleToggle } from '@/components/auth/role-toggle'
 import { FieldError } from '@/components/auth/field-error'
 import { Icon } from '@/components/ui/icon'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { AUTH_BUTTON_PRIMARY, AUTH_BUTTON_OUTLINE } from '@/components/auth/auth-button-styles'
 import { AuthInput } from '@/components/auth/auth-input'
 import { AuthPasswordInput } from '@/components/auth/auth-password-input'
 import { Label } from '@/components/ui/label'
@@ -109,7 +111,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <Button type="submit" className="h-12 rounded-xl text-[15px] w-full" disabled={isLoading}>
+        <Button type="submit" className={cn(AUTH_BUTTON_PRIMARY, 'w-full')} disabled={isLoading}>
           {isLoading ? (
             <>
               <Icon name="Loader2" className="mr-2 h-4 w-4 animate-spin" />
