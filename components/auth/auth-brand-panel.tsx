@@ -5,23 +5,17 @@ import { Icon } from '@/components/ui/icon'
 import { HEADLINE_ACCENT_CLASS } from '@/components/auth/auth-heading'
 
 /**
- * ⚠️ PLACEHOLDER COPY — MUST BE REPLACED BEFORE LAUNCH.
+ * Attribution supplied by the product owner.
  *
- * The person in the photograph is a stock subject who has never used Gingerly
- * and has not endorsed it. Putting an invented quote under her face would be a
- * fabricated endorsement: misleading to anyone signing up, and outside what the
- * Unsplash Licence grants — it covers the photograph, not the likeness of the
- * person in it, and explicitly does not permit implying that they endorse a
- * product.
- *
- * Replace `quote`, `name` and `role` with a real customer's words, used with
- * their permission, and swap /public/auth-panel.jpg for a photograph of that
- * person or a neutral one. Until then this reads as an example, not a claim.
+ * ⚠️ One thing still outstanding: /public/auth-panel.jpg is a stock photograph
+ * of a different person, so this currently shows a model presented as Lucy
+ * Maina. Replace it with a photograph of Lucy, used with her permission, before
+ * this goes in front of customers. The quote should be her own words too.
  */
 const TESTIMONIAL = {
   quote: 'Rent arrives on time now, and I stopped chasing anyone for it.',
-  name: 'Example placeholder',
-  role: 'Replace with a real customer',
+  name: 'Lucy Maina',
+  role: 'Agent, Brookside Apartments',
 } as const
 
 /**
@@ -77,22 +71,24 @@ export function AuthBrandPanel() {
         <span className="text-lg font-medium tracking-tight">Gingerly</span>
       </motion.div>
 
-      <motion.figure {...rise(0.12)} className="relative m-0 space-y-6">
+      {/* pb-12 lifts the quote clear of the panel's bottom edge so it sits in the
+          lower third rather than against the corner radius. */}
+      <motion.figure {...rise(0.12)} className="relative m-0 space-y-7 pb-12">
         {/* The quote mark is decorative; the blockquote carries the meaning. */}
         <span
           aria-hidden="true"
-          className={`block text-6xl leading-none text-teal-100/40 ${HEADLINE_ACCENT_CLASS}`}
+          className={`block text-7xl leading-none text-teal-100/40 ${HEADLINE_ACCENT_CLASS}`}
         >
           &ldquo;
         </span>
 
-        <blockquote className="max-w-[24ch] text-[1.75rem] font-light leading-[1.25] tracking-[-0.015em] text-white [text-wrap:balance]">
+        <blockquote className="max-w-[22ch] text-[2.15rem] font-light leading-[1.22] tracking-[-0.02em] text-white [text-wrap:balance]">
           {TESTIMONIAL.quote}
         </blockquote>
 
-        <figcaption className="flex flex-col gap-0.5">
-          <span className="text-sm font-medium text-white">{TESTIMONIAL.name}</span>
-          <span className="text-sm text-white/70">{TESTIMONIAL.role}</span>
+        <figcaption className="flex flex-col gap-1">
+          <span className="text-base font-medium text-white">{TESTIMONIAL.name}</span>
+          <span className="text-base text-white/70">{TESTIMONIAL.role}</span>
         </figcaption>
       </motion.figure>
     </aside>
