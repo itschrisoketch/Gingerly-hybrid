@@ -37,7 +37,7 @@ export function MobileNav() {
             aria-label="Gingerly home"
             className="flex items-center rounded-lg text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
           >
-            <Wordmark className="h-[18px]" />
+            <Wordmark className="h-7" />
           </Link>
         </div>
 
