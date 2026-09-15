@@ -82,12 +82,12 @@ export function TenantSignupForm({ step, onStepChange }: TenantSignupFormProps) 
             <div className="space-y-2">
               <Label htmlFor="tenant-first-name">First Name</Label>
               <Input id="tenant-first-name" placeholder="John" {...register('first_name')} />
-              <FieldError message={errors.first_name?.message} />
+              <FieldError id="first_name-error" message={errors.first_name?.message} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="tenant-last-name">Last Name</Label>
               <Input id="tenant-last-name" placeholder="Doe" {...register('last_name')} />
-              <FieldError message={errors.last_name?.message} />
+              <FieldError id="last_name-error" message={errors.last_name?.message} />
             </div>
           </div>
           <div className="space-y-2">
@@ -98,12 +98,12 @@ export function TenantSignupForm({ step, onStepChange }: TenantSignupFormProps) 
               placeholder="john@example.com"
               {...register('email')}
             />
-            <FieldError message={errors.email?.message} />
+            <FieldError id="email-error" message={errors.email?.message} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="tenant-phone">Phone</Label>
             <Input id="tenant-phone" placeholder="254700000000" {...register('msisdn')} />
-            <FieldError message={errors.msisdn?.message} />
+            <FieldError id="msisdn-error" message={errors.msisdn?.message} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="tenant-password">Password</Label>
@@ -114,7 +114,7 @@ export function TenantSignupForm({ step, onStepChange }: TenantSignupFormProps) 
               {...register('password')}
             />
             <PasswordStrengthIndicator password={password || ''} />
-            <FieldError message={errors.password?.message} />
+            <FieldError id="password-error" message={errors.password?.message} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="tenant-confirm-password">Confirm Password</Label>
@@ -124,7 +124,7 @@ export function TenantSignupForm({ step, onStepChange }: TenantSignupFormProps) 
               placeholder="Re-enter your password"
               {...register('confirm_password')}
             />
-            <FieldError message={errors.confirm_password?.message} />
+            <FieldError id="confirm_password-error" message={errors.confirm_password?.message} />
           </div>
           <Button type="button" onClick={goToStepTwo} className="w-full">
             Continue
@@ -145,12 +145,12 @@ export function TenantSignupForm({ step, onStepChange }: TenantSignupFormProps) 
               placeholder="Sunset Apartments"
               {...register('apartment_name')}
             />
-            <FieldError message={errors.apartment_name?.message} />
+            <FieldError id="apartment_name-error" message={errors.apartment_name?.message} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="tenant-unit">Unit Number</Label>
             <Input id="tenant-unit" placeholder="3B" {...register('unit_number')} />
-            <FieldError message={errors.unit_number?.message} />
+            <FieldError id="unit_number-error" message={errors.unit_number?.message} />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
@@ -163,12 +163,12 @@ export function TenantSignupForm({ step, onStepChange }: TenantSignupFormProps) 
                 placeholder="25000"
                 {...register('monthly_rent')}
               />
-              <FieldError message={errors.monthly_rent?.message} />
+              <FieldError id="monthly_rent-error" message={errors.monthly_rent?.message} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="tenant-billing-date">Billing Date</Label>
               <Input id="tenant-billing-date" type="date" {...register('billing_date')} />
-              <FieldError message={errors.billing_date?.message} />
+              <FieldError id="billing_date-error" message={errors.billing_date?.message} />
             </div>
           </div>
           <div className="flex gap-3 pt-2">

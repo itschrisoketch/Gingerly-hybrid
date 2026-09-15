@@ -71,7 +71,7 @@ function VerifyAccountContent() {
             <div className="space-y-2">
               <Label htmlFor="msisdn">Phone number</Label>
               <Input id="msisdn" placeholder="254700000000" {...register('msisdn')} />
-              <FieldError message={errors.msisdn?.message} />
+              <FieldError id="msisdn-error" message={errors.msisdn?.message} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="otp">Verification code</Label>
@@ -83,7 +83,7 @@ function VerifyAccountContent() {
                 placeholder="123456"
                 {...register('otp')}
               />
-              <FieldError message={errors.otp?.message} />
+              <FieldError id="otp-error" message={errors.otp?.message} />
             </div>
           </div>
 
