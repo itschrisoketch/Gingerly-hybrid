@@ -46,9 +46,22 @@ function SignupContent() {
       <StepProgress current={step} total={TOTAL_STEPS[tab]} />
 
       <Tabs value={tab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="mb-8 grid w-full grid-cols-2">
-          <TabsTrigger value="tenant">Tenant</TabsTrigger>
-          <TabsTrigger value="landlord">Agent</TabsTrigger>
+        {/* Geometry and colour match components/auth/role-toggle.tsx, so the
+            role switch looks the same on login and signup. shadcn's default
+            active state is `bg-background` (white); brand teal replaces it. */}
+        <TabsList className="mb-8 grid h-auto w-full grid-cols-2 gap-1 rounded-xl bg-muted/60 p-0.5">
+          <TabsTrigger
+            value="tenant"
+            className="h-11 cursor-pointer rounded-lg text-sm font-medium data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=active]:shadow-sm"
+          >
+            Tenant
+          </TabsTrigger>
+          <TabsTrigger
+            value="landlord"
+            className="h-11 cursor-pointer rounded-lg text-sm font-medium data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=active]:shadow-sm"
+          >
+            Agent
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="tenant" className="space-y-6">
