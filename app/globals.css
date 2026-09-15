@@ -57,6 +57,14 @@
     --info: 185 81% 29%;
     --info-foreground: 0 0% 100%;
 
+    /* Text-safe variants. --success/--warning/--destructive are FILL colours,
+       designed to carry white text. As foreground text on a light ground they
+       measure 3.33, 2.79 and 3.78 against the 4.5 floor, so they fail. These are
+       darkened until they pass, keeping hue and saturation. */
+    --success-text: 142 76% 30%;
+    --warning-text: 25 95% 39%;
+    --destructive-text: 0 84% 50%;
+
     /* Brand color tints for better visibility */
     --navy-50: 209 71% 97%;
     --navy-100: 209 71% 90%;
@@ -131,6 +139,12 @@
     --success: 142 76% 41%;
     --warning: 25 95% 58%;
     --info: 187 100% 40%;
+
+    /* Lightened for the dark ground rather than reused: the light-mode text
+       variants measure below 2:1 against hsl(209 71% 10%). */
+    --success-text: 142 76% 45%;
+    --warning-text: 25 95% 55%;
+    --destructive-text: 0 84% 65%;
 
     --sidebar-background: 209 71% 12%;
     --sidebar-accent: 187 100% 40%;
