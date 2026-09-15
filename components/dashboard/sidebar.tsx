@@ -119,30 +119,25 @@ function SidebarHeader() {
   return (
     <Link
       href="/"
-      className="flex h-11 shrink-0 items-center gap-2.5 rounded-lg px-[13px] text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+      className="flex h-12 shrink-0 items-center rounded-lg px-[11px] text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
       aria-label="Gingerly home"
     >
-      {/* A diamond stands in for the mark at rail width, because the lockup is
-          3.45:1 and would be illegible squeezed into 68px. It is drawn in CSS
-          rather than cut from the logo asset, so if the brand mark changes this
-          is a second place to update — worth replacing with a square-format
-          asset when one exists. */}
-      <span
-        aria-hidden="true"
-        className="h-[18px] w-[18px] shrink-0 rotate-45 rounded-[3px] border-2 border-current"
-      />
-      <AnimatePresence initial={false}>
-        {expanded ? (
-          <motion.span
-            initial={reduceMotion ? false : { opacity: 0, x: -4 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -4 }}
-            transition={{ duration: reduceMotion ? 0 : 0.15 }}
-          >
-            <Wordmark className="h-[18px]" />
-          </motion.span>
-        ) : null}
-      </AnimatePresence>
+      {/* Collapsed shows the diamond alone, cut from the same asset by
+          Wordmark's markOnly crop rather than redrawn — the full lockup is
+          3.45:1 and illegible in a 68px rail. */}
+      {expanded ? (
+        <motion.span
+          key="full"
+          initial={reduceMotion ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: reduceMotion ? 0 : 0.15 }}
+          className="flex items-center"
+        >
+          <Wordmark className="h-8" />
+        </motion.span>
+      ) : (
+        <Wordmark className="h-8" markOnly />
+      )}
     </Link>
   )
 }
