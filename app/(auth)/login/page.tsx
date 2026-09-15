@@ -14,6 +14,7 @@ import { AuthInput } from '@/components/auth/auth-input'
 import { AuthPasswordInput } from '@/components/auth/auth-password-input'
 import { Label } from '@/components/ui/label'
 import { AuthDivider } from '@/components/auth/auth-divider'
+import { SocialAuthButtons } from '@/components/auth/social-auth-buttons'
 import { loginSchema, type LoginFormData } from '@/lib/validations'
 import { useLogin } from '@/lib/hooks/api'
 import type { LoginType } from '@/lib/api/types'
@@ -64,7 +65,10 @@ export default function LoginPage() {
 
       <RoleToggle value={loginType} onChange={handleLoginTypeChange} />
 
-      {/* Form */}
+      <SocialAuthButtons action="Sign in" />
+
+      <AuthDivider>or continue with email</AuthDivider>
+
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-4">
           <div className="space-y-2">
@@ -116,16 +120,25 @@ export default function LoginPage() {
           )}
         </Button>
 
-        <AuthDivider>or create an account</AuthDivider>
-
-        <div className="grid grid-cols-2 gap-3">
-          <Button variant="outline" asChild className="h-12 rounded-xl text-[15px]">
-            <Link href="/signup?type=tenant">As Tenant</Link>
-          </Button>
-          <Button variant="outline" asChild className="h-12 rounded-xl text-[15px]">
-            <Link href="/signup?type=landlord">As Landlord</Link>
-          </Button>
-        </div>
+        {/* Only one divider on this page: the one above the email form. A second
+            rule here would read as another choice of equal weight, when these
+            are just links onward to signup. */}
+        <p className="text-center text-sm text-muted-foreground">
+          New to Gingerly? Create an account as{' '}
+          <Link
+            href="/signup?type=tenant"
+            className="font-medium text-foreground underline underline-offset-4"
+          >
+            a tenant
+          </Link>{' '}
+          or{' '}
+          <Link
+            href="/signup?type=landlord"
+            className="font-medium text-foreground underline underline-offset-4"
+          >
+            a landlord
+          </Link>
+        </p>
       </form>
     </div>
   )
