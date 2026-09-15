@@ -143,7 +143,6 @@ export function TenantSignupForm({ step, onStepChange }: TenantSignupFormProps) 
                 aria-describedby={errors.password ? 'password-error' : undefined}
                 {...register('password')}
               />
-              <PasswordStrengthIndicator password={password || ''} />
               <FieldError id="password-error" message={errors.password?.message} />
             </div>
             <div className="space-y-2">
@@ -159,6 +158,7 @@ export function TenantSignupForm({ step, onStepChange }: TenantSignupFormProps) 
               <FieldError id="confirm_password-error" message={errors.confirm_password?.message} />
             </div>
           </div>
+          <PasswordStrengthIndicator password={password || ''} />
           <Button type="button" onClick={goToStepTwo} className="h-12 rounded-xl text-[15px] w-full">
             Continue
             <Icon name="ChevronRight" className="ml-2 h-4 w-4" />

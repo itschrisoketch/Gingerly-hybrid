@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Progress } from "@/components/ui/progress"
-import { CheckCircle2, XCircle } from "lucide-react"
+import { Icon } from "@/components/ui/icon"
 
 interface PasswordStrengthIndicatorProps {
   password: string
@@ -66,16 +66,16 @@ export function PasswordStrengthIndicator({ password }: PasswordStrengthIndicato
       </div>
       <div className="space-y-1">
         <p className="text-xs text-muted-foreground">Password requirements:</p>
-        <div className="grid grid-cols-1 gap-1 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-x-4 gap-y-1.5 sm:grid-cols-2">
           {requirements.map((requirement, index) => (
-            <div key={index} className="flex items-center gap-1">
+            <div key={index} className="flex items-center gap-1.5">
               {requirement.regex.test(password) ? (
-                <CheckCircle2 className="h-3 w-3 text-green-500" />
+                <Icon name="CheckCircle2" className="h-3.5 w-3.5 shrink-0 text-green-600" />
               ) : (
-                <XCircle className="h-3 w-3 text-muted-foreground" />
+                <Icon name="Circle" className="h-3.5 w-3.5 shrink-0 text-muted-foreground/40" />
               )}
               <span
-                className={`text-xs ${requirement.regex.test(password) ? "text-green-500" : "text-muted-foreground"}`}
+                className={`text-xs ${requirement.regex.test(password) ? "text-green-600" : "text-muted-foreground"}`}
               >
                 {requirement.text}
               </span>

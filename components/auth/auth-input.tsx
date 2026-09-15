@@ -52,6 +52,13 @@ const AuthInput = React.forwardRef<HTMLInputElement, AuthInputProps>(
             'w-full min-w-0 bg-transparent text-[15px] text-foreground outline-none',
             'placeholder:text-muted-foreground/50',
             'disabled:cursor-not-allowed',
+            // globals.css @layer utilities has a bare `:focus-visible` rule
+            // applying `ring-2 ring-primary/40 ring-offset-2`. On focus that
+            // painted a second, offset navy ring *inside* this container — the
+            // stray box people were seeing on click. These cancel it at
+            // specificity (0,2,0), which outranks the bare rule's (0,1,0).
+            // Focus is shown by the container, once.
+            'focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0',
           )}
           {...props}
         />
