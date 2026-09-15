@@ -481,16 +481,65 @@ And extend the `body` class list:
 
 Leave `--font-sans` on line 85 **unchanged**.
 
-- [ ] **Step 4: Expose the fonts to Tailwind**
+- [ ] **Step 4: Expose the fonts and brand colours to Tailwind**
 
-In `tailwind.config.ts`, inside `theme.extend`, add:
+`tailwind.config.ts` currently defines **no** `fontFamily` and **no** `navy`/`teal` colours,
+so `bg-navy-500` and `text-teal-100` presently produce nothing at all. Both are required by
+Tasks 3 and 4.
+
+Inside `theme.extend`, add `fontFamily` — note it deliberately does **not** define `sans`:
 
 ```ts
       fontFamily: {
-        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        // `sans` is intentionally absent. With no fontFamily.sans defined, Tailwind's
+        // `font-sans` resolves to its default system stack, which is what the dashboard
+        // renders today. Adding `sans: var(--font-sans)` here would switch the whole
+        // dashboard to Jost — a change this work must not make.
         body: ["var(--font-body)", "system-ui", "sans-serif"],
         display: ["var(--font-display)", "Georgia", "serif"],
       },
+```
+
+And inside the existing `theme.extend.colors` object, add the two brand scales:
+
+```ts
+  			navy: {
+  				'50': 'hsl(var(--navy-50))',
+  				'100': 'hsl(var(--navy-100))',
+  				'500': 'hsl(var(--navy-500))',
+  				'600': 'hsl(var(--navy-600))'
+  			},
+  			teal: {
+  				'50': 'hsl(var(--teal-50))',
+  				'100': 'hsl(var(--teal-100))',
+  				'500': 'hsl(var(--teal-500))',
+  				'600': 'hsl(var(--teal-600))'
+  			},
+```
+
+This is purely additive: no existing code uses these class names.
+
+- [ ] **Step 4b: Scope the auth fonts past the base layer**
+
+`app/globals.css` sets an explicit `font-family: var(--font-sans)` on `p`, `h1`–`h6`,
+`input`, `textarea` and `select` inside `@layer base`. An explicit element rule beats
+inheritance, so putting `font-body` on a wrapper div does **not** restyle any of that text —
+without this step the auth pages silently render in Jost and the entire brand-continuity
+goal fails.
+
+Append inside the existing `@layer base` block in `app/globals.css`:
+
+```css
+  /* The auth shell opts out of the global Jost element rules above. Specificity
+     (0,1,1) beats the bare element selectors (0,0,1), so these win without !important. */
+  [data-auth-shell] :is(h1, h2, h3, h4, h5, h6, p, input, textarea, select, button, label) {
+    font-family: var(--font-body);
+  }
+
+  [data-auth-shell] .font-display,
+  [data-auth-shell] :is(h1, h2, h3, h4, h5, h6) .font-display {
+    font-family: var(--font-display);
+  }
 ```
 
 - [ ] **Step 5: Verify the dashboard is untouched**
@@ -505,10 +554,12 @@ Open `http://localhost:3000/dashboard/landlord`. Expected: renders in Jost exact
 
 ```bash
 git add app/layout.tsx app/globals.css tailwind.config.ts
-git commit -m "feat(design): add Inter Tight and Instrument Serif, align teal to landing
+git commit -m "feat(design): add Inter Tight and Instrument Serif, wire brand colours
 
-Scoped as --font-body/--font-display; --font-sans (Jost) untouched so the
-dashboard is unaffected. Removes maximumScale viewport zoom lock.
+Scoped as --font-body/--font-display; fontFamily.sans deliberately undefined
+so the dashboard keeps its current rendering. Adds the navy/teal Tailwind
+scales (previously missing despite CLAUDE.md) and a [data-auth-shell] rule so
+auth text escapes the global Jost element rules. Removes the viewport zoom lock.
 
 Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
 ```
@@ -564,7 +615,9 @@ interface AuthHeadingProps {
 export function AuthHeading({ children, accent, description, className }: AuthHeadingProps) {
   return (
     <div className={cn('space-y-2', className)}>
-      <h1 className="text-3xl leading-tight text-navy-500 [text-wrap:balance]">
+      {/* font-normal is explicit: globals.css @layer base applies `font-bold` to every
+          h1, which is heavier than this display treatment intends. */}
+      <h1 className="text-3xl font-normal leading-tight text-navy-500 [text-wrap:balance]">
         {children}{' '}
         <span className="font-display italic font-normal">{accent}</span>
       </h1>
@@ -623,7 +676,10 @@ import { Icon } from '@/components/ui/icon'
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen font-body lg:grid lg:grid-cols-[1fr_minmax(420px,45%)]">
+    <div
+      data-auth-shell
+      className="min-h-screen font-body lg:grid lg:grid-cols-[1fr_minmax(420px,45%)]"
+    >
       <main className="flex flex-col px-6 py-10 sm:px-10 lg:px-16 lg:py-14">
         {/* Mobile-only wordmark; the panel below lg is hidden. */}
         <div className="flex items-center gap-2 lg:hidden">
@@ -778,17 +834,48 @@ export function StepProgress({ current, total }: { current: number; total: numbe
 }
 ```
 
-- [ ] **Step 4: Type-check and commit**
+- [ ] **Step 4: Repair all 28 existing FieldError call sites**
+
+Making `id` required breaks every existing caller: **11 in
+`components/auth/tenant-signup-form.tsx` and 17 in
+`components/auth/landlord-signup-form.tsx`**. The Global Constraints require
+`tsc --noEmit` to pass at every commit, so this task fixes them rather than deferring.
+
+This step is mechanical only — add the `id` prop, change nothing else. The `autoComplete`
+and `aria-describedby` work belongs to Task 6.
+
+List every call site first:
+
+```bash
+grep -n "FieldError" components/auth/tenant-signup-form.tsx components/auth/landlord-signup-form.tsx
+```
+
+For each one, add an `id` matching the field name it reports on:
+
+```tsx
+// before
+<FieldError message={errors.first_name?.message} />
+// after
+<FieldError id="first_name-error" message={errors.first_name?.message} />
+```
+
+The id convention is `<field_name>-error`, matching what Tasks 5-7 point
+`aria-describedby` at. Do not restyle, reorder, or otherwise touch these forms here.
+
+- [ ] **Step 5: Type-check and commit**
 
 ```bash
 pnpm exec tsc --noEmit
 ```
-
-`FieldError` now requires an `id`, so existing call sites in the signup forms will fail type-checking. That is expected and is fixed in Task 6 — if you need a green tree at this commit, do Task 6 before committing.
+Expected: no errors. If any `FieldError` call still lacks an `id`, this fails — fix it
+before committing.
 
 ```bash
-git add components/auth/field-error.tsx components/auth/role-toggle.tsx components/auth/step-progress.tsx
+git add components/auth/field-error.tsx components/auth/role-toggle.tsx components/auth/step-progress.tsx components/auth/tenant-signup-form.tsx components/auth/landlord-signup-form.tsx
 git commit -m "feat(auth): add accessible field error, role toggle and step progress
+
+FieldError now requires an id so inputs can reference it via aria-describedby;
+all 28 existing call sites updated to keep the type check green.
 
 Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
 ```
@@ -947,7 +1034,7 @@ Keep the `Suspense` boundary and `TOTAL_STEPS` exactly as they are.
 
 - [ ] **Step 2: Fix every FieldError call site**
 
-`FieldError` now requires `id` (Task 4). In **both** signup forms, every call changes shape. For each field, give the input the ARIA pair and the error the matching id — e.g. for `first_name`:
+Task 4 already added the required `id` to all 28 `FieldError` calls. This step adds what Task 4 deliberately left out: `autoComplete` on each input, plus the `aria-invalid`/`aria-describedby` pair pointing at the id that is already there. For `first_name`:
 
 ```tsx
               <Input
