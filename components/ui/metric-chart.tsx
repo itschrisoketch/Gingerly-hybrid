@@ -8,10 +8,14 @@ import * as React from 'react'
  * Written here rather than vendored: the card that consumes it shipped without
  * this module, so there was nothing to copy.
  *
- * Hand-drawn SVG rather than Recharts. The chart sits inside an absolutely
- * positioned region behind the card's text, bleeds off both edges, and needs
- * keyboard-addressable points — three things that fight Recharts'
- * ResponsiveContainer harder than drawing two paths is worth.
+ * Hand-drawn SVG rather than Recharts: the chart needs keyboard-addressable
+ * points and a fixed-height band that stretches to any width, which fight
+ * Recharts' ResponsiveContainer harder than drawing two paths is worth.
+ *
+ * The active point is owned by the card, not held here, so the card's headline
+ * can report the value being inspected. This replaced a floating tooltip that
+ * was pinned to the same corner as the card's period select and collided with
+ * it at every width.
  *
  * Accessibility, per the chart guidance: points are reachable by keyboard, not
  * hover alone, and the whole series is exposed as a real table to assistive tech
@@ -92,19 +96,23 @@ function smoothPath(pts: { x: number; y: number }[]): string {
 export function MetricChart({
   series,
   view,
-  defaultIndex,
+  activeIndex,
+  onInspect,
   valueFormatter,
   dateFormatter,
 }: {
   series: ChartSeries[]
   view: ChartView
-  defaultIndex: number
+  /** Which point is highlighted. Owned by the card, so the headline can follow it. */
+  activeIndex: number
+  /** Index being inspected, or null when the pointer leaves and focus is lost. */
+  onInspect: (index: number | null) => void
   valueFormatter: (n: number) => string
   dateFormatter: (d: string) => string
 }) {
   const primary = series[0]
   const count = primary?.data.length ?? 0
-  const [active, setActive] = React.useState(Math.min(defaultIndex, Math.max(count - 1, 0)))
+  const active = Math.min(Math.max(activeIndex, 0), Math.max(count - 1, 0))
 
   const all = series.flatMap((s) => s.data.map((d) => d.value))
   const max = all.length ? Math.max(...all) : 0
@@ -119,7 +127,6 @@ export function MetricChart({
 
   if (!primary || count < 2) return null
 
-  const activePoint = primary.data[active]
   const activeXY = toXY(primary.data)[active]
 
   return (
@@ -195,25 +202,24 @@ export function MetricChart({
         }}
       />
 
-      <p
-        className="pointer-events-none absolute right-3 top-3 rounded-md bg-card/95 px-2 py-1 text-right text-xs tabular-nums shadow-sm"
-        aria-hidden="true"
-      >
-        <span className="block font-medium text-foreground">
-          {valueFormatter(activePoint.value)}
-        </span>
-        <span className="block text-muted-foreground">{dateFormatter(activePoint.date)}</span>
-      </p>
-
       {/* One focusable stop per point: the chart guidance requires the values be
           reachable without a pointer, and hover alone excludes keyboard users. */}
-      <div className="pointer-events-auto absolute inset-0 flex">
+      <div
+        className="pointer-events-auto absolute inset-0 flex"
+        onMouseLeave={() => onInspect(null)}
+      >
         {primary.data.map((d, i) => (
           <button
             key={i}
             type="button"
-            onMouseEnter={() => setActive(i)}
-            onFocus={() => setActive(i)}
+            onMouseEnter={() => onInspect(i)}
+            onFocus={() => onInspect(i)}
+            onBlur={(e) => {
+              // Release only once focus has left the chart entirely.
+              if (!e.currentTarget.parentElement?.contains(e.relatedTarget as Node)) {
+                onInspect(null)
+              }
+            }}
             aria-label={`${dateFormatter(d.date)}: ${valueFormatter(d.value)}`}
             className="h-full flex-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/50"
           />
