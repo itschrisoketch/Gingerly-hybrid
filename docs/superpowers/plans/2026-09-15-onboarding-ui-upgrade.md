@@ -609,6 +609,12 @@ Create `components/auth/auth-heading.tsx`:
 ```tsx
 import { cn } from '@/lib/utils'
 
+// Colour note: this uses the semantic `foreground`/`accent` tokens rather than the
+// fixed `navy-*`/`teal-*` brand scales. globals.css does NOT redefine --navy-* or
+// --teal-* inside `.dark`, so `text-navy-500` would render near-black text on the
+// near-black dark background. The brand panel keeps `bg-navy-500` deliberately: it is
+// a constant branded surface carrying white text, which reads correctly in both themes.
+
 interface AuthHeadingProps {
   /** Leading text, set in the body sans. */
   children: React.ReactNode
@@ -623,7 +629,7 @@ export function AuthHeading({ children, accent, description, className }: AuthHe
     <div className={cn('space-y-2', className)}>
       {/* font-normal is explicit: globals.css @layer base applies `font-bold` to every
           h1, which is heavier than this display treatment intends. */}
-      <h1 className="text-3xl font-normal leading-tight text-navy-500 [text-wrap:balance]">
+      <h1 className="text-3xl font-normal leading-tight text-foreground [text-wrap:balance]">
         {children}{' '}
         <span className="font-display italic font-normal">{accent}</span>
       </h1>
@@ -689,8 +695,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <main className="flex flex-col px-6 py-10 sm:px-10 lg:px-16 lg:py-14">
         {/* Mobile-only wordmark; the panel below lg is hidden. */}
         <div className="flex items-center gap-2 lg:hidden">
-          <Icon name="Building2" className="h-6 w-6 text-navy-500" />
-          <span className="text-lg font-medium tracking-tight text-navy-500">Gingerly</span>
+          <Icon name="Building2" className="h-6 w-6 text-foreground" />
+          <span className="text-lg font-medium tracking-tight text-foreground">Gingerly</span>
         </div>
 
         <div className="flex flex-1 items-center justify-center py-10">
@@ -827,7 +833,7 @@ export function StepProgress({ current, total }: { current: number; total: numbe
             key={i}
             className={
               'h-1 flex-1 rounded-full transition-colors duration-300 ' +
-              (i < current ? 'bg-teal-500' : 'bg-muted')
+              (i < current ? 'bg-accent' : 'bg-muted')
             }
           />
         ))}
