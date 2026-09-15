@@ -23,58 +23,38 @@ export const sampleCollection = {
   collected: 2_385_000,
   unitsTotal: 42,
   unitsPaid: 34,
+  /** Past the due date. */
+  unitsLate: 4,
+  /** Not yet due this period. */
+  unitsDue: 4,
   /** Days remaining in the collection window. */
   daysLeft: 6,
 }
 
-export interface ArrearsRow {
+export type TxStatus = 'paid' | 'pending' | 'failed'
+export type TxMethod = 'M-Pesa' | 'Bank transfer' | 'Card'
+
+export interface Transaction {
   id: string
+  tenant: string
   unit: string
   property: string
-  tenant: string
   amount: number
-  daysLate: number
-  /** Last time anyone contacted this tenant, ISO date, or null if never. */
-  lastContacted: string | null
+  method: TxMethod
+  status: TxStatus
+  /** ISO timestamp. */
+  at: string
+  /** Present on failures, so the row can say what to do about it. */
+  note?: string
 }
 
-export const sampleArrears: ArrearsRow[] = [
-  {
-    id: '1',
-    unit: 'B4',
-    property: 'Brookside Apartments',
-    tenant: 'Peter Njoroge',
-    amount: 85_000,
-    daysLate: 19,
-    lastContacted: '2026-09-09',
-  },
-  {
-    id: '2',
-    unit: 'A2',
-    property: 'Brookside Apartments',
-    tenant: 'Grace Wanjiku',
-    amount: 72_000,
-    daysLate: 12,
-    lastContacted: null,
-  },
-  {
-    id: '3',
-    unit: '14',
-    property: 'Kileleshwa Court',
-    tenant: 'Samuel Otieno',
-    amount: 68_000,
-    daysLate: 9,
-    lastContacted: '2026-09-12',
-  },
-  {
-    id: '4',
-    unit: '7C',
-    property: 'Riverside Gardens',
-    tenant: 'Mercy Achieng',
-    amount: 55_000,
-    daysLate: 4,
-    lastContacted: '2026-09-13',
-  },
+export const sampleTransactions: Transaction[] = [
+  { id: 't1', tenant: 'Grace Wanjiku', unit: 'A2', property: 'Brookside Apartments', amount: 72_000, method: 'M-Pesa', status: 'paid', at: '2026-09-15T09:12:00Z' },
+  { id: 't2', tenant: 'Daniel Kimani', unit: '9', property: 'Kileleshwa Court', amount: 64_000, method: 'M-Pesa', status: 'paid', at: '2026-09-15T07:48:00Z' },
+  { id: 't3', tenant: 'Peter Njoroge', unit: 'B4', property: 'Brookside Apartments', amount: 85_000, method: 'Bank transfer', status: 'failed', at: '2026-09-14T16:20:00Z', note: 'Insufficient funds' },
+  { id: 't4', tenant: 'Mercy Achieng', unit: '7C', property: 'Riverside Gardens', amount: 55_000, method: 'M-Pesa', status: 'pending', at: '2026-09-14T14:05:00Z' },
+  { id: 't5', tenant: 'Samuel Otieno', unit: '14', property: 'Kileleshwa Court', amount: 68_000, method: 'Card', status: 'paid', at: '2026-09-14T11:32:00Z' },
+  { id: 't6', tenant: 'Alice Muthoni', unit: 'C1', property: 'Riverside Gardens', amount: 60_000, method: 'M-Pesa', status: 'paid', at: '2026-09-13T18:55:00Z' },
 ]
 
 export const samplePortfolio = {

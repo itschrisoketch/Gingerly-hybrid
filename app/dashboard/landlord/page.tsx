@@ -1,41 +1,46 @@
 import Link from 'next/link'
 import { Icon } from '@/components/ui/icon'
-import { CollectionSummary } from '@/components/dashboard/collection-summary'
-import { ArrearsList } from '@/components/dashboard/arrears-list'
 import { DashboardMetrics } from '@/components/dashboard/dashboard-metrics'
+import { RecentTransactions } from '@/components/dashboard/recent-transactions'
+import { formatKes } from '@/lib/format'
 import {
   IS_SAMPLE_DATA,
-  sampleArrears,
   sampleCollection,
   sampleCollectionTrend,
   sampleOccupancyTrend,
   samplePortfolio,
+  sampleTransactions,
 } from '@/lib/dashboard/sample-data'
 
 /**
  * Agent dashboard.
  *
- * Ordered by what gets acted on: outstanding rent, then the units behind it,
- * then the trends that give them context. The previous version opened with a
- * congratulatory banner and four matching stat tiles, which is the arrangement
- * every admin template ships with and answers no question the agent has.
+ * Metrics lead, then the payment ledger, then portfolio reference figures.
  *
- * The four tabs are gone. Two of them, Properties and Tenants, pointed at the
- * same destinations as the sidebar, so the page was competing with the app's own
- * navigation.
+ * The page deliberately does not stack four identically-styled panels: the
+ * metric cards carry their own charts, the ledger is a bordered list, and the
+ * portfolio is plain text on the page ground with no container at all. Weight
+ * comes from what each section is, not from giving everything the same box.
  */
 export default function LandlordDashboard() {
   const { landlords, properties, units, occupied } = samplePortfolio
+  const outstanding = Math.max(sampleCollection.expected - sampleCollection.collected, 0)
 
   return (
     <div className="space-y-6">
       {IS_SAMPLE_DATA ? <SampleDataNotice /> : null}
 
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">Dashboard</h1>
-          <p className="text-sm text-muted-foreground">
-            Rent collection across {properties} properties
+          {/* The one line of context that matters, stated once, rather than a
+              panel of its own: what is still owed and how long is left. */}
+          <p className="mt-1 text-sm text-muted-foreground">
+            <span className="font-medium text-foreground tabular-nums">
+              {formatKes(outstanding)}
+            </span>{' '}
+            outstanding in {sampleCollection.periodLabel} &middot;{' '}
+            <span className="tabular-nums">{sampleCollection.daysLeft}</span> days left
           </p>
         </div>
 
@@ -57,10 +62,6 @@ export default function LandlordDashboard() {
         </div>
       </header>
 
-      <CollectionSummary {...sampleCollection} />
-
-      <ArrearsList rows={sampleArrears} />
-
       <DashboardMetrics
         collectionTrend={sampleCollectionTrend}
         occupancyTrend={sampleOccupancyTrend}
@@ -68,47 +69,30 @@ export default function LandlordDashboard() {
         units={units}
       />
 
-      {/* Portfolio reads as one strip rather than four matching tiles. These are
-          reference figures, not decisions; a bordered card each would claim a
-          weight they do not have. */}
-      <section
-        aria-labelledby="portfolio-heading"
-        className="rounded-2xl border border-border bg-card p-5 sm:p-6"
-      >
-        <h2 id="portfolio-heading" className="text-base font-semibold text-foreground">
+      <RecentTransactions rows={sampleTransactions} />
+
+      {/* No container. These are reference figures an agent glances at, not a
+          section they work in, and a bordered panel would claim otherwise. */}
+      <section aria-labelledby="portfolio-heading" className="px-1">
+        <h2 id="portfolio-heading" className="sr-only">
           Portfolio
         </h2>
-        <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-5 sm:grid-cols-4">
+        <dl className="flex flex-wrap items-baseline gap-x-8 gap-y-3 border-t border-border pt-5">
           <PortfolioFigure label="Landlords" value={landlords} />
           <PortfolioFigure label="Properties" value={properties} />
           <PortfolioFigure label="Units" value={units} />
-          <PortfolioFigure label="Occupied" value={occupied} note={`${units - occupied} vacant`} />
+          <PortfolioFigure label="Occupied" value={`${occupied} of ${units}`} />
         </dl>
       </section>
     </div>
   )
 }
 
-function PortfolioFigure({
-  label,
-  value,
-  note,
-}: {
-  label: string
-  value: number
-  note?: string
-}) {
+function PortfolioFigure({ label, value }: { label: string; value: string | number }) {
   return (
-    <div>
+    <div className="flex items-baseline gap-2">
       <dt className="text-sm text-muted-foreground">{label}</dt>
-      <dd className="mt-0.5 text-2xl font-semibold text-foreground tabular-nums">
-        {value}
-        {note ? (
-          <span className="ml-2 align-middle text-sm font-normal text-muted-foreground">
-            {note}
-          </span>
-        ) : null}
-      </dd>
+      <dd className="text-sm font-medium text-foreground tabular-nums">{value}</dd>
     </div>
   )
 }
@@ -117,8 +101,7 @@ function PortfolioFigure({
  * Visible for as long as the figures are invented.
  *
  * A plausible number on a rent dashboard is indistinguishable from a real one,
- * and what rides on the difference is somebody's housing. This says so plainly
- * and disappears when lib/dashboard/sample-data.ts does.
+ * and what rides on the difference is somebody's housing.
  */
 function SampleDataNotice() {
   return (
