@@ -2,10 +2,12 @@ import Link from 'next/link'
 import { Icon } from '@/components/ui/icon'
 import { DashboardMetrics } from '@/components/dashboard/dashboard-metrics'
 import { RecentTransactions } from '@/components/dashboard/recent-transactions'
+import { CollectionMixChart } from '@/components/dashboard/collection-mix-chart'
 import { formatKes } from '@/lib/format'
 import {
   IS_SAMPLE_DATA,
   sampleCollection,
+  sampleCollectionMix,
   sampleCollectionTrend,
   sampleOccupancyTrend,
   samplePortfolio,
@@ -68,6 +70,8 @@ export default function LandlordDashboard() {
         occupied={occupied}
         units={units}
       />
+
+      <CollectionMixChart data={sampleCollectionMix} />
 
       <RecentTransactions rows={sampleTransactions} />
 
