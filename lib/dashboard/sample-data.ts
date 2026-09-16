@@ -95,3 +95,34 @@ export const sampleOccupancyTrend = [
   { value: 39, date: 'Aug 2026' },
   { value: 39, date: 'Sep 2026' },
 ]
+
+/**
+ * Collection composition by month, in KES.
+ *
+ * Each month sums to the rent that was due, split by how it actually arrived.
+ * This is the portfolio's health in one shape: a widening `late` band is the
+ * leading indicator that a portfolio is drifting, and it shows up here months
+ * before it shows up in a total, because the total can stay flat while the money
+ * arrives later and later.
+ */
+export interface CollectionMixPoint {
+  month: string
+  onTime: number
+  late: number
+  unpaid: number
+}
+
+export const sampleCollectionMix: CollectionMixPoint[] = [
+  { month: '2025-10', onTime: 1_760_000, late: 220_000, unpaid: 120_000 },
+  { month: '2025-11', onTime: 1_810_000, late: 240_000, unpaid: 110_000 },
+  { month: '2025-12', onTime: 1_690_000, late: 430_000, unpaid: 180_000 },
+  { month: '2026-01', onTime: 1_640_000, late: 300_000, unpaid: 260_000 },
+  { month: '2026-02', onTime: 1_920_000, late: 290_000, unpaid: 130_000 },
+  { month: '2026-03', onTime: 2_010_000, late: 295_000, unpaid: 105_000 },
+  { month: '2026-04', onTime: 1_880_000, late: 300_000, unpaid: 160_000 },
+  { month: '2026-05', onTime: 2_090_000, late: 330_000, unpaid: 120_000 },
+  { month: '2026-06', onTime: 2_020_000, late: 370_000, unpaid: 150_000 },
+  { month: '2026-07', onTime: 2_100_000, late: 410_000, unpaid: 130_000 },
+  { month: '2026-08', onTime: 1_990_000, late: 470_000, unpaid: 180_000 },
+  { month: '2026-09', onTime: 1_915_000, late: 470_000, unpaid: 555_000 },
+]
