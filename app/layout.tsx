@@ -1,6 +1,6 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
-import { Jost, Inter_Tight, Instrument_Serif } from "next/font/google"
+import { Jost, Poppins, Instrument_Serif } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { SidebarProvider } from "@/components/sidebar-provider"
@@ -15,10 +15,15 @@ const fontSans = Jost({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 })
 
-const fontBody = Inter_Tight({
+// Poppins is not a variable font, so every weight the UI uses must be listed
+// explicitly: 300 for the light headline treatment, 400/500 for body and labels,
+// 600/700 for emphasis. A weight left out here is synthesised by the browser and
+// looks smeared.
+const fontBody = Poppins({
   subsets: ["latin"],
   variable: "--font-body",
   display: "swap",
+  weight: ["300", "400", "500", "600", "700"],
 })
 
 const fontDisplay = Instrument_Serif({

@@ -49,14 +49,19 @@ belongs with the wider dashboard work. Until then, actions take their colour fro
 
 | Role | Face | Token | Notes |
 |---|---|---|---|
-| Body | Inter Tight | `--font-body` | Neutral grotesque; carries UI text |
+| Body | Poppins | `--font-body` | Geometric sans; carries UI text. Weights 300/400/500/600/700 loaded explicitly — Poppins is not variable |
 | Display | Instrument Serif | `--font-display` | 400 only, normal + italic; where the brand's character lives |
 | Legacy | Jost | `--font-sans` | Still the global default; being retired |
+
+Note this no longer matches gingerly.africa, which uses Inter Tight. That
+continuity was the original goal of the auth work; the product owner chose
+Poppins app-wide on 2026-09-17 with the divergence stated. If the landing site
+moves to Poppins too, the two are back in step.
 
 **The brand face is opt-in via `data-brand-font`.** `globals.css` sets an explicit
 `font-family: var(--font-sans)` on `h1`-`h6`, `p`, `a`, `span`, `div`, `input` and
 `button` inside `@layer base`. A class on a wrapper cannot override that. Only a
-subtree carrying `data-brand-font` renders in Inter Tight. Currently: the auth
+subtree carrying `data-brand-font` renders in Poppins. Currently: the auth
 shell and the dashboard shell.
 
 Instrument Serif is used sparingly and deliberately — a single accent word in a

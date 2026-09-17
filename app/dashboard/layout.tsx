@@ -6,7 +6,7 @@ import { SidebarProvider } from "@/components/sidebar-provider"
 /**
  * Dashboard shell.
  *
- * `data-brand-font` opts this subtree into Inter Tight. It is load-bearing, not
+ * `data-brand-font` opts this subtree into Poppins. It is load-bearing, not
  * decorative: globals.css sets an explicit `font-family: var(--font-sans)` (Jost)
  * on h1-h6, p, a, span, div, input and button inside @layer base, which a class
  * on this element cannot override. The scoped rule keyed to this attribute is
