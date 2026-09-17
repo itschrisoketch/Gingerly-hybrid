@@ -18,6 +18,10 @@ import type { Transaction, TxStatus } from '@/lib/dashboard/sample-data'
  * and 2.79 against the 4.5 floor when used as foreground.
  *
  * Numbers right, text left. Every status carries a word as well as a colour.
+
+ * Rows carry no rule between them. Six dividers plus a header rule plus the card
+ * border turned a short list into a stack of horizontal lines; padding and the
+ * hover highlight separate rows without drawing anything.
  */
 
 // The dot uses bg-current so it takes the pill's text colour. That keeps it at
@@ -121,7 +125,7 @@ export function RecentTransactions({ rows }: { rows: Transaction[] }) {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody>
                 {rows.map((row) => (
                   <tr key={row.id} className="transition-colors hover:bg-muted/40">
                     <th scope="row" className="px-6 py-3.5 text-left font-normal">
@@ -159,7 +163,7 @@ export function RecentTransactions({ rows }: { rows: Transaction[] }) {
           </div>
 
           {/* Mobile: the same rows as label/value cards. */}
-          <ul className="divide-y divide-border sm:hidden">
+          <ul className="sm:hidden">
             {rows.map((row) => (
               <li key={row.id} className="space-y-2 px-5 py-4">
                 <div className="flex items-start justify-between gap-3">

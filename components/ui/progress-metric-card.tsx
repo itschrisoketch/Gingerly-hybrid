@@ -210,7 +210,7 @@ export default function ProgressMetricCard({
           <div className="h-9 w-44 animate-pulse rounded-lg bg-muted" />
           <div className={`${sz.chart} w-full animate-pulse rounded-lg bg-muted/60`} />
         </div>
-        <div className={`border-t border-border ${sz.footer}`}>
+        <div className={`bg-muted/40 ${sz.footer}`}>
           <div className="h-4 w-40 animate-pulse rounded bg-muted" />
         </div>
       </div>
@@ -313,7 +313,7 @@ export default function ProgressMetricCard({
       </div>
 
       <div
-        className={`flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-border ${sz.footer} text-sm`}
+        className={`flex flex-wrap items-center justify-between gap-x-4 gap-y-2 bg-muted/40 ${sz.footer} text-sm`}
       >
         <p>
           <span className="font-medium tabular-nums" style={{ color: color.text }}>
