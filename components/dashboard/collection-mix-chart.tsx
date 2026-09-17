@@ -124,7 +124,20 @@ export function CollectionMixChart({ data }: { data: DailyInflowPoint[] }) {
                 <stop offset="95%" stopColor="var(--color-late)" stopOpacity={0.1} />
               </linearGradient>
             </defs>
-            <CartesianGrid vertical={false} />
+            {/* Dashed, and without the line recharts draws flush across the top
+                of the plot — that one sits right under the card's own header
+                rule, so the two read as a double border rather than as a grid.
+                The generator places three evenly spaced lines and skips both the
+                top edge and the baseline. */}
+            <CartesianGrid
+              vertical={false}
+              strokeDasharray="4 4"
+              horizontalCoordinatesGenerator={({ offset }) => {
+                const top = offset?.top ?? 0
+                const height = offset?.height ?? 0
+                return [0.25, 0.5, 0.75].map((f) => top + height * f)
+              }}
+            />
             <XAxis
               dataKey="date"
               tickLine={false}
