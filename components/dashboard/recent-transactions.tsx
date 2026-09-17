@@ -18,14 +18,17 @@ import type { Transaction, TxStatus } from '@/lib/dashboard/sample-data'
  * Card, a CardHeader holding title and description in a grid with the control
  * pushed right, and CardContent below — with no rule between them.
  *
- * No grey lines inside. Rows carry no divider, because six rules plus a header
- * rule plus the card border turned a short list into a stack of horizontal
- * lines. Padding and the hover highlight separate rows without drawing anything,
- * and the header separates from the body by spacing alone.
+ * Rows are separated by a dashed rule, matching the dashed grid in the chart
+ * card beside it. Dashed reads as a lighter mark than solid at the same colour,
+ * so the list keeps its structure without the stack of hard lines it had when
+ * every row carried a solid divider. The header still separates from the body by
+ * spacing alone, and the card has no other rule inside it.
  *
- * Numbers right, text left, both tabular. Status is a word as well as a colour,
- * on the contrast-checked `-text` tokens: `--success` and `--warning` are fill
- * colours and measure 3.33 and 2.79 against the 4.5 floor when used as text.
+ * Numbers right, text left, both tabular. Status is carried by the word itself
+ * rather than a coloured dot beside it: the label already names the state, so the
+ * dot repeated it. The pill colours are the contrast-checked `-text` tokens,
+ * since `--success` and `--warning` are fill colours and measure 3.33 and 2.79
+ * against the 4.5 floor when used as text.
  */
 
 const STATUS: Record<TxStatus, { label: string; pill: string }> = {
@@ -39,13 +42,10 @@ function StatusPill({ status }: { status: TxStatus }) {
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium',
+        'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
         s.pill,
       )}
     >
-      {/* bg-current so the dot takes the label's colour: one value to keep in
-          contrast rather than two. */}
-      <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-current" />
       {s.label}
     </span>
   )
@@ -98,7 +98,10 @@ export function RecentTransactions({ rows }: { rows: Transaction[] }) {
                 </thead>
                 <tbody>
                   {rows.map((row) => (
-                    <tr key={row.id} className="transition-colors hover:bg-muted/40">
+                    <tr
+                      key={row.id}
+                      className="border-b border-dashed border-border transition-colors last:border-b-0 hover:bg-muted/40"
+                    >
                       <th scope="row" className="py-3 pr-6 text-left font-normal">
                         <span className="block font-medium text-foreground">{row.tenant}</span>
                         <span className="block text-muted-foreground">
@@ -138,7 +141,10 @@ export function RecentTransactions({ rows }: { rows: Transaction[] }) {
             {/* Below sm the same rows become label/value cards. */}
             <ul className="sm:hidden">
               {rows.map((row) => (
-                <li key={row.id} className="space-y-2 rounded-xl px-3 py-3">
+                <li
+                  key={row.id}
+                  className="space-y-2 border-b border-dashed border-border px-3 py-3 last:border-b-0"
+                >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="truncate font-medium text-foreground">{row.tenant}</p>
