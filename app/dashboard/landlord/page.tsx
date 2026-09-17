@@ -21,10 +21,13 @@ import {
  *
  * Metrics lead, then the payment ledger, then portfolio reference figures.
  *
- * Sections differ in form so the page is not one box repeated: a navy action
- * banner, two metric cards carrying their own charts, a stacked area chart, a
- * data table, and a row of portfolio tiles. Weight comes from what each section
- * is rather than from giving everything the same treatment.
+ * Order runs from what to do, to what you have, to how it is moving, to the
+ * detail: a navy action banner, portfolio tiles, two metric cards carrying their
+ * own trends, a stacked area chart, then the payments table.
+ *
+ * Sections differ in form on purpose, so the page is not one box repeated.
+ * Weight comes from what each section is rather than from giving everything the
+ * same treatment.
  */
 export default function LandlordDashboard() {
   const { landlords, properties, units, occupied } = samplePortfolio
@@ -73,6 +76,13 @@ export default function LandlordDashboard() {
         periodLabel={sampleCollection.periodLabel}
       />
 
+      <PortfolioCards
+        landlords={landlords}
+        properties={properties}
+        units={units}
+        occupied={occupied}
+      />
+
       <DashboardMetrics
         collectionTrend={sampleCollectionTrend}
         occupancyTrend={sampleOccupancyTrend}
@@ -83,13 +93,6 @@ export default function LandlordDashboard() {
       <CollectionMixChart data={sampleCollectionMix} />
 
       <RecentTransactions rows={sampleTransactions} />
-
-      <PortfolioCards
-        landlords={landlords}
-        properties={properties}
-        units={units}
-        occupied={occupied}
-      />
     </div>
   )
 }
