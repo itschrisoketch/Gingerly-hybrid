@@ -86,7 +86,7 @@ export function CollectionMixChart({ data }: { data: DailyInflowPoint[] }) {
 
   return (
     <Card className="overflow-hidden">
-      <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
+      <CardHeader className="flex items-center gap-2 space-y-0 pb-2 sm:flex-row">
         <div className="grid flex-1 gap-1">
           <CardTitle>How rent arrives</CardTitle>
           <CardDescription>Daily rent received, on time against late</CardDescription>
@@ -124,11 +124,9 @@ export function CollectionMixChart({ data }: { data: DailyInflowPoint[] }) {
                 <stop offset="95%" stopColor="var(--color-late)" stopOpacity={0.1} />
               </linearGradient>
             </defs>
-            {/* Dashed, and without the line recharts draws flush across the top
-                of the plot — that one sits right under the card's own header
-                rule, so the two read as a double border rather than as a grid.
-                The generator places three evenly spaced lines and skips both the
-                top edge and the baseline. */}
+            {/* Three dashed lines, skipping the top edge and the baseline. The
+                generator computes them from the plot offset rather than relying
+                on tick count, so the spacing holds at any height. */}
             <CartesianGrid
               vertical={false}
               strokeDasharray="4 4"
