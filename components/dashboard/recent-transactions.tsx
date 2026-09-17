@@ -1,4 +1,11 @@
 import Link from 'next/link'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { Icon } from '@/components/ui/icon'
 import { formatKes, formatRelativeTime } from '@/lib/format'
 import { cn } from '@/lib/utils'
@@ -7,42 +14,24 @@ import type { Transaction, TxStatus } from '@/lib/dashboard/sample-data'
 /**
  * Recent rent payments.
  *
- * Built to the dashboard-design table pattern: a toolbar carrying the title and
- * a row count, a real `<table>` with a proper header, divided rows with a hover
- * highlight, status as a dotted pill, amounts right-aligned and tabular, and a
- * stacked card list replacing the table below `sm`.
+ * Shares the chart card's construction so the two sections read as one system:
+ * Card, a CardHeader holding title and description in a grid with the control
+ * pushed right, and CardContent below — with no rule between them.
  *
- * Colours are the project's semantic tokens rather than the skill's raw
- * `emerald-50`/`gray-200` examples: the pills use the contrast-checked `-text`
- * variants, since `--success` and `--warning` are fill colours that measure 3.33
- * and 2.79 against the 4.5 floor when used as foreground.
+ * No grey lines inside. Rows carry no divider, because six rules plus a header
+ * rule plus the card border turned a short list into a stack of horizontal
+ * lines. Padding and the hover highlight separate rows without drawing anything,
+ * and the header separates from the body by spacing alone.
  *
- * Numbers right, text left. Every status carries a word as well as a colour.
-
- * Rows carry no rule between them. Six dividers plus a header rule plus the card
- * border turned a short list into a stack of horizontal lines; padding and the
- * hover highlight separate rows without drawing anything.
+ * Numbers right, text left, both tabular. Status is a word as well as a colour,
+ * on the contrast-checked `-text` tokens: `--success` and `--warning` are fill
+ * colours and measure 3.33 and 2.79 against the 4.5 floor when used as text.
  */
 
-// The dot uses bg-current so it takes the pill's text colour. That keeps it at
-// the same measured contrast as the label instead of being a fourth value to
-// verify, and the fill tokens were only clearing ~2.5:1 against their own tint.
-const STATUS: Record<TxStatus, { label: string; pill: string; dot: string }> = {
-  paid: {
-    label: 'Paid',
-    pill: 'bg-success/10 text-success-text',
-    dot: 'bg-current',
-  },
-  pending: {
-    label: 'Pending',
-    pill: 'bg-warning/10 text-warning-text',
-    dot: 'bg-current',
-  },
-  failed: {
-    label: 'Failed',
-    pill: 'bg-destructive/10 text-destructive-text',
-    dot: 'bg-current',
-  },
+const STATUS: Record<TxStatus, { label: string; pill: string }> = {
+  paid: { label: 'Paid', pill: 'bg-success/10 text-success-text' },
+  pending: { label: 'Pending', pill: 'bg-warning/10 text-warning-text' },
+  failed: { label: 'Failed', pill: 'bg-destructive/10 text-destructive-text' },
 }
 
 function StatusPill({ status }: { status: TxStatus }) {
@@ -54,153 +43,146 @@ function StatusPill({ status }: { status: TxStatus }) {
         s.pill,
       )}
     >
-      <span aria-hidden="true" className={cn('h-1.5 w-1.5 rounded-full', s.dot)} />
+      {/* bg-current so the dot takes the label's colour: one value to keep in
+          contrast rather than two. */}
+      <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-current" />
       {s.label}
     </span>
   )
 }
 
+const COLUMNS = ['Tenant', 'Method', 'When', 'Status'] as const
+
 export function RecentTransactions({ rows }: { rows: Transaction[] }) {
   return (
-    <section
-      aria-labelledby="tx-heading"
-      className="overflow-hidden rounded-2xl border border-border bg-card"
-    >
-      <div className="flex items-center justify-between gap-4 border-b border-border px-5 py-4 sm:px-6">
-        <div className="flex items-center gap-3">
-          <h2 id="tx-heading" className="text-base font-semibold text-foreground">
-            Recent payments
-          </h2>
-          <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground tabular-nums">
-            {rows.length}
-          </span>
+    <Card className="overflow-hidden">
+      <CardHeader className="flex items-center gap-2 space-y-0 pb-2 sm:flex-row">
+        <div className="grid flex-1 gap-1">
+          <CardTitle>Recent payments</CardTitle>
+          <CardDescription>Across all properties</CardDescription>
         </div>
         <Link
           href="/dashboard/landlord/payments"
-          className="flex h-9 shrink-0 items-center gap-1.5 rounded-lg px-3 text-sm font-medium text-accent transition-colors hover:bg-accent/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+          className="hidden h-9 shrink-0 items-center gap-1.5 rounded-lg px-3 text-sm font-medium text-accent transition-colors hover:bg-accent/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 sm:ml-auto sm:flex"
         >
           View all
           <Icon name="ArrowRight" className="h-4 w-4" />
         </Link>
-      </div>
+      </CardHeader>
 
-      {rows.length === 0 ? (
-        <EmptyState />
-      ) : (
-        <>
-          {/* Desktop: table */}
-          <div className="hidden overflow-x-auto sm:block">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border text-left">
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-muted-foreground"
-                  >
-                    Tenant
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-muted-foreground"
-                  >
-                    Method
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-muted-foreground"
-                  >
-                    When
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-muted-foreground"
-                  >
-                    Status
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground"
-                  >
-                    Amount
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((row) => (
-                  <tr key={row.id} className="transition-colors hover:bg-muted/40">
-                    <th scope="row" className="px-6 py-3.5 text-left font-normal">
-                      <span className="block font-medium text-foreground">{row.tenant}</span>
-                      <span className="block text-muted-foreground">
-                        {row.unit}, {row.property}
-                      </span>
+      <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
+        {rows.length === 0 ? (
+          <EmptyState />
+        ) : (
+          <>
+            <div className="hidden overflow-x-auto sm:block">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-left">
+                    {COLUMNS.map((h) => (
+                      <th
+                        key={h}
+                        scope="col"
+                        className="pb-3 pr-6 text-xs font-medium uppercase tracking-wider text-muted-foreground"
+                      >
+                        {h}
+                      </th>
+                    ))}
+                    <th
+                      scope="col"
+                      className="pb-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground"
+                    >
+                      Amount
                     </th>
-                    <td className="whitespace-nowrap px-6 py-3.5 text-muted-foreground">
-                      {row.method}
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-3.5 text-muted-foreground tabular-nums">
-                      {formatRelativeTime(row.at)}
-                    </td>
-                    <td className="px-6 py-3.5">
-                      <StatusPill status={row.status} />
-                      {row.note ? (
-                        <span className="mt-1 block text-xs text-muted-foreground">{row.note}</span>
-                      ) : null}
-                    </td>
-                    <td
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((row) => (
+                    <tr key={row.id} className="transition-colors hover:bg-muted/40">
+                      <th scope="row" className="py-3 pr-6 text-left font-normal">
+                        <span className="block font-medium text-foreground">{row.tenant}</span>
+                        <span className="block text-muted-foreground">
+                          {row.unit}, {row.property}
+                        </span>
+                      </th>
+                      <td className="whitespace-nowrap py-3 pr-6 text-muted-foreground">
+                        {row.method}
+                      </td>
+                      <td className="whitespace-nowrap py-3 pr-6 text-muted-foreground tabular-nums">
+                        {formatRelativeTime(row.at)}
+                      </td>
+                      <td className="py-3 pr-6">
+                        <StatusPill status={row.status} />
+                        {row.note ? (
+                          <span className="mt-1 block text-xs text-muted-foreground">
+                            {row.note}
+                          </span>
+                        ) : null}
+                      </td>
+                      <td
+                        className={cn(
+                          'whitespace-nowrap py-3 text-right font-medium tabular-nums',
+                          row.status === 'failed'
+                            ? 'text-muted-foreground line-through'
+                            : 'text-foreground',
+                        )}
+                      >
+                        {formatKes(row.amount)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Below sm the same rows become label/value cards. */}
+            <ul className="sm:hidden">
+              {rows.map((row) => (
+                <li key={row.id} className="space-y-2 rounded-xl px-3 py-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate font-medium text-foreground">{row.tenant}</p>
+                      <p className="truncate text-sm text-muted-foreground">
+                        {row.unit}, {row.property}
+                      </p>
+                    </div>
+                    <p
                       className={cn(
-                        'whitespace-nowrap px-6 py-3.5 text-right font-medium tabular-nums',
+                        'shrink-0 font-medium tabular-nums',
                         row.status === 'failed'
                           ? 'text-muted-foreground line-through'
                           : 'text-foreground',
                       )}
                     >
                       {formatKes(row.amount)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Mobile: the same rows as label/value cards. */}
-          <ul className="sm:hidden">
-            {rows.map((row) => (
-              <li key={row.id} className="space-y-2 px-5 py-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="truncate font-medium text-foreground">{row.tenant}</p>
-                    <p className="truncate text-sm text-muted-foreground">
-                      {row.unit}, {row.property}
                     </p>
                   </div>
-                  <p
-                    className={cn(
-                      'shrink-0 font-medium tabular-nums',
-                      row.status === 'failed'
-                        ? 'text-muted-foreground line-through'
-                        : 'text-foreground',
-                    )}
-                  >
-                    {formatKes(row.amount)}
-                  </p>
-                </div>
 
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-                  <StatusPill status={row.status} />
-                  <span className="text-sm text-muted-foreground tabular-nums">
-                    {row.method} &middot; {formatRelativeTime(row.at)}
-                  </span>
-                </div>
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                    <StatusPill status={row.status} />
+                    <span className="text-sm text-muted-foreground tabular-nums">
+                      {row.method} &middot; {formatRelativeTime(row.at)}
+                    </span>
+                  </div>
 
-                {row.note ? (
-                  <p className="text-sm text-muted-foreground">{row.note}</p>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
-    </section>
+                  {row.note ? <p className="text-sm text-muted-foreground">{row.note}</p> : null}
+                </li>
+              ))}
+            </ul>
+
+            {/* The header's "View all" is hidden below sm, so the link lives here
+                on a phone rather than being unreachable. */}
+            <Link
+              href="/dashboard/landlord/payments"
+              className="mt-2 flex h-11 items-center justify-center gap-1.5 rounded-xl text-sm font-medium text-accent transition-colors hover:bg-accent/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 sm:hidden"
+            >
+              View all payments
+              <Icon name="ArrowRight" className="h-4 w-4" />
+            </Link>
+          </>
+        )}
+      </CardContent>
+    </Card>
   )
 }
 
