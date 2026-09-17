@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
+import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts'
 
 import {
   ChartContainer,
@@ -18,7 +18,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { formatCompact } from '@/components/ui/metric-chart'
 import { formatKes } from '@/lib/format'
 import type { CollectionMixPoint } from '@/lib/dashboard/sample-data'
 
@@ -96,12 +95,12 @@ export function CollectionMixChart({ data }: { data: CollectionMixPoint[] }) {
 
       <div className="p-2 pt-4 sm:p-6">
         <ChartContainer config={chartConfig} className="aspect-auto h-[260px] w-full">
-          <AreaChart data={filtered} margin={{ left: 4, right: 4 }}>
+          <AreaChart data={filtered}>
             <defs>
               {(['onTime', 'late', 'unpaid'] as const).map((key) => (
                 <linearGradient key={key} id={`fill-${key}`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={`var(--color-${key})`} stopOpacity={0.7} />
-                  <stop offset="95%" stopColor={`var(--color-${key})`} stopOpacity={0.15} />
+                  <stop offset="5%" stopColor={`var(--color-${key})`} stopOpacity={0.8} />
+                  <stop offset="95%" stopColor={`var(--color-${key})`} stopOpacity={0.1} />
                 </linearGradient>
               ))}
             </defs>
@@ -114,13 +113,6 @@ export function CollectionMixChart({ data }: { data: CollectionMixPoint[] }) {
               tickMargin={8}
               minTickGap={24}
               tickFormatter={monthLabel}
-            />
-            <YAxis
-              tickLine={false}
-              axisLine={false}
-              width={44}
-              tickMargin={4}
-              tickFormatter={(v: number) => formatCompact(v)}
             />
             <ChartTooltip
               cursor={false}

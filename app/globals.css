@@ -60,10 +60,15 @@
     /* Text-safe variants. --success/--warning/--destructive are FILL colours,
        designed to carry white text. As foreground text on a light ground they
        measure 3.33, 2.79 and 3.78 against the 4.5 floor, so they fail. These are
-       darkened until they pass, keeping hue and saturation. */
-    --success-text: 142 76% 30%;
-    --warning-text: 25 95% 39%;
-    --destructive-text: 0 84% 50%;
+       darkened until they pass, keeping hue and saturation.
+
+       Tuned against the HARDEST case rather than plain white: these also sit on
+       10%-tinted status pills, where the tint lifts the ground and costs about
+       0.5 of ratio. At the plain-white-only values they measured 4.13, 4.15 and
+       3.96 on those pills. Here they clear 4.5 on the tint and 5.0+ on white. */
+    --success-text: 142 76% 28%;
+    --warning-text: 25 95% 37%;
+    --destructive-text: 0 84% 45%;
 
     /* Brand color tints for better visibility */
     --navy-50: 209 71% 97%;
