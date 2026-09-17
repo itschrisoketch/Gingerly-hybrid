@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Icon } from '@/components/ui/icon'
+import { CollectionBanner } from '@/components/dashboard/collection-banner'
 import { DashboardMetrics } from '@/components/dashboard/dashboard-metrics'
 import { RecentTransactions } from '@/components/dashboard/recent-transactions'
 import { CollectionMixChart } from '@/components/dashboard/collection-mix-chart'
@@ -63,6 +64,13 @@ export default function LandlordDashboard() {
           </Link>
         </div>
       </header>
+
+      <CollectionBanner
+        unitsLate={sampleCollection.unitsLate}
+        outstanding={outstanding}
+        daysLeft={sampleCollection.daysLeft}
+        periodLabel={sampleCollection.periodLabel}
+      />
 
       <DashboardMetrics
         collectionTrend={sampleCollectionTrend}

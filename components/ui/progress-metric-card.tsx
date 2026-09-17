@@ -1,6 +1,6 @@
 'use client'
 
-import { useId, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Icon } from '@/components/ui/icon'
 import {
   ACCENTS,
@@ -109,7 +109,6 @@ export default function ProgressMetricCard({
   loading = false,
   className = '',
 }: ProgressMetricCardProps) {
-  const gridId = `grid-${useId().replace(/:/g, '')}`
   const sz = SIZES[size]
   const shell = `flex w-full flex-col overflow-hidden rounded-2xl border border-border bg-card ${className}`
 
@@ -303,17 +302,6 @@ export default function ProgressMetricCard({
             background: `linear-gradient(to top, color-mix(in srgb, ${color.stroke} 10%, transparent), transparent 80%)`,
           }}
         />
-        <div aria-hidden="true" className="absolute inset-0 text-foreground/[0.08]">
-          <svg className="h-full w-full" aria-hidden="true">
-            <defs>
-              <pattern id={gridId} width="14" height="14" patternUnits="userSpaceOnUse">
-                <circle cx="1" cy="1" r="1" fill="currentColor" />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill={`url(#${gridId})`} />
-          </svg>
-        </div>
-
         <MetricChart
           series={chartSeries}
           view={view}
