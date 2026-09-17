@@ -9,7 +9,7 @@ import { formatKes } from '@/lib/format'
 import {
   IS_SAMPLE_DATA,
   sampleCollection,
-  sampleCollectionMix,
+  sampleDailyInflow,
   sampleCollectionTrend,
   sampleOccupancyTrend,
   samplePortfolio,
@@ -90,7 +90,7 @@ export default function LandlordDashboard() {
         units={units}
       />
 
-      <CollectionMixChart data={sampleCollectionMix} />
+      <CollectionMixChart data={sampleDailyInflow} />
 
       <RecentTransactions rows={sampleTransactions} />
     </div>
