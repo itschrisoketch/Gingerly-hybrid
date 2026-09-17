@@ -244,7 +244,7 @@
   }
 
   /* Brand-font scope. Any subtree carrying data-brand-font opts out of the global
-     Jost element rules above and renders in Inter Tight — currently the auth shell
+     Jost element rules above and renders in Poppins — currently the auth shell
      and the dashboard shell. Specificity
      (0,1,1) beats the bare element selectors (0,0,1), so these win without !important. */
   [data-brand-font] :is(h1, h2, h3, h4, h5, h6, p, input, textarea, select, button, label, a, span, div, nav, header, footer) {
