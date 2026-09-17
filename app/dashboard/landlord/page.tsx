@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Icon } from '@/components/ui/icon'
 import { CollectionBanner } from '@/components/dashboard/collection-banner'
+import { PortfolioCards } from '@/components/dashboard/portfolio-cards'
 import { DashboardMetrics } from '@/components/dashboard/dashboard-metrics'
 import { RecentTransactions } from '@/components/dashboard/recent-transactions'
 import { CollectionMixChart } from '@/components/dashboard/collection-mix-chart'
@@ -20,10 +21,10 @@ import {
  *
  * Metrics lead, then the payment ledger, then portfolio reference figures.
  *
- * The page deliberately does not stack four identically-styled panels: the
- * metric cards carry their own charts, the ledger is a bordered list, and the
- * portfolio is plain text on the page ground with no container at all. Weight
- * comes from what each section is, not from giving everything the same box.
+ * Sections differ in form so the page is not one box repeated: a navy action
+ * banner, two metric cards carrying their own charts, a stacked area chart, a
+ * data table, and a row of portfolio tiles. Weight comes from what each section
+ * is rather than from giving everything the same treatment.
  */
 export default function LandlordDashboard() {
   const { landlords, properties, units, occupied } = samplePortfolio
@@ -83,28 +84,12 @@ export default function LandlordDashboard() {
 
       <RecentTransactions rows={sampleTransactions} />
 
-      {/* No container. These are reference figures an agent glances at, not a
-          section they work in, and a bordered panel would claim otherwise. */}
-      <section aria-labelledby="portfolio-heading" className="px-1">
-        <h2 id="portfolio-heading" className="sr-only">
-          Portfolio
-        </h2>
-        <dl className="flex flex-wrap items-baseline gap-x-8 gap-y-3 border-t border-border pt-5">
-          <PortfolioFigure label="Landlords" value={landlords} />
-          <PortfolioFigure label="Properties" value={properties} />
-          <PortfolioFigure label="Units" value={units} />
-          <PortfolioFigure label="Occupied" value={`${occupied} of ${units}`} />
-        </dl>
-      </section>
-    </div>
-  )
-}
-
-function PortfolioFigure({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div className="flex items-baseline gap-2">
-      <dt className="text-sm text-muted-foreground">{label}</dt>
-      <dd className="text-sm font-medium text-foreground tabular-nums">{value}</dd>
+      <PortfolioCards
+        landlords={landlords}
+        properties={properties}
+        units={units}
+        occupied={occupied}
+      />
     </div>
   )
 }
