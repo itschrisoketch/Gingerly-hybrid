@@ -1,237 +1,206 @@
-"use client"
+'use client'
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import * as React from 'react'
+import Link from 'next/link'
+import { usePathname, useRouter } from 'next/navigation'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import {
-  Building2,
-  CreditCard,
-  Home,
-  LayoutDashboard,
-  LogOut,
-  Menu,
-  MessageSquare,
-  Settings,
-  Users,
-  X,
-  PieChart,
-  CalendarDays,
-  Bell,
-  FileText,
-  HelpCircle,
-  Sparkles
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { useSidebar } from "@/components/sidebar-provider"
-import { cn } from "@/lib/utils"
-import { ThemeToggle } from "@/components/theme-toggle"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
+  Sidebar,
+  SidebarBody,
+  SidebarLink,
+  SidebarCtx,
+  type SidebarLinkItem,
+} from '@/components/ui/sidebar-shell'
+import { Icon } from '@/components/ui/icon'
+import { Wordmark } from '@/components/wordmark'
+import { ThemeToggle } from '@/components/theme-toggle'
+import { useSidebar } from '@/components/sidebar-provider'
+import { useAuth } from '@/contexts/auth-context'
+import { cn } from '@/lib/utils'
+
+const AGENT_LINKS: SidebarLinkItem[] = [
+  { label: 'Dashboard', href: '/dashboard/landlord', icon: 'LayoutDashboard' },
+  { label: 'Properties', href: '/dashboard/landlord/properties', icon: 'Building2' },
+  { label: 'Tenants', href: '/dashboard/landlord/tenants', icon: 'Users' },
+  { label: 'Payments', href: '/dashboard/landlord/payments', icon: 'CreditCard' },
+  { label: 'Analytics', href: '/dashboard/landlord/analytics', icon: 'PieChart' },
+  { label: 'Maintenance', href: '/dashboard/landlord/maintenance', icon: 'Wrench' },
+  { label: 'Calendar', href: '/dashboard/landlord/calendar', icon: 'CalendarDays' },
+  { label: 'Messages', href: '/dashboard/landlord/messages', icon: 'MessageSquare' },
+  { label: 'Documents', href: '/dashboard/landlord/documents', icon: 'FileText' },
+  { label: 'Settings', href: '/dashboard/landlord/settings', icon: 'Settings' },
+  { label: 'Help', href: '/dashboard/landlord/help', icon: 'HelpCircle' },
+]
+
+const TENANT_LINKS: SidebarLinkItem[] = [
+  { label: 'Dashboard', href: '/dashboard/tenant', icon: 'LayoutDashboard' },
+  { label: 'My Home', href: '/dashboard/tenant/home', icon: 'Home' },
+  { label: 'Payments', href: '/dashboard/tenant/payments', icon: 'CreditCard' },
+  { label: 'Maintenance', href: '/dashboard/tenant/maintenance', icon: 'Wrench' },
+  { label: 'Calendar', href: '/dashboard/tenant/calendar', icon: 'CalendarDays' },
+  { label: 'Messages', href: '/dashboard/tenant/messages', icon: 'MessageSquare' },
+  { label: 'Documents', href: '/dashboard/tenant/documents', icon: 'FileText' },
+  { label: 'Settings', href: '/dashboard/tenant/settings', icon: 'Settings' },
+  { label: 'Help', href: '/dashboard/tenant/help', icon: 'HelpCircle' },
+]
+
+/** Best available display name across the Customer and Merchant shapes. */
+function displayName(user: unknown): string | null {
+  if (!user || typeof user !== 'object') return null
+  const u = user as Record<string, unknown>
+  const full = typeof u.full_name === 'string' ? u.full_name.trim() : ''
+  if (full) return full
+  const first = typeof u.first_name === 'string' ? u.first_name.trim() : ''
+  const last = typeof u.last_name === 'string' ? u.last_name.trim() : ''
+  const joined = [first, last].filter(Boolean).join(' ')
+  if (joined) return joined
+  return typeof u.email === 'string' && u.email ? u.email : null
+}
+
+function initials(name: string): string {
+  const parts = name.split(/[\s@.]+/).filter(Boolean)
+  return (parts[0]?.[0] ?? '') + (parts[1]?.[0] ?? '')
+}
 
 export function DashboardSidebar() {
   const pathname = usePathname()
-  const { isOpen, setIsOpen, isMobile } = useSidebar()
+  const router = useRouter()
+  const { isMobile, setIsOpen } = useSidebar()
+  const { user, logout } = useAuth()
 
-  // Determine if the current user is an agent or tenant based on the URL
-  const isAgent = pathname.includes("/landlord") // URL path remains /landlord for now
+  const isAgent = pathname.includes('/landlord')
+  const links = isAgent ? AGENT_LINKS : TENANT_LINKS
 
-  // Agent dashboard links
-  const agentLinks = [
-  
-    { name: "Landlords", href: "/dashboard/landlord", icon: Users },
-    { name: "Properties", href: "/dashboard/landlord/properties", icon: Building2 },
-    { name: "Tenants", href: "/dashboard/landlord/tenants", icon: Users },
-    { name: "Payments", href: "/dashboard/landlord/payments", icon: CreditCard },
-    { name: "Analytics", href: "/dashboard/landlord/analytics", icon: PieChart },
-    { name: "Maintenance", href: "/dashboard/landlord/maintenance", icon: Bell },
-    { name: "Calendar", href: "/dashboard/landlord/calendar", icon: CalendarDays },
-    { name: "Messages", href: "/dashboard/landlord/messages", icon: MessageSquare, badge: 3 },
-    { name: "Documents", href: "/dashboard/landlord/documents", icon: FileText },
-    { name: "Settings", href: "/dashboard/landlord/settings", icon: Settings },
-  ]
-
-  const tenantLinks = [
-    { name: "Dashboard", href: "/dashboard/tenant", icon: LayoutDashboard },
-    { name: "My Home", href: "/dashboard/tenant/home", icon: Home },
-    { name: "Payments", href: "/dashboard/tenant/payments", icon: CreditCard },
-    { name: "Maintenance", href: "/dashboard/tenant/maintenance", icon: Bell },
-    { name: "Calendar", href: "/dashboard/tenant/calendar", icon: CalendarDays },
-    { name: "Messages", href: "/dashboard/tenant/messages", icon: MessageSquare, badge: 2 },
-    { name: "Documents", href: "/dashboard/tenant/documents", icon: FileText },
-    { name: "Settings", href: "/dashboard/tenant/settings", icon: Settings },
-  ]
-
-  const links = isAgent ? agentLinks : tenantLinks
-
-  if (!isOpen && !isMobile) {
-    return (
-      <div className="hidden w-16 h-full flex-col border-r border-border/20 bg-white/95 backdrop-blur-sm md:flex shadow-lg">
-        <div className="flex h-16 items-center justify-center border-b border-border/20">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => setIsOpen(true)} 
-            className="text-foreground hover:bg-primary/10 hover:text-primary transition-all duration-200"
-          >
-            <Menu className="h-5 w-5" />
-            <span className="sr-only">Toggle sidebar</span>
-          </Button>
-        </div>
-        <nav className="flex flex-1 flex-col gap-2 p-3 pt-6 overflow-y-auto">
-          {links.map((link) => (
-            <Button 
-              key={link.href} 
-              variant="ghost" 
-              size="icon" 
-              asChild
-              className={cn(
-                "relative h-11 w-11 rounded-xl transition-all duration-200",
-                pathname === link.href ? 
-                  "bg-primary text-white shadow-md hover:bg-primary/90" : 
-                  "text-muted-foreground hover:bg-primary/10 hover:text-primary"
-              )}
-            >
-              <Link href={link.href}>
-                <link.icon className="h-5 w-5" />
-                {link.badge && (
-                  <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-[10px] bg-gradient-to-r from-red-500 to-pink-500 text-white border-0">
-                    {link.badge}
-                  </Badge>
-                )}
-                <span className="sr-only">{link.name}</span>
-              </Link>
-            </Button>
-          ))}
-        </nav>
-        <div className="flex flex-col gap-2 border-t border-border/20 p-3 pb-6">
-          <ThemeToggle />
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            asChild 
-            className="h-11 w-11 rounded-xl text-muted-foreground hover:bg-red-50 hover:text-red-500 transition-all duration-200"
-          >
-            <Link href="/logout">
-              <LogOut className="h-5 w-5" />
-              <span className="sr-only">Log out</span>
-            </Link>
-          </Button>
-        </div>
-      </div>
-    )
+  const name = displayName(user)
+  const closeOnMobile = () => {
+    if (isMobile) setIsOpen(false)
   }
 
-  if (isMobile && !isOpen) {
-    return null
+  const handleLogout = async () => {
+    closeOnMobile()
+    // The sidebar previously linked to /logout, a route that does not exist.
+    // AuthProvider.logout clears the session and redirects to /login itself.
+    await logout()
+    router.refresh()
   }
 
   return (
-    <>
-      {/* Mobile Backdrop */}
-      {isMobile && isOpen && (
-        <div 
-          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
-          onClick={() => setIsOpen(false)}
+    <Sidebar>
+      <SidebarBody>
+        <SidebarHeader />
+
+        <nav className="mt-6 flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto overflow-x-hidden">
+          {links.map((link) => (
+            <SidebarLink
+              key={link.href}
+              link={link}
+              // Exact match only: every link shares the /dashboard/<role> prefix,
+              // so startsWith would mark the dashboard root active everywhere.
+              active={pathname === link.href}
+              onNavigate={closeOnMobile}
+            />
+          ))}
+        </nav>
+
+        <SidebarFooter
+          name={name}
+          isAgent={isAgent}
+          onLogout={handleLogout}
         />
+      </SidebarBody>
+    </Sidebar>
+  )
+}
+
+function SidebarHeader() {
+  const { expanded } = React.useContext(SidebarCtx)
+  const reduceMotion = useReducedMotion()
+
+  return (
+    <Link
+      href="/"
+      className="flex h-12 shrink-0 items-center rounded-lg px-[11px] text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+      aria-label="Gingerly home"
+    >
+      {/* Collapsed shows the diamond alone, cut from the same asset by
+          Wordmark's markOnly crop rather than redrawn — the full lockup is
+          3.45:1 and illegible in a 68px rail. */}
+      {expanded ? (
+        <motion.span
+          key="full"
+          initial={reduceMotion ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: reduceMotion ? 0 : 0.15 }}
+          className="flex items-center"
+        >
+          <Wordmark className="h-8" />
+        </motion.span>
+      ) : (
+        <Wordmark className="h-8" markOnly />
       )}
-      
-      <div className={cn(
-        "fixed inset-y-0 left-0 z-50 shadow-xl md:relative md:z-0 md:h-full", 
-        isMobile ? "w-80" : "w-72",
-        "bg-white/95 backdrop-blur-xl border-r border-border/20"
-      )}>
-        <div className="flex h-16 items-center border-b border-border/20 px-4 md:px-6">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="rounded-xl bg-gradient-to-r from-primary to-accent p-2 group-hover:scale-110 transition-transform duration-200">
-              <Building2 className="h-5 w-5 text-white" />
-            </div>
-            <span className="font-bold text-lg md:text-xl gradient-text">Gingerly</span>
-          </Link>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="ml-auto text-foreground hover:bg-primary/10 hover:text-primary rounded-xl transition-all duration-200" 
-            onClick={() => setIsOpen(false)}
-          >
-            {isMobile ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            <span className="sr-only">{isMobile ? "Close sidebar" : "Toggle sidebar"}</span>
-          </Button>
-        </div>
-        
-        <div className="flex flex-1 flex-col h-[calc(100%-4rem)] overflow-hidden">
-          <div className="px-4 md:px-6 py-4 md:py-6">
-            <div className="glass-card p-3 md:p-4 rounded-2xl border border-border/20">
-              <div className="flex items-center gap-3">
-                <Avatar className="h-10 w-10 md:h-12 md:w-12 border-2 border-primary/30 shadow-md">
-                  <AvatarImage src="" />
-                  <AvatarFallback className="bg-gradient-to-r from-primary to-accent text-white font-semibold text-sm md:text-base">JD</AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm md:text-base text-foreground truncate">John Doe</p>
-                  <div className="flex items-center gap-2">
-                    <div className={cn(
-                      "px-2 py-1 rounded-full text-xs font-medium",
-                      isAgent ? "bg-navy-50 text-navy-600" : "bg-green-50 text-green-700"
-                    )}>
-                      {isAgent ? "Agent" : "Tenant"}
-                    </div>
-                    <Sparkles className="h-3 w-3 text-yellow-500 shrink-0" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <nav className="px-3 md:px-4 space-y-1 flex-1 overflow-y-auto">
-            <div className="mb-4 px-2">
-              <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-3">Navigation</p>
-            </div>
-            {links.map((link) => (
-              <Button
-                key={link.href}
-                variant="ghost"
-                className={cn(
-                  "w-full justify-start h-11 md:h-12 px-3 md:px-4 rounded-xl transition-all duration-200 mb-1 group text-sm md:text-base",
-                  pathname === link.href ? 
-                    "bg-primary text-white shadow-md hover:bg-primary/90 font-medium" : 
-                    "text-muted-foreground hover:bg-primary/10 hover:text-primary hover:shadow-sm"
-                )}
-                asChild
-                onClick={() => isMobile && setIsOpen(false)}
-              >
-                <Link href={link.href} className="relative">
-                  <link.icon className={cn(
-                    "mr-3 h-4 w-4 md:h-5 md:w-5 transition-all duration-200 shrink-0",
-                    pathname === link.href ? "text-white" : "group-hover:scale-110"
-                  )} />
-                  <span className="font-medium truncate">{link.name}</span>
-                  {link.badge && (
-                    <Badge className="absolute right-2 ml-auto h-5 min-w-5 px-2 flex items-center justify-center text-[10px] bg-gradient-to-r from-red-500 to-pink-500 text-white border-0 shadow-sm shrink-0">
-                      {link.badge}
-                    </Badge>
-                  )}
-                </Link>
-              </Button>
-            ))}
-          </nav>
-          
-          <div className="border-t border-border/20 p-3 md:p-4 mt-4">
-            <div className="space-y-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="w-full justify-start h-10 md:h-11 rounded-xl border-border/30 text-muted-foreground hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-all duration-200 text-sm md:text-base" 
-                asChild
-                onClick={() => isMobile && setIsOpen(false)}
-              >
-                <Link href="/logout">
-                  <LogOut className="mr-3 h-4 w-4 shrink-0" />
-                  <span className="font-medium">Log out</span>
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </div>
+    </Link>
+  )
+}
+
+function SidebarFooter({
+  name,
+  isAgent,
+  onLogout,
+}: {
+  name: string | null
+  isAgent: boolean
+  onLogout: () => void
+}) {
+  const { expanded } = React.useContext(SidebarCtx)
+  const reduceMotion = useReducedMotion()
+
+  return (
+    <div className="mt-2 shrink-0 space-y-1 border-t border-border pt-3">
+      <div className="flex h-11 items-center gap-3 rounded-lg px-[13px]">
+        <span
+          className={cn(
+            'flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full',
+            'bg-accent/10 text-[11px] font-semibold uppercase text-accent',
+          )}
+          aria-hidden="true"
+        >
+          {name ? initials(name) : <Icon name="User" className="h-3.5 w-3.5" />}
+        </span>
+
+        <AnimatePresence initial={false}>
+          {expanded ? (
+            <motion.span
+              initial={reduceMotion ? false : { opacity: 0, x: -4 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -4 }}
+              transition={{ duration: reduceMotion ? 0 : 0.15 }}
+              className="flex min-w-0 flex-col whitespace-nowrap"
+            >
+              {/* No invented fallback name here. If the profile has not loaded,
+                  the row says so rather than showing a person who is not you. */}
+              <span className="truncate text-sm font-medium text-foreground">
+                {name ?? 'Signed in'}
+              </span>
+              <span className="truncate text-xs text-muted-foreground">
+                {isAgent ? 'Agent' : 'Tenant'}
+              </span>
+            </motion.span>
+          ) : null}
+        </AnimatePresence>
       </div>
-    </>
+
+      <div className="flex h-11 items-center gap-1 px-[5px]">
+        <ThemeToggle />
+        <button
+          type="button"
+          onClick={onLogout}
+          aria-label="Log out"
+          title="Log out"
+          className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors duration-200 hover:bg-destructive/10 hover:text-destructive-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+        >
+          <Icon name="LogOut" className="h-[18px] w-[18px]" />
+        </button>
+      </div>
+    </div>
   )
 }

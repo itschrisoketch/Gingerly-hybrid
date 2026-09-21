@@ -1,8 +1,11 @@
 "use client"
 
+// FORKED from shadcn/ui: the Dot separator now uses Material Symbols via
+// @/components/ui/icon instead of lucide-react. Re-running `npx shadcn add
+// input-otp` will overwrite this and reintroduce the lucide dependency.
 import * as React from "react"
 import { OTPInput, OTPInputContext } from "input-otp"
-import { Dot } from "lucide-react"
+import { Icon } from "@/components/ui/icon"
 
 import { cn } from "@/lib/utils"
 
@@ -63,7 +66,7 @@ const InputOTPSeparator = React.forwardRef<
   React.ComponentPropsWithoutRef<"div">
 >(({ ...props }, ref) => (
   <div ref={ref} role="separator" {...props}>
-    <Dot />
+    <Icon name="Dot" className="h-4 w-4" />
   </div>
 ))
 InputOTPSeparator.displayName = "InputOTPSeparator"
