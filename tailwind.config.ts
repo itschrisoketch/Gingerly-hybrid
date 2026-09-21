@@ -39,7 +39,8 @@ const config: Config = {
   			},
   			destructive: {
   				DEFAULT: 'hsl(var(--destructive))',
-  				foreground: 'hsl(var(--destructive-foreground))'
+  				foreground: 'hsl(var(--destructive-foreground))',
+  				text: 'hsl(var(--destructive-text))'
   			},
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
@@ -60,7 +61,46 @@ const config: Config = {
   				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
   				border: 'hsl(var(--sidebar-border))',
   				ring: 'hsl(var(--sidebar-ring))'
+  			},
+  			success: {
+  				DEFAULT: 'hsl(var(--success))',
+  				foreground: 'hsl(var(--success-foreground))',
+  				text: 'hsl(var(--success-text))'
+  			},
+  			warning: {
+  				DEFAULT: 'hsl(var(--warning))',
+  				foreground: 'hsl(var(--warning-foreground))',
+  				text: 'hsl(var(--warning-text))'
+  			},
+  			info: {
+  				DEFAULT: 'hsl(var(--info))',
+  				foreground: 'hsl(var(--info-foreground))',
+  				text: 'hsl(var(--info-text))'
+  			},
+  			// Badge-only text colours, contrast-solved against a 10% tint of
+  			// their own hue. See the note beside them in globals.css.
+  			'accent-text': 'hsl(var(--accent-text))',
+  			'neutral-text': 'hsl(var(--neutral-text))',
+  			navy: {
+  				'50': 'hsl(var(--navy-50))',
+  				'100': 'hsl(var(--navy-100))',
+  				'500': 'hsl(var(--navy-500))',
+  				'600': 'hsl(var(--navy-600))'
+  			},
+  			teal: {
+  				'50': 'hsl(var(--teal-50))',
+  				'100': 'hsl(var(--teal-100))',
+  				'500': 'hsl(var(--teal-500))',
+  				'600': 'hsl(var(--teal-600))'
   			}
+  		},
+  		fontFamily: {
+  			// `sans` is intentionally absent. With no fontFamily.sans defined, Tailwind's
+  			// `font-sans` resolves to its default system stack, which is what the dashboard
+  			// renders today. Adding `sans: var(--font-sans)` here would switch the whole
+  			// dashboard to Jost — a change this work must not make.
+  			body: ["var(--font-body)", "system-ui", "sans-serif"],
+  			display: ["var(--font-display)", "Georgia", "serif"]
   		},
   		borderRadius: {
   			lg: 'var(--radius)',

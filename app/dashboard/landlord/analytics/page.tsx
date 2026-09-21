@@ -1,533 +1,136 @@
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { 
-  BarChart3, 
-  TrendingUp, 
-  TrendingDown, 
-  DollarSign, 
-  Building2, 
-  Users, 
-  Calendar,
-  Target,
-  PieChart,
-  LineChart,
-  Activity,
-  ArrowUpRight,
-  ArrowDownRight,
-  Filter,
-  Download,
-  Sparkles,
-  Clock,
-  Star,
-  AlertTriangle,
-  CheckCircle,
-  Eye,
-  Home,
-  CreditCard,
-  Percent
-} from "lucide-react"
+import { CollectionRadial } from '@/components/dashboard/collection-radial'
+import { MethodDonut } from '@/components/dashboard/method-donut'
+import { PageBanner } from '@/components/dashboard/page-banner'
+import { PropertyCollectionChart } from '@/components/dashboard/property-collection-chart'
+import { SampleDataChip } from '@/components/dashboard/sample-data-notice'
+import { StatTiles, type Figure } from '@/components/dashboard/stat-tiles'
+import { formatKes } from '@/lib/format'
+import {
+  IS_SAMPLE_DATA,
+  sampleCollection,
+  sampleCollectionMix,
+  samplePayments,
+} from '@/lib/dashboard/sample-data'
 
-export default function LandlordAnalyticsPage() {
-  // Sample analytics data
-  const overviewStats = {
-    totalRevenue: "$48,250",
-    revenueChange: +12.5,
-    totalProperties: 15,
-    propertiesChange: +2,
-    totalTenants: 42,
-    tenantsChange: +5,
-    occupancyRate: 94.7,
-    occupancyChange: +3.2,
-    avgRent: "$1,150",
-    rentChange: +8.3,
-    maintenanceCosts: "$3,420",
-    maintenanceChange: -15.2
-  }
+/**
+ * Analytics.
+ *
+ * Same frame as the other screens — title, banner, tiles — with charts where the
+ * others have a table. What this page replaced had a grey box captioned
+ * "Financial Trends Chart" where the chart should have been, so none of the
+ * numbers on it were ever plotted.
+ *
+ * Three charts, three different jobs, which is the order the dataviz method puts
+ * first: a composition for where collection stands, a parts-of-whole for how the
+ * money arrives, and a stacked comparison for which properties carry the
+ * portfolio and where the shortfalls sit. Colour is last and computed rather than chosen — see the validated
+ * tokens in `app/globals.css`.
+ *
+ * Every figure is derived from `samplePayments`, so the charts cannot disagree
+ * with the payments page they are drawn from.
+ */
+export default function AnalyticsPage() {
+  const payments = samplePayments
+  const paid = payments.filter((p) => p.status === 'paid')
 
-  const propertyPerformance = [
+  const expected = payments.reduce((n, p) => n + p.amount, 0)
+  const collected = paid.reduce((n, p) => n + p.amount, 0)
+  const rate = Math.round((collected / expected) * 100)
+
+  // The baseline from CLOSED months only. September is still open, so it is
+  // reported beside the baseline and never subtracted from it: a month with six
+  // days to run is lower than a finished one by construction, and a headline
+  // reading "13 points below average" would be an artefact of that, not a
+  // finding. Comparing like for like needs collection-to-date for the same day
+  // of each prior month, which the daily series does not go back far enough to
+  // support — so the page states both numbers and leaves the inference alone.
+  const history = sampleCollectionMix.map((m) => {
+    const due = m.onTime + m.late + m.unpaid
+    return { rate: (m.onTime + m.late) / due, onTime: m.onTime / due }
+  })
+  const priorMonths = history.slice(0, -1)
+  const average = Math.round(
+    (priorMonths.reduce((n, m) => n + m.rate, 0) / priorMonths.length) * 100,
+  )
+  const onTimeRate = Math.round(history[history.length - 1].onTime * 100)
+
+  const figures: Figure[] = [
     {
-      id: 1,
-      name: "Sunset Apartments",
-      units: 12,
-      occupied: 11,
-      revenue: "$13,200",
-      yield: 8.2,
-      satisfaction: 4.6,
-      maintenanceRequests: 3
+      label: 'Collection rate',
+      value: `${rate}%`,
+      icon: 'Percent',
     },
     {
-      id: 2,
-      name: "Riverside Condos", 
-      units: 8,
-      occupied: 8,
-      revenue: "$11,600",
-      yield: 9.1,
-      satisfaction: 4.8,
-      maintenanceRequests: 1
+      // The baseline, not a delta against it, for the reason above.
+      label: 'Closed months average',
+      value: `${average}%`,
+      icon: 'BarChart3',
     },
+    { label: 'Paid on time', value: `${onTimeRate}%`, icon: 'Clock' },
     {
-      id: 3,
-      name: "Oakwood Residences",
-      units: 16,
-      occupied: 14,
-      revenue: "$16,800",
-      yield: 7.9,
-      satisfaction: 4.4,
-      maintenanceRequests: 5
+      label: 'Still out',
+      value: formatKes(expected - collected),
+      icon: 'AlertTriangle',
+      compact: true,
     },
-    {
-      id: 4,
-      name: "Downtown Lofts",
-      units: 6,
-      occupied: 6,
-      revenue: "$9,600",
-      yield: 8.7,
-      satisfaction: 4.7,
-      maintenanceRequests: 2
-    }
   ]
-
-  const monthlyTrends = [
-    { month: "Jan", revenue: 42000, expenses: 18000, occupancy: 92 },
-    { month: "Feb", revenue: 44500, expenses: 19200, occupancy: 94 },
-    { month: "Mar", revenue: 46200, expenses: 17800, occupancy: 96 },
-    { month: "Apr", revenue: 48250, expenses: 20100, occupancy: 95 },
-  ]
-
-  const tenantInsights = {
-    avgTenancy: "18 months",
-    renewalRate: 87,
-    newTenants: 8,
-    movingOut: 3,
-    avgPaymentTime: "2.3 days",
-    latePayments: 5
-  }
 
   return (
-    <div className="space-y-6 md:space-y-8">
-      {/* Modern Header - Mobile Optimized */}
-      <div className="relative overflow-hidden rounded-2xl md:rounded-3xl glass-card border border-border/50 p-4 md:p-6 lg:p-8">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-background to-purple-500/10" />
-        <div className="absolute top-4 right-4 w-20 h-20 md:w-32 md:h-32 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full blur-3xl" />
-        
-        <div className="relative">
-          <div className="flex flex-col gap-4 mb-4 md:mb-6">
-            <div className="flex items-start gap-3 md:gap-4">
-              <div className="p-2 md:p-3 rounded-xl md:rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shrink-0">
-                <BarChart3 className="h-5 w-5 md:h-6 md:w-6" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h1 className="text-xl md:text-2xl lg:text-3xl font-bold gradient-text">Analytics Dashboard</h1>
-                <p className="text-muted-foreground text-sm md:text-base lg:text-lg">Track performance, revenue, and insights across your property portfolio.</p>
-              </div>
-            </div>
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <Select defaultValue="all">
-                <SelectTrigger className="w-full sm:w-[180px] glass border border-border/50 rounded-xl">
-                  <SelectValue placeholder="Time Period" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Time</SelectItem>
-                  <SelectItem value="year">This Year</SelectItem>
-                  <SelectItem value="quarter">This Quarter</SelectItem>
-                  <SelectItem value="month">This Month</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button className="btn-primary shadow-lg hover:shadow-xl w-full sm:w-auto">
-                <Download className="mr-2 h-4 w-4" />
-                Export Report
-              </Button>
-            </div>
+    <div className="space-y-6">
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground">Analytics</h1>
+            {IS_SAMPLE_DATA ? (
+              <SampleDataChip detail="Every figure on this page is derived from placeholder data for design review. No analytics endpoint exists yet." />
+            ) : null}
           </div>
+          <p className="mt-1 text-sm text-muted-foreground">
+            <span className="font-medium text-foreground tabular-nums">{rate}%</span> of{' '}
+            <span className="tabular-nums">{formatKes(expected)}</span> collected in{' '}
+            {sampleCollection.periodLabel}
+          </p>
         </div>
+      </header>
+
+      {/* States where the month stands and what a finished month looks like,
+          without asserting a trend between them. */}
+      <PageBanner
+        id="analytics-banner"
+        eyebrow="Still collecting"
+        title={
+          <>
+            {rate}% collected with {sampleCollection.daysLeft}{' '}
+            {sampleCollection.daysLeft === 1 ? 'day' : 'days'} to go
+          </>
+        }
+        description={
+          <>
+            The previous <span className="tabular-nums">{priorMonths.length}</span> months
+            closed at <span className="tabular-nums">{average}%</span> on average.{' '}
+            {sampleCollection.periodLabel} is still open, so the two are not yet a fair
+            comparison.
+          </>
+        }
+        action={{ href: '/dashboard/landlord/payments?filter=late', label: 'See what is out' }}
+      />
+
+      <StatTiles
+        figures={figures}
+        label={`Collection in ${sampleCollection.periodLabel}`}
+        id="analytics-figures"
+      />
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <CollectionRadial
+          collected={collected}
+          expected={expected}
+          periodLabel={sampleCollection.periodLabel}
+        />
+        <MethodDonut payments={payments} />
       </div>
 
-      {/* Key Metrics Overview - Mobile Grid */}
-      <div className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        <Card className="glass-card border border-border/50 hover:border-primary/30 hover:shadow-xl hover:scale-[1.02] transition-all duration-500 group overflow-hidden">
-          <CardContent className="p-4 md:p-6 relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-green-50 to-emerald-100/50 dark:from-green-950/30 dark:to-emerald-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            
-            <div className="relative flex justify-between items-start">
-              <div className="space-y-2 flex-1 min-w-0">
-                <p className="text-xs md:text-sm font-semibold text-muted-foreground uppercase tracking-wider">Total Revenue</p>
-                <h3 className="text-xl md:text-2xl lg:text-3xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors duration-300">
-                  {overviewStats.totalRevenue}
-                </h3>
-                <div className="flex items-center gap-2">
-                  {overviewStats.revenueChange > 0 ? (
-                    <div className="flex items-center gap-1 text-green-600">
-                      <ArrowUpRight className="h-3 w-3 md:h-4 md:w-4" />
-                      <span className="text-xs md:text-sm font-medium">+{overviewStats.revenueChange}%</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-1 text-red-600">
-                      <ArrowDownRight className="h-3 w-3 md:h-4 md:w-4" />
-                      <span className="text-xs md:text-sm font-medium">{overviewStats.revenueChange}%</span>
-                    </div>
-                  )}
-                  <span className="text-xs md:text-sm text-muted-foreground">vs last month</span>
-                </div>
-              </div>
-              
-              <div className="relative ml-3 md:ml-4 shrink-0">
-                <div className="absolute inset-0 rounded-xl md:rounded-2xl bg-gradient-to-r from-green-500 to-emerald-600 opacity-20 blur-xl transition-all duration-500 group-hover:opacity-40 group-hover:blur-2xl" />
-                <div className="relative w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 rounded-xl md:rounded-2xl bg-gradient-to-r from-green-500 to-emerald-600 flex items-center justify-center text-white shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-                  <DollarSign className="h-5 w-5 md:h-6 md:w-6 lg:h-7 lg:w-7" />
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="glass-card border border-border/50 hover:border-primary/30 hover:shadow-xl hover:scale-[1.02] transition-all duration-500 group overflow-hidden">
-          <CardContent className="p-4 md:p-6 relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-cyan-100/50 dark:from-blue-950/30 dark:to-cyan-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            
-            <div className="relative flex justify-between items-start">
-              <div className="space-y-2 flex-1 min-w-0">
-                <p className="text-xs md:text-sm font-semibold text-muted-foreground uppercase tracking-wider">Occupancy Rate</p>
-                <h3 className="text-xl md:text-2xl lg:text-3xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors duration-300">
-                  {overviewStats.occupancyRate}%
-                </h3>
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1 text-green-600">
-                    <ArrowUpRight className="h-3 w-3 md:h-4 md:w-4" />
-                    <span className="text-xs md:text-sm font-medium">+{overviewStats.occupancyChange}%</span>
-                  </div>
-                  <span className="text-xs md:text-sm text-muted-foreground">vs last month</span>
-                </div>
-              </div>
-              
-              <div className="relative ml-3 md:ml-4 shrink-0">
-                <div className="absolute inset-0 rounded-xl md:rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-600 opacity-20 blur-xl transition-all duration-500 group-hover:opacity-40 group-hover:blur-2xl" />
-                <div className="relative w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 rounded-xl md:rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-600 flex items-center justify-center text-white shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-                  <Percent className="h-5 w-5 md:h-6 md:w-6 lg:h-7 lg:w-7" />
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="glass-card border border-border/50 hover:border-primary/30 hover:shadow-xl hover:scale-[1.02] transition-all duration-500 group overflow-hidden sm:col-span-2 lg:col-span-1">
-          <CardContent className="p-4 md:p-6 relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-50 to-pink-100/50 dark:from-purple-950/30 dark:to-pink-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            
-            <div className="relative flex justify-between items-start">
-              <div className="space-y-2 flex-1 min-w-0">
-                <p className="text-xs md:text-sm font-semibold text-muted-foreground uppercase tracking-wider">Average Rent</p>
-                <h3 className="text-xl md:text-2xl lg:text-3xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors duration-300">
-                  {overviewStats.avgRent}
-                </h3>
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1 text-green-600">
-                    <ArrowUpRight className="h-3 w-3 md:h-4 md:w-4" />
-                    <span className="text-xs md:text-sm font-medium">+{overviewStats.rentChange}%</span>
-                  </div>
-                  <span className="text-xs md:text-sm text-muted-foreground">vs last year</span>
-                </div>
-              </div>
-              
-              <div className="relative ml-3 md:ml-4 shrink-0">
-                <div className="absolute inset-0 rounded-xl md:rounded-2xl bg-gradient-to-r from-purple-500 to-pink-600 opacity-20 blur-xl transition-all duration-500 group-hover:opacity-40 group-hover:blur-2xl" />
-                <div className="relative w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 rounded-xl md:rounded-2xl bg-gradient-to-r from-purple-500 to-pink-600 flex items-center justify-center text-white shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-                  <Home className="h-5 w-5 md:h-6 md:w-6 lg:h-7 lg:w-7" />
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Additional Metrics - Mobile Grid */}
-      <div className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        <Card className="glass-card border border-border/50 hover:border-primary/30 hover:shadow-xl hover:scale-[1.02] transition-all duration-500 group">
-          <CardContent className="p-4 md:p-6">
-            <div className="flex items-center justify-between">
-              <div className="min-w-0">
-                <p className="text-xs md:text-sm font-medium text-muted-foreground">Total Properties</p>
-                <p className="text-xl md:text-2xl font-bold text-foreground">{overviewStats.totalProperties}</p>
-                <div className="flex items-center gap-1 text-green-600 mt-1">
-                  <TrendingUp className="h-3 w-3 md:h-4 md:w-4" />
-                  <span className="text-xs md:text-sm">+{overviewStats.propertiesChange} this quarter</span>
-                </div>
-              </div>
-              <Building2 className="h-6 w-6 md:h-8 md:w-8 text-blue-500 shrink-0" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="glass-card border border-border/50 hover:border-primary/30 hover:shadow-xl hover:scale-[1.02] transition-all duration-500 group">
-          <CardContent className="p-4 md:p-6">
-            <div className="flex items-center justify-between">
-              <div className="min-w-0">
-                <p className="text-xs md:text-sm font-medium text-muted-foreground">Active Tenants</p>
-                <p className="text-xl md:text-2xl font-bold text-foreground">{overviewStats.totalTenants}</p>
-                <div className="flex items-center gap-1 text-green-600 mt-1">
-                  <TrendingUp className="h-3 w-3 md:h-4 md:w-4" />
-                  <span className="text-xs md:text-sm">+{overviewStats.tenantsChange} this month</span>
-                </div>
-              </div>
-              <Users className="h-6 w-6 md:h-8 md:w-8 text-purple-500 shrink-0" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="glass-card border border-border/50 hover:border-primary/30 hover:shadow-xl hover:scale-[1.02] transition-all duration-500 group sm:col-span-2 lg:col-span-1">
-          <CardContent className="p-4 md:p-6">
-            <div className="flex items-center justify-between">
-              <div className="min-w-0">
-                <p className="text-xs md:text-sm font-medium text-muted-foreground">Maintenance Costs</p>
-                <p className="text-xl md:text-2xl font-bold text-foreground">{overviewStats.maintenanceCosts}</p>
-                <div className="flex items-center gap-1 text-green-600 mt-1">
-                  <TrendingDown className="h-3 w-3 md:h-4 md:w-4" />
-                  <span className="text-xs md:text-sm">{overviewStats.maintenanceChange}% vs last month</span>
-                </div>
-              </div>
-              <Activity className="h-6 w-6 md:h-8 md:w-8 text-orange-500 shrink-0" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Enhanced Tabs - Mobile Optimized */}
-      <Tabs defaultValue="performance" className="space-y-4 md:space-y-6">
-        <div className="overflow-x-auto">
-          <TabsList className="glass-card border border-border/50 p-1 bg-background/80 backdrop-blur-sm rounded-2xl shadow-md w-full min-w-fit">
-            <TabsTrigger 
-              value="performance" 
-              className="data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md rounded-xl font-medium transition-all duration-200 flex-1 text-xs md:text-sm whitespace-nowrap px-3 md:px-4"
-            >
-              <Target className="mr-1 md:mr-2 h-3 w-3 md:h-4 md:w-4" />
-              <span className="hidden sm:inline">Property </span>Performance
-            </TabsTrigger>
-            <TabsTrigger 
-              value="financial"
-              className="data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md rounded-xl font-medium transition-all duration-200 flex-1 text-xs md:text-sm whitespace-nowrap px-3 md:px-4"
-            >
-              <LineChart className="mr-1 md:mr-2 h-3 w-3 md:h-4 md:w-4" />
-              <span className="hidden sm:inline">Financial </span>Trends
-            </TabsTrigger>
-            <TabsTrigger 
-              value="tenants"
-              className="data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md rounded-xl font-medium transition-all duration-200 flex-1 text-xs md:text-sm whitespace-nowrap px-3 md:px-4"
-            >
-              <Users className="mr-1 md:mr-2 h-3 w-3 md:h-4 md:w-4" />
-              <span className="hidden sm:inline">Tenant </span>Insights
-            </TabsTrigger>
-          </TabsList>
-        </div>
-
-        <TabsContent value="performance" className="space-y-4 md:space-y-6">
-          <Card className="glass-card border border-border/50 hover:border-primary/30 hover:shadow-xl transition-all duration-300">
-            <CardHeader className="pb-3 md:pb-4 p-4 md:p-6">
-              <CardTitle className="text-lg md:text-xl font-bold flex items-center gap-2">
-                <div className="p-1.5 md:p-2 rounded-lg md:rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white">
-                  <Target className="h-4 w-4 md:h-5 md:w-5" />
-                </div>
-                Property Performance Analysis
-              </CardTitle>
-              <CardDescription className="text-sm md:text-base">Detailed performance metrics for each property in your portfolio</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 md:space-y-4 p-4 md:p-6 pt-0">
-              {propertyPerformance.map((property, i) => (
-                <Card key={property.id} className="glass-card border border-border/50 hover:border-primary/30 hover:shadow-lg hover:scale-[1.01] transition-all duration-300 group">
-                  <CardContent className="p-4 md:p-6">
-                    <div className="flex flex-col gap-4">
-                      <div className="flex items-start gap-3 md:gap-4">
-                        <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300 shrink-0">
-                          <Building2 className="h-5 w-5 md:h-6 md:w-6" />
-                        </div>
-                        <div className="space-y-2 flex-1 min-w-0">
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                            <p className="font-bold text-base md:text-lg group-hover:text-primary transition-colors duration-200 truncate">{property.name}</p>
-                            <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 px-2 py-1 text-xs font-semibold w-fit">
-                              {property.occupied}/{property.units} occupied
-                            </Badge>
-                          </div>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 text-xs md:text-sm">
-                            <div>
-                              <p className="text-muted-foreground">Monthly Revenue</p>
-                              <p className="font-bold text-green-600">{property.revenue}</p>
-                            </div>
-                            <div>
-                              <p className="text-muted-foreground">Yield</p>
-                              <p className="font-bold text-blue-600">{property.yield}%</p>
-                            </div>
-                            <div>
-                              <p className="text-muted-foreground">Satisfaction</p>
-                              <div className="flex items-center gap-1">
-                                <Star className="h-3 w-3 md:h-4 md:w-4 text-yellow-500 fill-current" />
-                                <p className="font-bold">{property.satisfaction}</p>
-                              </div>
-                            </div>
-                            <div>
-                              <p className="text-muted-foreground">Maintenance</p>
-                              <p className="font-bold text-orange-600">{property.maintenanceRequests} pending</p>
-                            </div>
-                          </div>
-                          <div className="mt-3">
-                            <div className="flex items-center justify-between text-xs md:text-sm mb-1">
-                              <span className="text-muted-foreground">Occupancy Rate</span>
-                              <span className="font-medium">{Math.round((property.occupied / property.units) * 100)}%</span>
-                            </div>
-                            <Progress value={(property.occupied / property.units) * 100} className="h-2" />
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 md:gap-3 flex-wrap pt-2 border-t border-border/20">
-                        <Button variant="outline" size="sm" className="btn-outline hover:shadow-md flex-1 sm:flex-none">
-                          <Eye className="mr-2 h-3 w-3 md:h-4 md:w-4" />
-                          <span className="text-xs md:text-sm">View Details</span>
-                        </Button>
-                        <Button variant="outline" size="sm" className="btn-outline hover:shadow-md flex-1 sm:flex-none">
-                          <BarChart3 className="mr-2 h-3 w-3 md:h-4 md:w-4" />
-                          <span className="text-xs md:text-sm">Analytics</span>
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="financial" className="space-y-4 md:space-y-6">
-          <Card className="glass-card border border-border/50 hover:border-primary/30 hover:shadow-xl transition-all duration-300">
-            <CardHeader className="pb-3 md:pb-4 p-4 md:p-6">
-              <CardTitle className="text-lg md:text-xl font-bold flex items-center gap-2">
-                <div className="p-1.5 md:p-2 rounded-lg md:rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white">
-                  <LineChart className="h-4 w-4 md:h-5 md:w-5" />
-                </div>
-                Financial Performance Trends
-              </CardTitle>
-              <CardDescription className="text-sm md:text-base">Revenue, expenses, and profitability trends over time</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 md:space-y-4 p-4 md:p-6 pt-0">
-              {/* Mock Chart Area */}
-              <div className="glass-card border border-border/50 p-6 rounded-2xl bg-gradient-to-br from-green-50/50 to-blue-50/50 dark:from-green-950/20 dark:to-blue-950/20">
-                <div className="h-64 flex items-center justify-center text-muted-foreground">
-                  <div className="text-center space-y-2">
-                    <LineChart className="h-16 w-16 mx-auto opacity-50" />
-                    <p className="text-lg font-semibold">Financial Trends Chart</p>
-                    <p>Interactive chart showing revenue vs expenses over time</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Monthly Breakdown */}
-              <div className="grid gap-4">
-                <h3 className="text-lg font-semibold">Monthly Breakdown</h3>
-                {monthlyTrends.map((month, i) => (
-                  <Card key={month.month} className="glass-card border border-border/50 hover:border-green-300 hover:shadow-lg transition-all duration-300">
-                    <CardContent className="p-4">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 flex items-center justify-center text-white font-bold">
-                            {month.month}
-                          </div>
-                          <div className="grid grid-cols-3 gap-6">
-                            <div>
-                              <p className="text-sm text-muted-foreground">Revenue</p>
-                              <p className="font-bold text-green-600">${month.revenue.toLocaleString()}</p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-muted-foreground">Expenses</p>
-                              <p className="font-bold text-red-600">${month.expenses.toLocaleString()}</p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-muted-foreground">Profit</p>
-                              <p className="font-bold text-blue-600">${(month.revenue - month.expenses).toLocaleString()}</p>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm text-muted-foreground">Occupancy</p>
-                          <p className="font-bold text-lg">{month.occupancy}%</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="tenants" className="space-y-4 md:space-y-6">
-          <Card className="glass-card border border-border/50 hover:border-primary/30 hover:shadow-xl transition-all duration-300">
-            <CardHeader className="pb-3 md:pb-4 p-4 md:p-6">
-              <CardTitle className="text-lg md:text-xl font-bold flex items-center gap-2">
-                <div className="p-1.5 md:p-2 rounded-lg md:rounded-xl bg-gradient-to-r from-purple-500 to-pink-600 text-white">
-                  <Users className="h-4 w-4 md:h-5 md:w-5" />
-                </div>
-                Tenant Analytics & Insights
-              </CardTitle>
-              <CardDescription className="text-sm md:text-base">Understanding tenant behavior and satisfaction patterns</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 md:space-y-4 p-4 md:p-6 pt-0">
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <Card className="glass-card border border-border/50 hover:border-purple-300 hover:shadow-lg transition-all duration-300">
-                  <CardContent className="p-6 text-center">
-                    <Clock className="h-10 w-10 mx-auto mb-3 text-blue-500" />
-                    <p className="text-sm text-muted-foreground">Average Tenancy</p>
-                    <p className="text-2xl font-bold text-foreground">{tenantInsights.avgTenancy}</p>
-                  </CardContent>
-                </Card>
-
-                <Card className="glass-card border border-border/50 hover:border-purple-300 hover:shadow-lg transition-all duration-300">
-                  <CardContent className="p-6 text-center">
-                    <CheckCircle className="h-10 w-10 mx-auto mb-3 text-green-500" />
-                    <p className="text-sm text-muted-foreground">Renewal Rate</p>
-                    <p className="text-2xl font-bold text-foreground">{tenantInsights.renewalRate}%</p>
-                  </CardContent>
-                </Card>
-
-                <Card className="glass-card border border-border/50 hover:border-purple-300 hover:shadow-lg transition-all duration-300">
-                  <CardContent className="p-6 text-center">
-                    <CreditCard className="h-10 w-10 mx-auto mb-3 text-purple-500" />
-                    <p className="text-sm text-muted-foreground">Avg Payment Time</p>
-                    <p className="text-2xl font-bold text-foreground">{tenantInsights.avgPaymentTime}</p>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-2">
-                <Card className="glass-card border border-border/50 hover:border-green-300 hover:shadow-lg transition-all duration-300">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <h4 className="font-semibold text-foreground">New Tenants</h4>
-                      <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">This Month</Badge>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-3xl font-bold text-green-600">{tenantInsights.newTenants}</p>
-                      <p className="text-sm text-muted-foreground">New move-ins</p>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="glass-card border border-border/50 hover:border-orange-300 hover:shadow-lg transition-all duration-300">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <h4 className="font-semibold text-foreground">Late Payments</h4>
-                      <Badge className="bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">Attention</Badge>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-3xl font-bold text-orange-600">{tenantInsights.latePayments}</p>
-                      <p className="text-sm text-muted-foreground">Accounts overdue</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+      <PropertyCollectionChart payments={payments} />
     </div>
   )
-} 
+}
