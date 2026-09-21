@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Icon } from '@/components/ui/icon'
 import { CollectionBanner } from '@/components/dashboard/collection-banner'
+import { SampleDataChip } from '@/components/dashboard/sample-data-notice'
 import { PortfolioCards } from '@/components/dashboard/portfolio-cards'
 import { DashboardMetrics } from '@/components/dashboard/dashboard-metrics'
 import { RecentTransactions } from '@/components/dashboard/recent-transactions'
@@ -35,11 +36,13 @@ export default function LandlordDashboard() {
 
   return (
     <div className="space-y-6">
-      {IS_SAMPLE_DATA ? <SampleDataNotice /> : null}
 
       <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Dashboard</h1>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground">Dashboard</h1>
+            {IS_SAMPLE_DATA ? <SampleDataChip /> : null}
+          </div>
           {/* The one line of context that matters, stated once, rather than a
               panel of its own: what is still owed and how long is left. */}
           <p className="mt-1 text-sm text-muted-foreground">
@@ -94,26 +97,5 @@ export default function LandlordDashboard() {
 
       <RecentTransactions rows={sampleTransactions} />
     </div>
-  )
-}
-
-/**
- * Visible for as long as the figures are invented.
- *
- * A plausible number on a rent dashboard is indistinguishable from a real one,
- * and what rides on the difference is somebody's housing.
- */
-function SampleDataNotice() {
-  return (
-    <p
-      role="status"
-      className="flex items-start gap-2 rounded-lg border border-warning/30 bg-warning/5 px-4 py-3 text-sm text-foreground"
-    >
-      <Icon name="AlertTriangle" className="mt-px h-4 w-4 shrink-0 text-warning-text" />
-      <span>
-        <span className="font-medium">Sample data.</span> These figures are placeholders for
-        design review. No dashboard endpoints exist yet, so nothing here reflects real accounts.
-      </span>
-    </p>
   )
 }

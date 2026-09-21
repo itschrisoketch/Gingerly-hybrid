@@ -1,7 +1,6 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import * as React from 'react'
 import {
   Dialog,
   DialogContent,
@@ -10,199 +9,237 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Textarea } from "@/components/ui/textarea"
-import { UserPlus, Users, Upload, Mail, Phone, Home, DollarSign, FileText, Sparkles } from "lucide-react"
+} from '@/components/ui/dialog'
+import { Icon } from '@/components/ui/icon'
+import { cn } from '@/lib/utils'
 
-export function TenantOnboardingModal() {
-  const [open, setOpen] = useState(false)
+/**
+ * Invite a tenant.
+ *
+ * Restyled to the dashboard's language, and localised with it. It previously
+ * asked for a `+1 (555)` phone number and rent in dollars, which no agent on
+ * this product can answer; it also led with a Sparkles icon on the submit
+ * button, which PRODUCT.md names in its anti-references.
+ *
+ * Single and bulk stay as two modes, because they are genuinely different jobs —
+ * one tenant moving in versus a portfolio being migrated on day one. They are a
+ * segmented control now rather than a second set of pill tabs, matching the
+ * filters on the page behind.
+ *
+ * ⚠️ Still a stub. There is no tenant endpoint, so Send closes the dialog and
+ * nothing is invited.
+ */
+
+const FIELD =
+  'h-10 w-full rounded-lg border border-border bg-card px-3 text-sm text-foreground placeholder:text-muted-foreground focus-visible:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40'
+
+const MODES = [
+  { value: 'single', label: 'One tenant' },
+  { value: 'bulk', label: 'Import a list' },
+] as const
+
+type Mode = (typeof MODES)[number]['value']
+
+export function TenantOnboardingModal({ properties = [] }: { properties?: string[] }) {
+  const [open, setOpen] = React.useState(false)
+  const [mode, setMode] = React.useState<Mode>('single')
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="btn-primary shadow-lg hover:shadow-xl">
-          <UserPlus className="mr-2 h-5 w-5" />
-          Add Tenant
-        </Button>
+        <button
+          type="button"
+          className="flex h-10 items-center gap-2 rounded-lg bg-accent px-4 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+        >
+          <Icon name="UserPlus" className="h-4 w-4" />
+          Add tenant
+        </button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden rounded-2xl glass-card border border-border/50">
-        <DialogHeader className="p-8 pb-4 relative overflow-hidden">
-          {/* Background decoration */}
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-background to-purple-500/10" />
-          <div className="absolute top-4 right-4 w-20 h-20 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full blur-xl" />
-          
-          <div className="relative">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white">
-                <UserPlus className="h-5 w-5" />
-              </div>
-              <div>
-                <DialogTitle className="text-2xl font-bold gradient-text">Add New Tenant</DialogTitle>
-                <DialogDescription className="text-muted-foreground">
-                  Onboard a new tenant to your property portfolio
-                </DialogDescription>
-              </div>
-            </div>
-          </div>
+
+      <DialogContent className="max-h-[90vh] gap-0 overflow-y-auto rounded-2xl p-0 sm:max-w-[560px] sm:rounded-2xl">
+        <DialogHeader className="space-y-1 p-6 pb-4 pr-12">
+          <DialogTitle className="text-lg font-semibold tracking-tight text-foreground">
+            Add a tenant
+          </DialogTitle>
+          <DialogDescription className="text-sm text-muted-foreground">
+            They get an invitation by SMS and email, and set their own password.
+          </DialogDescription>
         </DialogHeader>
-        
-        <div className="px-8 pb-4">
-          <Tabs defaultValue="single" className="w-full">
-            <TabsList className="glass-card border border-border/50 p-1 bg-background/80 backdrop-blur-sm rounded-2xl shadow-md w-full">
-              <TabsTrigger 
-                value="single" 
-                className="data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md rounded-xl font-medium transition-all duration-200 flex-1"
-              >
-                <Users className="mr-2 h-4 w-4" />
-                Single Tenant
-              </TabsTrigger>
-              <TabsTrigger 
-                value="bulk"
-                className="data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md rounded-xl font-medium transition-all duration-200 flex-1"
-              >
-                <Upload className="mr-2 h-4 w-4" />
-                Bulk Upload
-              </TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="single" className="space-y-6 pt-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="first-name" className="text-sm font-semibold text-foreground">First Name</Label>
-                  <Input 
-                    id="first-name" 
-                    placeholder="John" 
-                    variant="modern"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="last-name" className="text-sm font-semibold text-foreground">Last Name</Label>
-                  <Input 
-                    id="last-name" 
-                    placeholder="Doe" 
-                    variant="modern"
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-semibold text-foreground">Email Address</Label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  placeholder="john@example.com" 
-                  variant="modern"
-                  startIcon={<Mail className="h-4 w-4" />}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="phone" className="text-sm font-semibold text-foreground">Phone Number</Label>
-                <Input 
-                  id="phone" 
-                  placeholder="+1 (555) 000-0000" 
-                  variant="modern"
-                  startIcon={<Phone className="h-4 w-4" />}
-                />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="property" className="text-sm font-semibold text-foreground">Property</Label>
-                  <Input 
-                    id="property" 
-                    placeholder="Sunset Apartments" 
-                    variant="modern"
-                    startIcon={<Home className="h-4 w-4" />}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="unit" className="text-sm font-semibold text-foreground">Unit Number</Label>
-                  <Input 
-                    id="unit" 
-                    placeholder="3B" 
-                    variant="modern"
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="rent" className="text-sm font-semibold text-foreground">Monthly Rent</Label>
-                <Input 
-                  id="rent" 
-                  placeholder="1,200" 
-                  variant="modern"
-                  startIcon={<DollarSign className="h-4 w-4" />}
-                />
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="bulk" className="space-y-6 pt-6">
-              <div className="glass-card p-6 rounded-2xl border border-border/20">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white">
-                    <Upload className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground">Bulk Tenant Upload</h3>
-                    <p className="text-sm text-muted-foreground">Upload multiple tenants at once</p>
-                  </div>
-                </div>
-                
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="csv" className="text-sm font-semibold text-foreground">Upload CSV File</Label>
-                    <Input 
-                      id="csv" 
-                      type="file" 
-                      variant="modern"
-                      startIcon={<FileText className="h-4 w-4" />}
-                    />
-                    <p className="text-xs text-muted-foreground bg-blue-50 dark:bg-blue-950/30 p-2 rounded-lg">
-                      💡 Upload a CSV file with tenant details. Download our{" "}
-                      <a href="#" className="text-primary underline font-medium">
-                        template file
-                      </a>{" "}
-                      for the correct format.
-                    </p>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="notes" className="text-sm font-semibold text-foreground">Additional Notes</Label>
-                    <Textarea 
-                      id="notes" 
-                      placeholder="Any special instructions or notes for these tenants" 
-                      className="input-modern min-h-20"
-                    />
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
-        
-        <DialogFooter className="p-8 pt-4 border-t border-border/20 bg-gradient-to-r from-background/50 to-muted/20">
-          <div className="flex gap-3 w-full sm:w-auto">
-            <Button 
-              variant="outline" 
-              onClick={() => setOpen(false)}
-              className="btn-outline flex-1 sm:flex-none"
-            >
-              Cancel
-            </Button>
-            <Button 
-              onClick={() => setOpen(false)}
-              className="btn-primary flex-1 sm:flex-none shadow-lg hover:shadow-xl"
-            >
-              <Sparkles className="mr-2 h-4 w-4" />
-              Send Invitation
-            </Button>
+
+        <div className="space-y-5 px-6 pb-6">
+          <div
+            role="group"
+            aria-label="How to add tenants"
+            className="flex items-center gap-0.5 rounded-lg bg-muted/70 p-0.5"
+          >
+            {MODES.map((m) => {
+              const selected = mode === m.value
+              return (
+                <button
+                  key={m.value}
+                  type="button"
+                  aria-pressed={selected}
+                  onClick={() => setMode(m.value)}
+                  className={cn(
+                    'flex h-8 flex-1 cursor-pointer items-center justify-center rounded-md px-3 text-sm transition-colors duration-200',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40',
+                    selected
+                      ? 'bg-card font-medium text-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground',
+                  )}
+                >
+                  {m.label}
+                </button>
+              )
+            })}
           </div>
+
+          {mode === 'single' ? (
+            <>
+              <Field id="tenant-name" label="Full name">
+                <input id="tenant-name" className={FIELD} placeholder="Grace Wanjiku" />
+              </Field>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field id="tenant-phone" label="Phone" hint="Used for the M-Pesa prompt.">
+                  <input
+                    id="tenant-phone"
+                    type="tel"
+                    inputMode="tel"
+                    className={cn(FIELD, 'tabular-nums')}
+                    placeholder="+254 712 345 678"
+                  />
+                </Field>
+                <Field id="tenant-email" label="Email">
+                  <input
+                    id="tenant-email"
+                    type="email"
+                    className={FIELD}
+                    placeholder="grace@example.com"
+                  />
+                </Field>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field id="tenant-property" label="Property">
+                  {properties.length > 0 ? (
+                    <select id="tenant-property" className={FIELD} defaultValue="">
+                      <option value="" disabled>
+                        Choose a property
+                      </option>
+                      {properties.map((name) => (
+                        <option key={name} value={name}>
+                          {name}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      id="tenant-property"
+                      className={FIELD}
+                      placeholder="Brookside Apartments"
+                    />
+                  )}
+                </Field>
+                <Field id="tenant-unit" label="Unit">
+                  <input id="tenant-unit" className={FIELD} placeholder="A2" />
+                </Field>
+              </div>
+
+              <Field id="tenant-rent" label="Monthly rent" hint="In shillings.">
+                <div className="relative">
+                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                    Ksh
+                  </span>
+                  <input
+                    id="tenant-rent"
+                    type="number"
+                    min={0}
+                    inputMode="numeric"
+                    className={cn(FIELD, 'pl-12 tabular-nums')}
+                    placeholder="72,000"
+                  />
+                </div>
+              </Field>
+            </>
+          ) : (
+            <>
+              <Field
+                id="tenant-csv"
+                label="Tenant list"
+                hint="One row per tenant: name, phone, email, property, unit, rent."
+              >
+                <input
+                  id="tenant-csv"
+                  type="file"
+                  accept=".csv"
+                  className={cn(
+                    FIELD,
+                    'py-2 file:mr-3 file:rounded-md file:border-0 file:bg-muted file:px-3 file:py-1 file:text-sm file:font-medium file:text-foreground',
+                  )}
+                />
+              </Field>
+
+              <p className="flex items-start gap-2 rounded-lg border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
+                <Icon name="Info" className="mt-px h-4 w-4 shrink-0" />
+                <span>
+                  Everyone in the file is invited at once. Nobody is charged until they
+                  accept and a lease is attached.
+                </span>
+              </p>
+
+              <Field id="tenant-notes" label="Notes" hint="Optional. Kept on the import.">
+                <textarea
+                  id="tenant-notes"
+                  rows={3}
+                  className={cn(FIELD, 'h-auto py-2')}
+                  placeholder="Handover from the previous agent, leases start 1 October."
+                />
+              </Field>
+            </>
+          )}
+        </div>
+
+        <DialogFooter className="gap-2 border-t border-border px-6 py-4 sm:space-x-0">
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            className="flex h-10 items-center justify-center rounded-lg border border-border px-4 text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            className="flex h-10 items-center justify-center gap-2 rounded-lg bg-accent px-4 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+          >
+            <Icon name="Send" className="h-4 w-4" />
+            {mode === 'single' ? 'Send invitation' : 'Send invitations'}
+          </button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  )
+}
+
+function Field({
+  id,
+  label,
+  hint,
+  children,
+}: {
+  id: string
+  label: string
+  hint?: string
+  children: React.ReactNode
+}) {
+  return (
+    <div className="space-y-2">
+      <label htmlFor={id} className="block text-sm font-medium text-foreground">
+        {label}
+      </label>
+      {children}
+      {hint ? <p className="text-sm text-muted-foreground">{hint}</p> : null}
+    </div>
   )
 }

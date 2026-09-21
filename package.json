@@ -9,6 +9,7 @@
     "lint": "next lint",
     "verify:api": "node scripts/verify-api-contract.mjs",
     "verify:icons": "node scripts/verify-icon-map.mjs",
+    "verify:data": "node scripts/verify-sample-data.mjs",
     "generate:icons": "node scripts/generate-icon-data.mjs"
   },
   "dependencies": {

@@ -42,11 +42,23 @@
     --input: 209 20% 90%;
     --ring: 185 81% 29%;
 
-    /* Professional chart colors */
-    --chart-1: 185 81% 29%;
-    --chart-2: 209 71% 15%;
+    /* Chart colours for DATA MARKS, validated with the dataviz palette checker
+       (OKLab lightness band, chroma floor, CVD separation, contrast vs surface).
+       These are deliberately NOT the brand tokens: --accent at 185 81% 29%
+       measures 0.089 OKLab chroma against a 0.1 floor, i.e. it reads grey as a
+       fill, and --warning at 25 95% 53% lands at 2.79:1 on white, under the 3:1
+       a mark needs. Re-run before changing either:
+         node scripts/validate_palette.js "#009aab,#c2410c" --mode light --surface "#ffffff"
+       Chart-1, -2 and -4 are the three the collection charts render, validated
+       together across ALL pairs (a donut segment can neighbour any other), not
+       just adjacent ones. Chart-2 was the brand navy at 0.059 chroma — grey as a
+       fill — and is now the nearest passing indigo. 3 and 5 are unvalidated.
+         node scripts/validate_palette.js "#009aab,#c2410c,#4338ca" \
+           --mode light --surface "#ffffff" --pairs all */
+    --chart-1: 186 100% 34%;
+    --chart-2: 245 58% 51%;
     --chart-3: 142 76% 36%;
-    --chart-4: 25 95% 53%;
+    --chart-4: 17 88% 40%;
     --chart-5: 340 82% 52%;
 
     /* Success and warning colors */
@@ -54,7 +66,11 @@
     --success-foreground: 0 0% 100%;
     --warning: 25 95% 53%;
     --warning-foreground: 0 0% 100%;
-    --info: 185 81% 29%;
+    /* Indigo, matching --info-text. This was the same teal as --accent, which
+       made the info badge indigo text on a teal tint — two hues in one pill,
+       and in dark mode it measured 4.38 and failed. Its only other consumer,
+       `.status-info`, is unused in the app. */
+    --info: 245 58% 51%;
     --info-foreground: 0 0% 100%;
 
     /* Text-safe variants. --success/--warning/--destructive are FILL colours,
@@ -69,6 +85,16 @@
     --success-text: 142 76% 28%;
     --warning-text: 25 95% 37%;
     --destructive-text: 0 84% 45%;
+
+    /* Three more of the same kind, added for the status badges, which put text
+       on a 10% tint of its own hue. Each was solved for the 4.5 floor rather
+       than picked: --accent at 29% measures 4.34 on its own tint and
+       --muted-foreground 4.32, both under. Solved values clear 4.72 and 5.20.
+       --info-text is the badge colour for "submitted"-style states and is the
+       chart-2 indigo, which passes on the light tint unchanged at 6.59. */
+    --accent-text: 185 81% 27.5%;
+    --neutral-text: 209 20% 40%;
+    --info-text: 245 58% 51%;
 
     /* Brand color tints for better visibility */
     --navy-50: 209 71% 97%;
@@ -135,21 +161,38 @@
     --input: 209 30% 20%;
     --ring: 187 100% 40%;
 
-    --chart-1: 209 71% 85%;
-    --chart-2: 187 100% 40%;
+    /* Dark is SELECTED, not flipped: its own steps from the same hues, validated
+       against the dark card surface (#071a2c), whose passing band is a narrower
+       L 0.48–0.67. The light values are too dark here and the previous dark
+       values were too light (0.706 and 0.731, both outside the band).
+         node scripts/validate_palette.js "#12a3b5,#c2410c" --mode dark --surface "#071a2c"
+       Chart-1 and chart-2 were also swapped relative to light mode — teal was
+       chart-2 here and chart-1 there — so a series changed colour with the
+       theme. Colour follows the entity, so they are back in the light order.
+         node scripts/validate_palette.js "#12a3b5,#c2410c,#6366f1" \
+           --mode dark --surface "#071a2c" --pairs all */
+    --chart-1: 187 82% 39%;
+    --chart-2: 239 84% 67%;
     --chart-3: 142 76% 41%;
-    --chart-4: 25 95% 58%;
+    --chart-4: 17 88% 40%;
     --chart-5: 340 82% 57%;
 
     --success: 142 76% 41%;
     --warning: 25 95% 58%;
-    --info: 187 100% 40%;
+    --info: 239 84% 67%;
 
     /* Lightened for the dark ground rather than reused: the light-mode text
        variants measure below 2:1 against hsl(209 71% 10%). */
     --success-text: 142 76% 45%;
     --warning-text: 25 95% 55%;
     --destructive-text: 0 84% 65%;
+
+    /* Dark is solved separately against the dark card, not flipped. The indigo
+       fails here at its own value (3.59) and is lifted to 72% for 4.63; accent
+       and muted-foreground already clear the floor on this ground. */
+    --accent-text: 187 100% 40%;
+    --neutral-text: 215 20% 65%;
+    --info-text: 239 84% 72%;
 
     --sidebar-background: 209 71% 12%;
     --sidebar-accent: 187 100% 40%;
@@ -478,6 +521,54 @@
 [role="button"], [role="menuitem"], [role="tab"], [role="dialog"] {
   font-family: var(--font-sans) !important;
   @apply transition-all duration-200;
+}
+
+/* Portalled UI: selects, dropdowns, popovers, dialogs and toasts.
+ *
+ * Radix renders all of these through a portal into document.body, which is
+ * OUTSIDE the `[data-brand-font]` div in the dashboard and auth layouts. The
+ * Poppins scope therefore never reaches them, and they fall back to the Jost
+ * element rules above — which is why the font visibly changes the moment a menu
+ * opens. The portal roots below are the only handle CSS has on those subtrees.
+ *
+ * `!important` is required, not preferred: the two rules directly above set Jost
+ * with `!important` on `[data-radix-root]` and on the ARIA roles that dropdown
+ * items and dialogs carry, so nothing short of `!important` can win. This block
+ * sits after them so source order settles the tie at equal specificity.
+ *
+ * The element list mirrors the `[data-brand-font]` rule rather than using `*`,
+ * so `.font-display` inside a dialog keeps the display face. */
+:is(
+  [data-radix-popper-content-wrapper],
+  [data-sonner-toaster],
+  [role="dialog"],
+  [role="alertdialog"]
+) {
+  font-family: var(--font-body) !important;
+}
+
+:is(
+  [data-radix-popper-content-wrapper],
+  [data-sonner-toaster],
+  [role="dialog"],
+  [role="alertdialog"]
+) :is(
+  h1, h2, h3, h4, h5, h6, p, li,
+  input, textarea, select, button, label,
+  a, span, div, nav, header, footer,
+  [role="button"], [role="menuitem"], [role="menuitemradio"],
+  [role="menuitemcheckbox"], [role="option"], [role="tab"]
+) {
+  font-family: var(--font-body) !important;
+}
+
+:is(
+  [data-radix-popper-content-wrapper],
+  [data-sonner-toaster],
+  [role="dialog"],
+  [role="alertdialog"]
+) .font-display {
+  font-family: var(--font-display) !important;
 }
 
 /* Enhanced focus states */

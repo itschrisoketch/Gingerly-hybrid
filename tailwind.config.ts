@@ -74,8 +74,13 @@ const config: Config = {
   			},
   			info: {
   				DEFAULT: 'hsl(var(--info))',
-  				foreground: 'hsl(var(--info-foreground))'
+  				foreground: 'hsl(var(--info-foreground))',
+  				text: 'hsl(var(--info-text))'
   			},
+  			// Badge-only text colours, contrast-solved against a 10% tint of
+  			// their own hue. See the note beside them in globals.css.
+  			'accent-text': 'hsl(var(--accent-text))',
+  			'neutral-text': 'hsl(var(--neutral-text))',
   			navy: {
   				'50': 'hsl(var(--navy-50))',
   				'100': 'hsl(var(--navy-100))',

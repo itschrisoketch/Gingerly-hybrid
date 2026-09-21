@@ -7,6 +7,8 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Icon } from '@/components/ui/icon'
+import { StatusBadge, type StatusTone } from '@/components/ui/status-badge'
+import type { IconName } from '@/lib/icons/icon-map'
 import { formatKes, formatRelativeTime } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import type { Transaction, TxStatus } from '@/lib/dashboard/sample-data'
@@ -31,23 +33,18 @@ import type { Transaction, TxStatus } from '@/lib/dashboard/sample-data'
  * against the 4.5 floor when used as text.
  */
 
-const STATUS: Record<TxStatus, { label: string; pill: string }> = {
-  paid: { label: 'Paid', pill: 'bg-success/10 text-success-text' },
-  pending: { label: 'Pending', pill: 'bg-warning/10 text-warning-text' },
-  failed: { label: 'Failed', pill: 'bg-destructive/10 text-destructive-text' },
+const STATUS: Record<TxStatus, { label: string; tone: StatusTone; icon: IconName }> = {
+  paid: { label: 'Paid', tone: 'success', icon: 'CheckCircle' },
+  pending: { label: 'Pending', tone: 'warning', icon: 'Clock' },
+  failed: { label: 'Failed', tone: 'danger', icon: 'XCircle' },
 }
 
 function StatusPill({ status }: { status: TxStatus }) {
   const s = STATUS[status]
   return (
-    <span
-      className={cn(
-        'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
-        s.pill,
-      )}
-    >
+    <StatusBadge tone={s.tone} icon={s.icon}>
       {s.label}
-    </span>
+    </StatusBadge>
   )
 }
 
