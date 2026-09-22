@@ -1,8 +1,7 @@
 import Link from 'next/link'
 import { Icon } from '@/components/ui/icon'
-import { CollectionBanner } from '@/components/dashboard/collection-banner'
 import { SampleDataChip } from '@/components/dashboard/sample-data-notice'
-import { PortfolioCards } from '@/components/dashboard/portfolio-cards'
+import { PortfolioBento } from '@/components/dashboard/portfolio-bento'
 import { DashboardMetrics } from '@/components/dashboard/dashboard-metrics'
 import { RecentTransactions } from '@/components/dashboard/recent-transactions'
 import { CollectionMixChart } from '@/components/dashboard/collection-mix-chart'
@@ -24,7 +23,8 @@ import {
  *
  * Order runs from what to do, to what you have, to how it is moving, to the
  * detail: a navy action banner, portfolio tiles, two metric cards carrying their
- * own trends, a stacked area chart, then the payments table.
+ * own trends, a stacked area chart, then the payments table. The banner and the
+ * portfolio tiles are one ranked grid now — see portfolio-bento.tsx.
  *
  * Sections differ in form on purpose, so the page is not one box repeated.
  * Weight comes from what each section is rather than from giving everything the
@@ -72,18 +72,15 @@ export default function LandlordDashboard() {
         </div>
       </header>
 
-      <CollectionBanner
-        unitsLate={sampleCollection.unitsLate}
-        outstanding={outstanding}
-        daysLeft={sampleCollection.daysLeft}
-        periodLabel={sampleCollection.periodLabel}
-      />
-
-      <PortfolioCards
+      <PortfolioBento
         landlords={landlords}
         properties={properties}
         units={units}
         occupied={occupied}
+        unitsLate={sampleCollection.unitsLate}
+        outstanding={outstanding}
+        daysLeft={sampleCollection.daysLeft}
+        periodLabel={sampleCollection.periodLabel}
       />
 
       <DashboardMetrics
