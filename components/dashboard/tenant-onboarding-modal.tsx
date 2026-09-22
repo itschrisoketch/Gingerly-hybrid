@@ -200,7 +200,7 @@ export function TenantOnboardingModal({ properties = [] }: { properties?: string
           )}
         </div>
 
-        <DialogFooter className="gap-2 border-t border-border px-6 py-4 sm:space-x-0">
+        <DialogFooter className="rule-t gap-2 px-6 py-4 [--rule-inset:1.5rem] sm:space-x-0">
           <button
             type="button"
             onClick={() => setOpen(false)}
