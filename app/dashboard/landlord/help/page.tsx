@@ -1,42 +1,11 @@
 import { Button } from "@/components/ui/button"
+import { Icon } from "@/components/ui/icon"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { 
-  HelpCircle, 
-  MessageSquare, 
-  Phone, 
-  Mail, 
-  Clock, 
-  CheckCircle, 
-  Search, 
-  Plus, 
-  FileText, 
-  AlertTriangle,
-  Info,
-  Star,
-  ThumbsUp,
-  Book,
-  Video,
-  Download,
-  ExternalLink,
-  Send,
-  ChevronDown,
-  ChevronRight,
-  Users,
-  Calendar,
-  Building2,
-  Settings,
-  BarChart3,
-  Shield,
-  CreditCard,
-  Briefcase,
-  TrendingUp,
-  DollarSign
-} from "lucide-react"
 
 export default function LandlordHelpPage() {
   // Sample FAQs data for landlords
@@ -177,14 +146,14 @@ export default function LandlordHelpPage() {
         <div className="relative">
           <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
             <div className="p-3 rounded-2xl bg-gradient-to-r from-purple-500 to-orange-600 text-white shadow-lg">
-              <HelpCircle className="h-6 w-6" />
+              <Icon name="HelpCircle" className="h-6 w-6" />
             </div>
             <div className="flex-1">
               <h1 className="text-2xl md:text-3xl font-bold gradient-text">Business Support</h1>
               <p className="text-muted-foreground text-base md:text-lg">Get expert help for your property management business.</p>
             </div>
             <Button className="btn-primary shadow-lg hover:shadow-xl w-full sm:w-auto">
-              <MessageSquare className="mr-2 h-4 w-4" />
+              <Icon name="MessageSquare" className="mr-2 h-4 w-4" />
               Business Support
             </Button>
           </div>
@@ -199,7 +168,7 @@ export default function LandlordHelpPage() {
             
             <div className="relative text-center space-y-4">
               <div className="mx-auto w-16 h-16 rounded-3xl bg-gradient-to-r from-blue-500 to-cyan-600 flex items-center justify-center text-white shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-                <Briefcase className="h-8 w-8" />
+                <Icon name="Briefcase" className="h-8 w-8" />
               </div>
               <div>
                 <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors duration-300">Business Line</h3>
@@ -216,7 +185,7 @@ export default function LandlordHelpPage() {
             
             <div className="relative text-center space-y-4">
               <div className="mx-auto w-16 h-16 rounded-3xl bg-gradient-to-r from-green-500 to-emerald-600 flex items-center justify-center text-white shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-                <Mail className="h-8 w-8" />
+                <Icon name="Mail" className="h-8 w-8" />
               </div>
               <div>
                 <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors duration-300">Account Manager</h3>
@@ -233,7 +202,7 @@ export default function LandlordHelpPage() {
             
             <div className="relative text-center space-y-4">
               <div className="mx-auto w-16 h-16 rounded-3xl bg-gradient-to-r from-orange-500 to-red-600 flex items-center justify-center text-white shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-                <Users className="h-8 w-8" />
+                <Icon name="Users" className="h-8 w-8" />
               </div>
               <div>
                 <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors duration-300">Training Sessions</h3>
@@ -250,7 +219,7 @@ export default function LandlordHelpPage() {
             
             <div className="relative text-center space-y-4">
               <div className="mx-auto w-16 h-16 rounded-3xl bg-gradient-to-r from-purple-500 to-pink-600 flex items-center justify-center text-white shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-                <Clock className="h-8 w-8" />
+                <Icon name="Clock" className="h-8 w-8" />
               </div>
               <div>
                 <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors duration-300">Business Hours</h3>
@@ -269,28 +238,28 @@ export default function LandlordHelpPage() {
             value="faq" 
             className="data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md rounded-xl font-medium transition-all duration-200 flex-1 md:flex-none"
           >
-            <HelpCircle className="mr-2 h-4 w-4" />
+            <Icon name="HelpCircle" className="mr-2 h-4 w-4" />
             Business FAQ
           </TabsTrigger>
           <TabsTrigger 
             value="tickets"
             className="data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md rounded-xl font-medium transition-all duration-200 flex-1 md:flex-none"
           >
-            <MessageSquare className="mr-2 h-4 w-4" />
+            <Icon name="MessageSquare" className="mr-2 h-4 w-4" />
             Support Cases
           </TabsTrigger>
           <TabsTrigger 
             value="resources"
             className="data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md rounded-xl font-medium transition-all duration-200 flex-1 md:flex-none"
           >
-            <Book className="mr-2 h-4 w-4" />
+            <Icon name="Book" className="mr-2 h-4 w-4" />
             Business Resources
           </TabsTrigger>
           <TabsTrigger 
             value="contact"
             className="data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md rounded-xl font-medium transition-all duration-200 flex-1 md:flex-none"
           >
-            <Phone className="mr-2 h-4 w-4" />
+            <Icon name="Phone" className="mr-2 h-4 w-4" />
             Contact Business
           </TabsTrigger>
         </TabsList>
@@ -299,11 +268,16 @@ export default function LandlordHelpPage() {
           {/* Search */}
           <div className="glass-card border border-border/50 p-6 rounded-2xl bg-background/80 backdrop-blur-sm">
             <div className="relative">
-              <Search className="input-icon" />
+              {/* h-4 w-4 restates .input-icon's size: <Icon> defaults to h-5 w-5, and
+                  tailwind-merge cannot see that a non-Tailwind class sets a size. */}
+              <Icon name="Search" className="input-icon h-4 w-4" />
               <Input 
                 type="search" 
                 placeholder="Search business FAQs and property management questions..." 
-                className="input-modern pl-10"
+                /* !pl-10 because .input-modern @applies px-4 and lands later in the
+                   utilities layer, so a plain pl-10 never wins and the placeholder
+                   ran under the search icon. */
+                className="input-modern !pl-10"
               />
             </div>
           </div>
@@ -312,7 +286,7 @@ export default function LandlordHelpPage() {
             <CardHeader className="pb-4">
               <CardTitle className="text-xl font-bold flex items-center gap-2">
                 <div className="p-2 rounded-xl bg-gradient-to-r from-purple-500 to-orange-600 text-white">
-                  <HelpCircle className="h-5 w-5" />
+                  <Icon name="HelpCircle" className="h-5 w-5" />
                 </div>
                 Business & Property Management FAQ
               </CardTitle>
@@ -341,17 +315,17 @@ export default function LandlordHelpPage() {
                           }`}>
                             {faq.category}
                           </Badge>
-                          <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                          <Icon name="ChevronDown" className="h-5 w-5 text-muted-foreground" />
                         </div>
                       </div>
                       <p className="text-muted-foreground leading-relaxed">{faq.answer}</p>
-                      <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                      <div className="flex items-center justify-between pt-2 border-t border-dashed border-border/50">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <ThumbsUp className="h-4 w-4" />
+                          <Icon name="ThumbsUp" className="h-4 w-4" />
                           <span>{faq.helpful} property managers found this helpful</span>
                         </div>
                         <Button variant="outline" size="sm" className="btn-outline">
-                          <ThumbsUp className="mr-2 h-4 w-4" />
+                          <Icon name="ThumbsUp" className="mr-2 h-4 w-4" />
                           Helpful
                         </Button>
                       </div>
@@ -370,7 +344,7 @@ export default function LandlordHelpPage() {
               <p className="text-muted-foreground">Manage your business support requests and technical issues</p>
             </div>
             <Button className="btn-primary w-full sm:w-auto">
-              <Plus className="mr-2 h-4 w-4" />
+              <Icon name="Plus" className="mr-2 h-4 w-4" />
               New Business Case
             </Button>
           </div>
@@ -379,7 +353,7 @@ export default function LandlordHelpPage() {
             <CardHeader className="pb-4">
               <CardTitle className="text-xl font-bold flex items-center gap-2">
                 <div className="p-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white">
-                  <MessageSquare className="h-5 w-5" />
+                  <Icon name="MessageSquare" className="h-5 w-5" />
                 </div>
                 Your Support Cases
               </CardTitle>
@@ -398,9 +372,9 @@ export default function LandlordHelpPage() {
                               ? 'bg-gradient-to-r from-blue-500 to-cyan-600'
                               : 'bg-gradient-to-r from-green-500 to-emerald-600'
                         } flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                          {ticket.status === 'open' && <AlertTriangle className="h-6 w-6" />}
-                          {ticket.status === 'in-progress' && <Clock className="h-6 w-6" />}
-                          {ticket.status === 'resolved' && <CheckCircle className="h-6 w-6" />}
+                          {ticket.status === 'open' && <Icon name="AlertTriangle" className="h-6 w-6" />}
+                          {ticket.status === 'in-progress' && <Icon name="Clock" className="h-6 w-6" />}
+                          {ticket.status === 'resolved' && <Icon name="CheckCircle" className="h-6 w-6" />}
                         </div>
                         <div className="space-y-2 flex-1">
                           <div className="flex flex-col sm:flex-row sm:items-center gap-2">
@@ -438,7 +412,7 @@ export default function LandlordHelpPage() {
                           {ticket.status === 'open' ? 'Open' : ticket.status === 'in-progress' ? 'In Progress' : 'Resolved'}
                         </Badge>
                         <Button variant="outline" size="sm" className="btn-outline hover:shadow-md">
-                          <MessageSquare className="mr-2 h-4 w-4" />
+                          <Icon name="MessageSquare" className="mr-2 h-4 w-4" />
                           <span className="hidden sm:inline">Manage</span>
                         </Button>
                       </div>
@@ -455,7 +429,7 @@ export default function LandlordHelpPage() {
             <CardHeader className="pb-4">
               <CardTitle className="text-xl font-bold flex items-center gap-2">
                 <div className="p-2 rounded-xl bg-gradient-to-r from-green-500 to-blue-600 text-white">
-                  <Book className="h-5 w-5" />
+                  <Icon name="Book" className="h-5 w-5" />
                 </div>
                 Business Resources & Training
               </CardTitle>
@@ -476,10 +450,10 @@ export default function LandlordHelpPage() {
                                 ? 'bg-gradient-to-r from-green-500 to-emerald-600'
                                 : 'bg-gradient-to-r from-orange-500 to-yellow-600'
                         } flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                          {resource.type === 'PDF' && <FileText className="h-6 w-6" />}
-                          {resource.type === 'Video' && <Video className="h-6 w-6" />}
-                          {resource.type === 'Excel' && <BarChart3 className="h-6 w-6" />}
-                          {resource.type === 'Web' && <ExternalLink className="h-6 w-6" />}
+                          {resource.type === 'PDF' && <Icon name="FileText" className="h-6 w-6" />}
+                          {resource.type === 'Video' && <Icon name="Video" className="h-6 w-6" />}
+                          {resource.type === 'Excel' && <Icon name="BarChart3" className="h-6 w-6" />}
+                          {resource.type === 'Web' && <Icon name="ExternalLink" className="h-6 w-6" />}
                         </div>
                         <div className="space-y-2 flex-1">
                           <div className="flex flex-col sm:flex-row sm:items-center gap-2">
@@ -508,9 +482,9 @@ export default function LandlordHelpPage() {
                       </div>
                       <div className="flex items-center gap-3 flex-wrap">
                         <Button variant="outline" size="sm" className="btn-outline hover:shadow-md">
-                          {resource.type === 'Web' ? <ExternalLink className="mr-2 h-4 w-4" /> : 
-                           resource.type === 'Video' ? <ExternalLink className="mr-2 h-4 w-4" /> :
-                           <Download className="mr-2 h-4 w-4" />}
+                          {resource.type === 'Web' ? <Icon name="ExternalLink" className="mr-2 h-4 w-4" /> : 
+                           resource.type === 'Video' ? <Icon name="ExternalLink" className="mr-2 h-4 w-4" /> :
+                           <Icon name="Download" className="mr-2 h-4 w-4" />}
                           <span className="hidden sm:inline">
                             {resource.type === 'Web' ? 'View' : 
                              resource.type === 'Video' ? 'Watch' : 'Download'}
@@ -532,7 +506,7 @@ export default function LandlordHelpPage() {
               <CardHeader className="pb-4">
                 <CardTitle className="text-xl font-bold flex items-center gap-2">
                   <div className="p-2 rounded-xl bg-gradient-to-r from-purple-500 to-orange-600 text-white">
-                    <Send className="h-5 w-5" />
+                    <Icon name="Send" className="h-5 w-5" />
                   </div>
                   Business Support Request
                 </CardTitle>
@@ -600,7 +574,7 @@ export default function LandlordHelpPage() {
                   />
                 </div>
                 <Button className="w-full btn-primary">
-                  <Send className="mr-2 h-4 w-4" />
+                  <Icon name="Send" className="mr-2 h-4 w-4" />
                   Submit Business Request
                 </Button>
               </CardContent>
@@ -612,7 +586,7 @@ export default function LandlordHelpPage() {
                 <CardHeader className="pb-4">
                   <CardTitle className="text-xl font-bold flex items-center gap-2">
                     <div className="p-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white">
-                      <Info className="h-5 w-5" />
+                      <Icon name="Info" className="h-5 w-5" />
                     </div>
                     Business Contact Information
                   </CardTitle>
@@ -620,7 +594,7 @@ export default function LandlordHelpPage() {
                 <CardContent className="space-y-4">
                   <div className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/30 dark:to-cyan-950/30 border border-blue-200 dark:border-blue-800">
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-600 flex items-center justify-center text-white">
-                      <Briefcase className="h-5 w-5" />
+                      <Icon name="Briefcase" className="h-5 w-5" />
                     </div>
                     <div>
                       <p className="font-semibold">Business Support Line</p>
@@ -631,7 +605,7 @@ export default function LandlordHelpPage() {
 
                   <div className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 border border-green-200 dark:border-green-800">
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 flex items-center justify-center text-white">
-                      <Mail className="h-5 w-5" />
+                      <Icon name="Mail" className="h-5 w-5" />
                     </div>
                     <div>
                       <p className="font-semibold">Account Management</p>
@@ -642,7 +616,7 @@ export default function LandlordHelpPage() {
 
                   <div className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-950/30 dark:to-red-950/30 border border-orange-200 dark:border-orange-800">
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-orange-500 to-red-600 flex items-center justify-center text-white">
-                      <TrendingUp className="h-5 w-5" />
+                      <Icon name="TrendingUp" className="h-5 w-5" />
                     </div>
                     <div>
                       <p className="font-semibold">Sales & Upgrades</p>
@@ -659,19 +633,19 @@ export default function LandlordHelpPage() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <Button variant="outline" className="w-full btn-outline justify-start">
-                    <BarChart3 className="mr-2 h-4 w-4" />
+                    <Icon name="BarChart3" className="mr-2 h-4 w-4" />
                     Financial Reports
                   </Button>
                   <Button variant="outline" className="w-full btn-outline justify-start">
-                    <Building2 className="mr-2 h-4 w-4" />
+                    <Icon name="Building2" className="mr-2 h-4 w-4" />
                     Property Analytics
                   </Button>
                   <Button variant="outline" className="w-full btn-outline justify-start">
-                    <Users className="mr-2 h-4 w-4" />
+                    <Icon name="Users" className="mr-2 h-4 w-4" />
                     Tenant Screening
                   </Button>
                   <Button variant="outline" className="w-full btn-outline justify-start">
-                    <Settings className="mr-2 h-4 w-4" />
+                    <Icon name="Settings" className="mr-2 h-4 w-4" />
                     API Documentation
                   </Button>
                 </CardContent>
