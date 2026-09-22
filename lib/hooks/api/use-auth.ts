@@ -25,6 +25,10 @@ import type {
   VerifyOtpResponse,
   ChangePasswordResponse,
 } from '@/lib/api/types'
+import type {
+  MerchantUpdateData,
+  MerchantUpdateResponse,
+} from '@/lib/api/types/merchant.types'
 
 /** Where each role lands after signing in. */
 export const DASHBOARD_PATHS = {
@@ -190,6 +194,35 @@ export function useResetPassword(
 /**
  * Change the password of the logged-in user.
  */
+/**
+ * Update the logged-in merchant.
+ *
+ * The endpoint accepts FOUR fields — `first_name`, `last_name`, `erp` and
+ * `erp_name` — and nothing else. Business address, banking details and tax
+ * identifiers have no endpoint on this API despite the settings screen having
+ * always shown inputs for them; those inputs are read-only until one exists.
+ *
+ * Refreshes the session afterwards so the sidebar and header pick up a changed
+ * name without a reload.
+ */
+export function useUpdateMerchant(
+  options?: MutationOptions<MerchantUpdateResponse, { id: string } & MerchantUpdateData>
+) {
+  const { refreshUser } = useAuth()
+
+  return useMutation<MerchantUpdateResponse, { id: string } & MerchantUpdateData>(
+    async ({ id, ...data }) => {
+      const response = await merchantService.update(id, data)
+      await refreshUser()
+      return response
+    },
+    {
+      successMessage: 'Saved',
+      ...options,
+    }
+  )
+}
+
 export function useChangePassword(
   options?: MutationOptions<
     ChangePasswordResponse,

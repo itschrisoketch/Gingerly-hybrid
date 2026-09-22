@@ -17,5 +17,6 @@ export {
   useVerifyOtp,
   useResetPassword,
   useChangePassword,
+  useUpdateMerchant,
   useLogout,
 } from './use-auth'
