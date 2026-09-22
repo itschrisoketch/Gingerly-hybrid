@@ -803,3 +803,63 @@ export const sampleDocuments: StoredDocument[] = [
   { id: 'doc33', title: 'Buildings insurance — Parklands Terrace', kind: 'insurance', category: 'legal', status: 'active', property: 'Parklands Terrace', uploadedAt: '2025-10-01', expiresAt: '2027-01-31', bytes: 1_219_325, format: 'pdf', note: 'Comprehensive cover, including communal areas' },
   { id: 'doc34', title: 'Lease agreement — previous tenant, South B', kind: 'lease', category: 'legal', status: 'archived', property: 'South B Maisonettes', unit: '2', uploadedAt: '2024-03-01', expiresAt: '2026-02-28', bytes: 204_563, format: 'pdf', note: 'Superseded — unit now vacant' },
 ]
+
+/* ------------------------------------------------------------------ */
+/* Support cases                                                       */
+/* ------------------------------------------------------------------ */
+
+export type CaseStatus = 'open' | 'waiting' | 'resolved'
+export type CasePriority = 'low' | 'normal' | 'high'
+
+export interface SupportCase {
+  id: string
+  subject: string
+  detail: string
+  status: CaseStatus
+  priority: CasePriority
+  opened: string
+  updated: string
+}
+
+/**
+ * Placeholder cases, and the reason the page carries a sample-data chip.
+ *
+ * The three here are the three a Kenyan letting agent actually opens, and two
+ * of them exist because of real gaps: payout details and account contact
+ * details have no update endpoint, so they can only be changed by support. The
+ * set this replaced was about QuickBooks integration, bulk-importing 50+
+ * properties and tenant-screening API criteria — none of which this product
+ * has.
+ */
+export const sampleSupportCases: SupportCase[] = [
+  {
+    id: 'GIN-2041',
+    subject: 'M-Pesa payment not showing against a unit',
+    detail:
+      'Tenant in B4, Brookside Apartments sent Ksh 85,000 on 14 Sept and has the confirmation SMS, but the unit still reads as unpaid.',
+    status: 'open',
+    priority: 'high',
+    opened: '2026-09-15',
+    updated: '2026-09-19',
+  },
+  {
+    id: 'GIN-2038',
+    subject: 'Change the payout bank account',
+    detail:
+      'Moving the business account to a different bank and need the payout details updated, which Settings does not allow.',
+    status: 'waiting',
+    priority: 'normal',
+    opened: '2026-09-11',
+    updated: '2026-09-18',
+  },
+  {
+    id: 'GIN-2027',
+    subject: 'Invited tenant never received the SMS',
+    detail:
+      'Invite sent twice to a Safaricom number with no code arriving. Resolved — the number had a leading zero and a country code.',
+    status: 'resolved',
+    priority: 'normal',
+    opened: '2026-09-02',
+    updated: '2026-09-04',
+  },
+]

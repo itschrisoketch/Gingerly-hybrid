@@ -44,6 +44,7 @@ const maintenance = read('sampleMaintenance')
 const diary = read('sampleDiary')
 const conversations = read('sampleConversations')
 const documents = read('sampleDocuments')
+const cases = read('sampleSupportCases')
 
 const sum = (xs, f) => xs.reduce((n, x) => n + f(x), 0)
 const failures = []
@@ -269,6 +270,16 @@ check(
   documents.filter((d) => d.kind === 'photos' && !properties.some((p) => p.name === d.property && p.occupied < p.units)).length,
   0,
 )
+
+console.log('\nsupport cases')
+check('case ids unique', new Set(cases.map((c) => c.id)).size, cases.length)
+check('statuses are all known', cases.filter((c) => !['open', 'waiting', 'resolved'].includes(c.status)).length, 0)
+check('priorities are all known', cases.filter((c) => !['low', 'normal', 'high'].includes(c.priority)).length, 0)
+check('dates are all YYYY-MM-DD', cases.filter((c) => !/^\d{4}-\d{2}-\d{2}$/.test(c.opened) || !/^\d{4}-\d{2}-\d{2}$/.test(c.updated)).length, 0)
+check('nothing was opened in the future', cases.filter((c) => c.opened > TODAY).length, 0)
+// A case cannot be touched before it existed, and cannot be updated after today.
+check('updated is on or after opened, and not in the future', cases.filter((c) => c.updated < c.opened || c.updated > TODAY).length, 0)
+check('every case has a subject and a detail', cases.filter((c) => !c.subject?.trim() || !c.detail?.trim()).length, 0)
 
 if (failures.length > 0) {
   console.error(`\n${failures.length} failed:\n` + failures.map((f) => `  - ${f}`).join('\n'))
