@@ -42,6 +42,8 @@ const payments = read('samplePayments')
 const mix = read('sampleCollectionMix')
 const maintenance = read('sampleMaintenance')
 const diary = read('sampleDiary')
+const conversations = read('sampleConversations')
+const documents = read('sampleDocuments')
 
 const sum = (xs, f) => xs.reduce((n, x) => n + f(x), 0)
 const failures = []
@@ -208,6 +210,63 @@ check('times, where given, are HH:mm', diary.filter((d) => d.time && !/^\d{2}:\d
 check(
   'every contractor visit has a time',
   maintenance.filter((m) => m.scheduledFor && !m.scheduledTime).length,
+  0,
+)
+
+console.log('\nconversations')
+check('conversation ids unique', new Set(conversations.map((c) => c.id)).size, conversations.length)
+// The bug that shipped: six conversations, message threads for two of them.
+check('every conversation has messages', conversations.filter((c) => !c.messages?.length).length, 0)
+check(
+  'every conversation is a real tenant on their own unit',
+  conversations.filter(
+    (c) => !tenants.some((t) => t.name === c.tenant && t.unit === c.unit && t.property === c.property),
+  ).length,
+  0,
+)
+check('message ids unique across all threads', new Set(conversations.flatMap((c) => c.messages.map((m) => m.id))).size, conversations.reduce((n, c) => n + c.messages.length, 0))
+check(
+  'messages are oldest-first within a thread',
+  conversations.filter((c) => c.messages.some((m, i) => i > 0 && m.at < c.messages[i - 1].at)).length,
+  0,
+)
+check(
+  'senders are all known',
+  conversations.flatMap((c) => c.messages).filter((m) => !['tenant', 'agent'].includes(m.from)).length,
+  0,
+)
+check('topics are all known', conversations.filter((c) => !['maintenance', 'payment', 'lease', 'general'].includes(c.topic)).length, 0)
+check(
+  'unread never exceeds the tenant messages in the thread',
+  conversations.filter((c) => c.unread > c.messages.filter((m) => m.from === 'tenant').length).length,
+  0,
+)
+
+console.log('\ndocuments')
+const TODAY = '2026-09-21'
+check('document ids unique', new Set(documents.map((d) => d.id)).size, documents.length)
+check(
+  'every document names a real property',
+  documents.filter((d) => d.property !== 'All properties' && !names.has(d.property)).length,
+  0,
+)
+check(
+  'documents naming a tenant name a real one, on that unit',
+  documents.filter(
+    (d) => d.tenant && !tenants.some((t) => t.name === d.tenant && t.unit === d.unit && t.property === d.property),
+  ).length,
+  0,
+)
+// Caught during authoring: the September statement was dated the 28th.
+check('nothing is uploaded in the future', documents.filter((d) => d.uploadedAt > TODAY).length, 0)
+check('nothing expires before it was uploaded', documents.filter((d) => d.expiresAt && d.expiresAt < d.uploadedAt).length, 0)
+check('only leases and insurance expire', documents.filter((d) => d.expiresAt && !['lease', 'insurance'].includes(d.kind)).length, 0)
+check('every size is a positive byte count', documents.filter((d) => !(d.bytes > 0)).length, 0)
+check('categories are all known', documents.filter((d) => !['legal', 'finance', 'tenant', 'property', 'marketing'].includes(d.category)).length, 0)
+check('statuses are all known', documents.filter((d) => !['active', 'approved', 'final', 'draft', 'archived'].includes(d.status)).length, 0)
+check(
+  'listing photos only exist for properties with a vacancy',
+  documents.filter((d) => d.kind === 'photos' && !properties.some((p) => p.name === d.property && p.occupied < p.units)).length,
   0,
 )
 
