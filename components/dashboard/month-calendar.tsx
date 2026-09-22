@@ -149,11 +149,11 @@ export function MonthCalendar({
             </div>
           </div>
 
-          <div className="grid grid-cols-7 border-t border-border">
+          <div className="rule-t grid grid-cols-7">
             {WEEKDAYS.map((d) => (
               <div
                 key={d}
-                className="border-b border-border px-1 py-2 text-center text-xs font-medium uppercase tracking-wider text-muted-foreground"
+                className="border-b border-dashed border-border px-1 py-2 text-center text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 <span className="hidden sm:inline">{d}</span>
                 <span className="sm:hidden">{d[0]}</span>
@@ -171,7 +171,7 @@ export function MonthCalendar({
                 <div
                   key={key}
                   className={cn(
-                    'group relative min-h-[64px] border-b border-r border-border transition-colors sm:min-h-[108px]',
+                    'group relative min-h-[64px] border-b border-r border-dashed border-border transition-colors sm:min-h-[108px]',
                     '[&:nth-child(7n+7)]:border-r-0',
                     outside ? 'bg-muted/30' : 'hover:bg-muted/40',
                     isSelected && 'bg-accent/[0.07] hover:bg-accent/10',
@@ -347,7 +347,7 @@ function Agenda({
 
   return (
     <Card className="flex flex-col">
-      <div className="flex items-start justify-between gap-3 border-b border-border px-5 py-4">
+      <div className="rule-b flex items-start justify-between gap-3 px-5 py-4">
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">
             {isToday ? 'Today' : format(d, 'EEEE')}
@@ -381,9 +381,9 @@ function Agenda({
             </p>
           </div>
         ) : (
-          <ul className="divide-y divide-dashed divide-border">
+          <ul>
             {events.map((e) => (
-              <li key={e.id} className="flex gap-3 px-5 py-4">
+              <li key={e.id} className="rule-b flex gap-3 px-5 py-4">
                 <span
                   aria-hidden="true"
                   className={cn(
@@ -442,7 +442,7 @@ function Upcoming({ events, today }: { events: CalendarEvent[]; today: string })
 
   return (
     <Card>
-      <div className="border-b border-border px-5 py-4 sm:px-6">
+      <div className="rule-b px-5 py-4 sm:px-6">
         <h2 className="text-base font-semibold tracking-tight text-foreground">Next up</h2>
         <p className="mt-0.5 text-sm text-muted-foreground">
           The next {events.length} {events.length === 1 ? 'entry' : 'entries'}, whatever month
@@ -450,11 +450,11 @@ function Upcoming({ events, today }: { events: CalendarEvent[]; today: string })
         </p>
       </div>
 
-      <ul className="divide-y divide-dashed divide-border">
+      <ul>
         {events.map((e) => {
           const d = parseIsoDate(e.date)
           return (
-            <li key={e.id} className="flex items-center gap-4 px-5 py-3 sm:px-6">
+            <li key={e.id} className="rule-b flex items-center gap-4 px-5 py-3 sm:px-6">
               <div className="flex w-12 shrink-0 flex-col items-center rounded-lg border border-border py-1">
                 <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
                   {format(d, 'MMM')}

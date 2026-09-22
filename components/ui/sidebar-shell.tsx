@@ -63,7 +63,7 @@ export function Sidebar({ children }: { children: React.ReactNode }) {
                 animate={{ x: 0 }}
                 exit={{ x: '-100%' }}
                 transition={{ type: 'tween', ease: [0.22, 1, 0.36, 1], duration: reduceMotion ? 0 : 0.28 }}
-                className="fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-border bg-background px-3 py-4 md:hidden"
+                className="fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-dashed border-border bg-background px-3 py-4 md:hidden"
               >
                 <button
                   type="button"
@@ -95,7 +95,7 @@ export function Sidebar({ children }: { children: React.ReactNode }) {
         animate={{ width: expanded ? PANEL_WIDTH : RAIL_WIDTH }}
         initial={false}
         transition={{ type: 'tween', ease: [0.22, 1, 0.36, 1], duration: reduceMotion ? 0 : 0.22 }}
-        className="relative z-30 hidden h-full shrink-0 flex-col overflow-hidden border-r border-border bg-background px-3 py-4 md:flex"
+        className="relative z-30 hidden h-full shrink-0 flex-col overflow-hidden border-r border-dashed border-border bg-background px-3 py-4 md:flex"
       >
         {children}
       </motion.aside>

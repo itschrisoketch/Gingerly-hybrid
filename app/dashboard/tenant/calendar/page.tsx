@@ -202,7 +202,7 @@ export default function TenantCalendarPage() {
             />
             
             {/* Calendar Legend */}
-            <div className="mt-6 pt-4 border-t border-border/50">
+            <div className="mt-6 pt-4 border-t border-dashed border-border/50">
               <h4 className="text-sm font-semibold text-foreground mb-3">Event Types</h4>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 <div className="flex items-center gap-2">

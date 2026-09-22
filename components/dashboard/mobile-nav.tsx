@@ -18,7 +18,7 @@ export function MobileNav() {
 
   return (
     <header
-      className="sticky z-40 border-b border-border bg-background md:hidden"
+      className="sticky z-40 border-b border-dashed border-border bg-background md:hidden"
       style={{ top: 'env(safe-area-inset-top, 0px)' }}
     >
       <div className="flex h-16 items-center justify-between gap-3 px-4">

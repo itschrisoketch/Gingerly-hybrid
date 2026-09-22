@@ -297,7 +297,7 @@ export default function TenantHelpPage() {
                         </div>
                       </div>
                       <p className="text-muted-foreground leading-relaxed">{faq.answer}</p>
-                      <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                      <div className="flex items-center justify-between pt-2 border-t border-dashed border-border/50">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <ThumbsUp className="h-4 w-4" />
                           <span>{faq.helpful} people found this helpful</span>

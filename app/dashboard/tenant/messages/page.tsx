@@ -146,7 +146,7 @@ export default function TenantMessagesPage() {
         {/* Chat Area */}
         <Card className="glass-card border border-border/50 hover:border-primary/30 hover:shadow-xl transition-all duration-300 flex flex-col lg:col-span-2">
           {/* Chat Header */}
-          <CardHeader className="border-b border-border/50 pb-4">
+          <CardHeader className="border-b border-dashed border-border/50 pb-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="relative">
@@ -259,7 +259,7 @@ export default function TenantMessagesPage() {
           </CardContent>
 
           {/* Message Input */}
-          <div className="border-t border-border/50 p-4 md:p-6">
+          <div className="border-t border-dashed border-border/50 p-4 md:p-6">
             <div className="glass-card border border-border/50 rounded-2xl p-3 bg-background/80 backdrop-blur-sm">
               <div className="flex items-center gap-3">
                 <Button variant="outline" size="icon" className="shrink-0 btn-outline hover:shadow-md rounded-xl">

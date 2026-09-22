@@ -155,7 +155,7 @@ function SidebarFooter({
   const reduceMotion = useReducedMotion()
 
   return (
-    <div className="mt-2 shrink-0 space-y-1 border-t border-border pt-3">
+    <div className="mt-2 shrink-0 space-y-1 border-t border-dashed border-border pt-3">
       <div className="flex h-11 items-center gap-3 rounded-lg px-[13px]">
         <span
           className={cn(
