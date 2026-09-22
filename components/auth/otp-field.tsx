@@ -40,9 +40,15 @@ export function OtpField({ value, onChange, disabled, invalid, describedBy }: Ot
       inputMode="numeric"
       aria-invalid={invalid || undefined}
       aria-describedby={describedBy}
-      containerClassName="gap-2.5"
+      containerClassName="w-full gap-2.5"
     >
-      <InputOTPGroup className="gap-2.5">
+      {/*
+        The group must be a full-width flex line and the slots must flex within
+        it. Sizing a slot with `w-full` instead collapses it to a hairline: the
+        group is shrink-to-fit, so its width is derived from the slots, and a
+        percentage width resolving against that is circular.
+      */}
+      <InputOTPGroup className="flex w-full gap-2.5">
         {Array.from({ length: 6 }, (_, i) => (
           <InputOTPSlot
             key={i}
@@ -50,12 +56,17 @@ export function OtpField({ value, onChange, disabled, invalid, describedBy }: Ot
             className={cn(
               // Override the vendor component's joined-box treatment: each slot
               // is its own field here, matching AuthInput's geometry.
-              'h-14 w-full rounded-xl border text-lg font-medium',
-              'first:rounded-xl last:rounded-xl border-l',
+              'h-14 w-auto min-w-0 flex-1 rounded-xl border text-lg font-medium',
+              // The vendor rounds only the outer corners of a joined row; these
+              // outrank it on specificity so every slot keeps the same radius.
+              'first:rounded-xl last:rounded-xl',
               'transition-[background-color,border-color,box-shadow] duration-200 ease-out',
+              // Focus mirrors AuthInput: lift to the page ground, low-opacity
+              // halo, no offset gap. ring-offset-0 cancels the vendor's offset.
+              'ring-offset-0 data-[active=true]:bg-background data-[active=true]:ring-4',
               invalid
-                ? 'border-destructive/70 bg-destructive/[0.03]'
-                : 'border-border/70 bg-muted/30',
+                ? 'border-destructive/70 bg-destructive/[0.03] data-[active=true]:border-destructive data-[active=true]:ring-destructive/10'
+                : 'border-border/70 bg-muted/30 data-[active=true]:border-accent data-[active=true]:ring-accent/10',
             )}
           />
         ))}
