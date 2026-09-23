@@ -11,13 +11,18 @@
  * templates, a (555) phone number. None of it existed in this codebase. Every
  * answer below names a screen, a control or an API limit that does.
  *
- * Several answers are uncomfortable — you cannot change your own payout bank
- * account, your email, or your notification preferences. They are here BECAUSE
- * they are the things a landlord will actually get stuck on. A help page that
- * only documents the happy path sends people to support with the questions it
- * should have answered. Each of these is traceable to the endpoint audit in
- * components/dashboard/settings/settings-panel.tsx — if the API gains an
- * endpoint, the matching answer here is wrong and must change with it.
+ * Several answers are uncomfortable — you cannot change your email, your phone
+ * number or your notification preferences, and payout details still go through
+ * support. They are here BECAUSE they are the things a landlord will actually
+ * get stuck on. A help page that only documents the happy path sends people to
+ * support with the questions it should have answered.
+ *
+ * Verify these against the LIVE /apispec.json, not gingerly-api.md — the
+ * markdown documents 13 of the 44 paths the API actually serves and is stale.
+ * The payout answer was wrong on first writing for exactly that reason: it
+ * claimed no endpoint existed, when /bank-accounts has five. If the client
+ * wires up an endpoint, or the API gains one, the matching answer here is
+ * wrong and must change with it.
  */
 
 export type HelpTopic = 'Payments' | 'Tenants' | 'Properties' | 'Documents' | 'Account'
@@ -49,7 +54,7 @@ export const HELP_ANSWERS: HelpAnswer[] = [
     topic: 'Account',
     question: 'How do I change the bank account my rent is paid into?',
     answer:
-      'You cannot change it yourself. Payout details are captured once when your account is created and there is no endpoint to update them, which is why the Banking tab in Settings is read-only. Contact support to change them. This is deliberate rather than missing — a payout account that can be changed from a signed-in session is the single most valuable thing for someone who has taken over an account.',
+      'Not from Settings yet. The Banking tab is read-only today because it has not been wired up — the API itself does support adding, updating and removing bank accounts, so this is a gap on our side rather than a missing capability. Contact support to change payout details in the meantime.',
   },
   {
     id: 'change-email',

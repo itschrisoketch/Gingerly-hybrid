@@ -198,9 +198,14 @@ export function useResetPassword(
  * Update the logged-in merchant.
  *
  * The endpoint accepts FOUR fields — `first_name`, `last_name`, `erp` and
- * `erp_name` — and nothing else. Business address, banking details and tax
- * identifiers have no endpoint on this API despite the settings screen having
- * always shown inputs for them; those inputs are read-only until one exists.
+ * `erp_name` — and nothing else. Business address and tax identifiers have no
+ * endpoint anywhere on this API despite the settings screen having always
+ * shown inputs for them, so those stay read-only.
+ *
+ * Banking is a different case and was previously described wrongly here: the
+ * API DOES expose /bank-accounts (add, update, remove, list). It is simply not
+ * wired up in this client yet. Verified against the live /apispec.json, which
+ * has 44 paths — gingerly-api.md documents 13 and is stale.
  *
  * Refreshes the session afterwards so the sidebar and header pick up a changed
  * name without a reload.

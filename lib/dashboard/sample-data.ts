@@ -825,8 +825,9 @@ export interface SupportCase {
  * Placeholder cases, and the reason the page carries a sample-data chip.
  *
  * The three here are the three a Kenyan letting agent actually opens, and two
- * of them exist because of real gaps: payout details and account contact
- * details have no update endpoint, so they can only be changed by support. The
+ * of them exist because of real gaps: changing your email or phone has no
+ * endpoint at all, and the payout tab is not yet wired to /bank-accounts, so
+ * both currently go through support. The
  * set this replaced was about QuickBooks integration, bulk-importing 50+
  * properties and tenant-screening API criteria — none of which this product
  * has.
