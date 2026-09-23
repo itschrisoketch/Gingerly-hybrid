@@ -18,7 +18,7 @@ import { useSidebar } from '@/components/sidebar-provider'
 import { useAuth } from '@/contexts/auth-context'
 import { cn } from '@/lib/utils'
 
-const AGENT_LINKS: SidebarLinkItem[] = [
+const LANDLORD_LINKS: SidebarLinkItem[] = [
   { label: 'Dashboard', href: '/dashboard/landlord', icon: 'LayoutDashboard' },
   { label: 'Properties', href: '/dashboard/landlord/properties', icon: 'Building2' },
   { label: 'Tenants', href: '/dashboard/landlord/tenants', icon: 'Users' },
@@ -68,8 +68,8 @@ export function DashboardSidebar() {
   const { isMobile, setIsOpen } = useSidebar()
   const { user, logout } = useAuth()
 
-  const isAgent = pathname.includes('/landlord')
-  const links = isAgent ? AGENT_LINKS : TENANT_LINKS
+  const isLandlord = pathname.includes('/landlord')
+  const links = isLandlord ? LANDLORD_LINKS : TENANT_LINKS
 
   const name = displayName(user)
   const closeOnMobile = () => {
@@ -104,7 +104,7 @@ export function DashboardSidebar() {
 
         <SidebarFooter
           name={name}
-          isAgent={isAgent}
+          isLandlord={isLandlord}
           onLogout={handleLogout}
         />
       </SidebarBody>
@@ -144,11 +144,11 @@ function SidebarHeader() {
 
 function SidebarFooter({
   name,
-  isAgent,
+  isLandlord,
   onLogout,
 }: {
   name: string | null
-  isAgent: boolean
+  isLandlord: boolean
   onLogout: () => void
 }) {
   const { expanded } = React.useContext(SidebarCtx)
@@ -182,7 +182,7 @@ function SidebarFooter({
                 {name ?? 'Signed in'}
               </span>
               <span className="truncate text-xs text-muted-foreground">
-                {isAgent ? 'Agent' : 'Tenant'}
+                {isLandlord ? 'Landlord' : 'Tenant'}
               </span>
             </motion.span>
           ) : null}

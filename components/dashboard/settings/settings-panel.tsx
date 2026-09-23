@@ -303,9 +303,9 @@ export function SettingsPanel() {
           description="Where collected rent is settled."
           icon="CreditCard"
           connected={false}
-          unavailableReason="Banking details are captured at registration and have no update endpoint. Contact support to change them."
+          unavailableReason="These fields are read-only because the merchant update endpoint does not accept them. The API does have /bank-accounts (add, update, remove, list) — this tab is simply not wired to it yet."
           footer={
-            <UnavailableButton icon="Plus" reason="No banking endpoint yet">
+            <UnavailableButton icon="Plus" reason="Not wired up yet — POST /bank-accounts/add-bank-account exists">
               Add bank account
             </UnavailableButton>
           }
