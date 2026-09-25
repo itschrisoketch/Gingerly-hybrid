@@ -34,7 +34,7 @@ const LANDLORD_LINKS: SidebarLinkItem[] = [
 
 const TENANT_LINKS: SidebarLinkItem[] = [
   { label: 'Home', href: '/dashboard/tenant', icon: 'LayoutDashboard' },
-  { label: 'My Home', href: '/dashboard/tenant/home', icon: 'Home' },
+  { label: 'My unit', href: '/dashboard/tenant/home', icon: 'Home' },
   { label: 'Payments', href: '/dashboard/tenant/payments', icon: 'CreditCard' },
   { label: 'Maintenance', href: '/dashboard/tenant/maintenance', icon: 'Wrench' },
   { label: 'Calendar', href: '/dashboard/tenant/calendar', icon: 'CalendarDays' },

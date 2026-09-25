@@ -310,6 +310,10 @@ check('September matches the landlord ledger row',
 check('deposit is a positive amount', tenancy.deposit > 0 ? 1 : 0, 1)
 check('the unit has at least one room of each kind',
   tenancy.bedrooms > 0 && tenancy.bathrooms > 0 ? 1 : 0, 1)
+check('the floor is not below ground', tenancy.floor >= 0 ? 1 : 0, 1)
+check('every amenity says when it can be used',
+  tenancy.amenities.filter((a) => !a.name?.trim() || !a.access?.trim()).length, 0)
+check('amenity names unique', new Set(tenancy.amenities.map((a) => a.name)).size, tenancy.amenities.length)
 
 if (failures.length > 0) {
   console.error(`\n${failures.length} failed:\n` + failures.map((f) => `  - ${f}`).join('\n'))

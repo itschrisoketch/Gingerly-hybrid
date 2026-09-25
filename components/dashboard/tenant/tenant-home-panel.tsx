@@ -145,10 +145,11 @@ export function TenantHomePanel({
             <ul className="mt-2 flex flex-wrap gap-1.5">
               {tenancy.amenities.map((a) => (
                 <li
-                  key={a}
+                  key={a.name}
+                  title={a.access}
                   className="rounded-lg border border-border px-2.5 py-1 text-xs text-muted-foreground"
                 >
-                  {a}
+                  {a.name}
                 </li>
               ))}
             </ul>
