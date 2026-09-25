@@ -1,7 +1,6 @@
 import Link from 'next/link'
-import { PageBanner } from '@/components/dashboard/page-banner'
 import { SampleDataChip } from '@/components/dashboard/sample-data-notice'
-import { StatTiles, type Figure } from '@/components/dashboard/stat-tiles'
+import { TenancyBento } from '@/components/dashboard/tenant/tenancy-bento'
 import { TenantHomePanel } from '@/components/dashboard/tenant/tenant-home-panel'
 import { Icon } from '@/components/ui/icon'
 import { formatKes } from '@/lib/format'
@@ -9,13 +8,15 @@ import { IS_SAMPLE_DATA } from '@/lib/dashboard/sample-data'
 import {
   daysBetween,
   formatDueDate,
+  formatFullDate,
   formatPeriod,
   isPeriodSettled,
   me,
   myDocuments,
   myJobs,
   myPayments,
-  nextDueDate,
+  myThread,
+  rentDueDate,
   periodOf,
   tenancy,
 } from '@/lib/dashboard/tenant-view'
@@ -51,37 +52,20 @@ const AS_OF = '2026-09-21'
 
 export default function TenantHome() {
   const settled = isPeriodSettled(AS_OF)
-  const due = nextDueDate(AS_OF)
+  const due = rentDueDate(AS_OF)
   const daysToDue = daysBetween(AS_OF, due)
   const thisPeriod = myPayments.find((p) => p.period === periodOf(AS_OF))
 
   const openJobs = myJobs.filter((j) => j.status !== 'resolved')
   const lastPaid = myPayments.find((p) => p.status === 'paid')
-  const leaseDaysLeft = daysBetween(AS_OF, me.leaseEnd)
 
-  const figures: Figure[] = [
-    {
-      label: 'Monthly rent',
-      value: formatKes(me.rent),
-      icon: 'Home',
-      compact: true,
-    },
-    {
-      label: settled ? 'Next due' : 'Due now',
-      value: formatDueDate(due),
-      icon: 'CalendarDays',
-    },
-    {
-      label: 'Open requests',
-      value: String(openJobs.length),
-      icon: 'Wrench',
-    },
-    {
-      label: 'Lease ends',
-      value: `${Math.max(Math.round(leaseDaysLeft / 30), 0)} mo`,
-      icon: 'FileText',
-    },
-  ]
+  // Lease progress in whole months, from the tenancy itself rather than a
+  // hardcoded twelve — a lease is not always a year.
+  const monthsTotal = Math.max(Math.round(daysBetween(me.moveIn, me.leaseEnd) / 30), 1)
+  const monthsElapsed = Math.min(
+    Math.max(Math.round(daysBetween(me.moveIn, AS_OF) / 30), 0),
+    monthsTotal,
+  )
 
   return (
     <div className="space-y-6">
@@ -120,53 +104,21 @@ export default function TenantHome() {
         </div>
       </header>
 
-      {/* The banner is the rent state and nothing else. When this month is
-          settled it says so rather than disappearing — a tenant checking
-          whether they have paid should get an answer, not an absence. */}
-      {settled ? (
-        <section
-          aria-labelledby="rent-state"
-          className="flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-card px-5 py-4 sm:px-6"
-        >
-          <Icon name="CheckCircle" className="h-5 w-5 shrink-0 text-success-text" />
-          <h2 id="rent-state" className="text-sm font-medium text-foreground">
-            {formatPeriod(periodOf(AS_OF))} rent is paid
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            {formatKes(thisPeriod?.amount ?? me.rent)} received
-            {thisPeriod?.method ? ` by ${thisPeriod.method}` : null}. Next rent is due{' '}
-            {formatDueDate(due)}.
-          </p>
-        </section>
-      ) : (
-        <PageBanner
-          id="rent-state"
-          eyebrow={daysToDue < 0 ? 'Overdue' : 'Rent due'}
-          title={
-            <>
-              {formatKes(me.rent)} for {formatPeriod(periodOf(due))}
-            </>
-          }
-          description={
-            daysToDue < 0 ? (
-              <>
-                Was due {formatDueDate(due)},{' '}
-                <span className="tabular-nums">{Math.abs(daysToDue)}</span>{' '}
-                {Math.abs(daysToDue) === 1 ? 'day' : 'days'} ago
-              </>
-            ) : (
-              <>
-                Due {formatDueDate(due)}, in{' '}
-                <span className="tabular-nums">{daysToDue}</span>{' '}
-                {daysToDue === 1 ? 'day' : 'days'}
-              </>
-            )
-          }
-          action={{ href: '/dashboard/tenant/payments', label: 'Pay rent' }}
-        />
-      )}
-
-      <StatTiles figures={figures} label="Your tenancy" id="tenant-figures" />
+      <TenancyBento
+        rent={me.rent}
+        settled={settled}
+        periodLabel={formatPeriod(settled ? periodOf(AS_OF) : periodOf(due))}
+        dueLabel={formatDueDate(due)}
+        daysToDue={daysToDue}
+        paidMethod={thisPeriod?.method}
+        paidAmount={thisPeriod?.amount}
+        monthsElapsed={monthsElapsed}
+        monthsTotal={monthsTotal}
+        leaseEndLabel={formatFullDate(me.leaseEnd)}
+        openRequests={openJobs.length}
+        documents={myDocuments.length}
+        unreadMessages={myThread?.unread ?? 0}
+      />
 
       <TenantHomePanel
         payments={myPayments.slice(0, 6)}

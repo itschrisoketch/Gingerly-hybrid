@@ -59,20 +59,32 @@ export const myThread: Conversation | undefined = sampleConversations.find(
 )
 
 /**
- * The next rent date on or after `asOf`.
+ * The rent date the tenant is actually being asked about.
  *
- * Rent is due on the 1st, so the answer is either the 1st of this month (when
- * today IS the 1st) or the 1st of next month. Built from UTC parts rather than
- * date arithmetic so the server and the client cannot land on different days
- * either side of midnight — the bug class that makes a countdown flicker by one
- * on first paint.
+ * NOT simply "the next 1st on or after today". That was the first version and
+ * it was wrong in the one case that matters: on 5 October with October rent
+ * unpaid it pointed at 1 November and told the tenant they had 26 days, when
+ * in fact they were four days late. On a screen about rent, telling someone
+ * they have time they do not have is how they end up with a late fee.
+ *
+ * So the answer depends on whether the period covering `asOf` has been
+ * settled. If it has, the next thing to pay is next month's. If it has not,
+ * the date in question is this month's — already in the past, which is exactly
+ * what the caller needs to know to render it as overdue.
+ *
+ * Built from UTC parts rather than date arithmetic so the server and the client
+ * cannot land on different days either side of midnight — the bug class that
+ * makes a countdown flicker by one on first paint.
  */
-export function nextDueDate(asOf: string): string {
-  const [y, m, d] = asOf.slice(0, 10).split('-').map(Number)
-  if (d === RENT_DUE_DAY) return `${y}-${String(m).padStart(2, '0')}-01`
+export function rentDueDate(asOf: string): string {
+  const [y, m] = asOf.slice(0, 10).split('-').map(Number)
+  const thisMonthDue = `${y}-${String(m).padStart(2, '0')}-${String(RENT_DUE_DAY).padStart(2, '0')}`
+
+  if (!isPeriodSettled(asOf)) return thisMonthDue
+
   const nextMonth = m === 12 ? 1 : m + 1
   const nextYear = m === 12 ? y + 1 : y
-  return `${nextYear}-${String(nextMonth).padStart(2, '0')}-01`
+  return `${nextYear}-${String(nextMonth).padStart(2, '0')}-${String(RENT_DUE_DAY).padStart(2, '0')}`
 }
 
 /** Whole days from `asOf` to `date`. Negative once the date has passed. */
