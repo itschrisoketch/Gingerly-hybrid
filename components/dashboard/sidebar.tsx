@@ -19,7 +19,7 @@ import { useAuth } from '@/contexts/auth-context'
 import { cn } from '@/lib/utils'
 
 const LANDLORD_LINKS: SidebarLinkItem[] = [
-  { label: 'Dashboard', href: '/dashboard/landlord', icon: 'LayoutDashboard' },
+  { label: 'Home', href: '/dashboard/landlord', icon: 'LayoutDashboard' },
   { label: 'Properties', href: '/dashboard/landlord/properties', icon: 'Building2' },
   { label: 'Tenants', href: '/dashboard/landlord/tenants', icon: 'Users' },
   { label: 'Payments', href: '/dashboard/landlord/payments', icon: 'CreditCard' },
@@ -33,7 +33,7 @@ const LANDLORD_LINKS: SidebarLinkItem[] = [
 ]
 
 const TENANT_LINKS: SidebarLinkItem[] = [
-  { label: 'Dashboard', href: '/dashboard/tenant', icon: 'LayoutDashboard' },
+  { label: 'Home', href: '/dashboard/tenant', icon: 'LayoutDashboard' },
   { label: 'My Home', href: '/dashboard/tenant/home', icon: 'Home' },
   { label: 'Payments', href: '/dashboard/tenant/payments', icon: 'CreditCard' },
   { label: 'Maintenance', href: '/dashboard/tenant/maintenance', icon: 'Wrench' },
