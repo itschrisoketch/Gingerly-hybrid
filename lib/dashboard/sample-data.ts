@@ -902,11 +902,15 @@ export interface TenancyDetail {
    *  anyone in Nairobi quotes. */
   areaSqm: number
   furnished: boolean
-  /** What the building actually offers. Deliberately short and plausible for a
-   *  Nairobi apartment block — the old page listed a swimming pool, a fitness
-   *  centre, a rooftop terrace, a community lounge and bike storage, which is a
-   *  US leasing brochure rather than this building. */
-  amenities: string[]
+  /** Which floor the unit is on. Ground is 0. */
+  floor: number
+  /** What the building actually offers, and when it can be used — the page
+   *  this replaced listed access hours, so they are kept rather than dropped.
+   *  Deliberately short and plausible for a Nairobi apartment block: the old
+   *  list was a swimming pool, a fitness centre, a rooftop terrace, a community
+   *  lounge and bike storage, which is a US leasing brochure, not this
+   *  building. */
+  amenities: { name: string; access: string }[]
   /** Who to contact about the unit. */
   agent: { name: string; phone: string }
 }
@@ -917,7 +921,15 @@ export const sampleTenancy: TenancyDetail = {
   bathrooms: 1,
   areaSqm: 78,
   furnished: false,
-  amenities: ['Borehole water', 'Backup generator', 'Secure parking', '24-hour security', 'Lift'],
+  floor: 2,
+  amenities: [
+    { name: 'Borehole water', access: 'Always' },
+    { name: 'Backup generator', access: 'Automatic on outage' },
+    { name: 'Secure parking', access: 'Always, one bay' },
+    { name: '24-hour security', access: 'Always' },
+    { name: 'Lift', access: 'Always' },
+    { name: 'Rooftop drying area', access: '6am – 8pm' },
+  ],
   agent: { name: 'Mary Njoki', phone: '+254 711 402 118' },
 }
 
