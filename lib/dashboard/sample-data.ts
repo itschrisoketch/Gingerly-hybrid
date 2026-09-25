@@ -864,3 +864,99 @@ export const sampleSupportCases: SupportCase[] = [
     updated: '2026-09-04',
   },
 ]
+
+/* ------------------------------------------------------------------ */
+/* The signed-in tenant                                                */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Who "you" are on the tenant dashboard.
+ *
+ * The tenant screens need a single person to be about, the way the landlord
+ * screens are about the whole portfolio. Rather than invent one — the old
+ * tenant pages were about "Sarah" on "Main Street" paying "$1,200", a person
+ * and a currency that exist nowhere else in this product — this points at a
+ * tenant who is already in `sampleTenants` and already cross-referenced by
+ * maintenance, conversations, documents and the payment ledger. Every tenant
+ * screen derives from her, so the two sides of the product tell one story: the
+ * landlord sees Grace's payment in their ledger, and Grace sees the same
+ * payment in hers.
+ *
+ * Grace specifically because she is the most completely connected tenant in
+ * the data (a resolved plumbing job, a lease, a works report, a conversation
+ * thread and a paid September), and because `paid` is the honest common case.
+ * A tenant dashboard permanently showing a crisis would be a demo, not a
+ * design.
+ */
+export const SIGNED_IN_TENANT_ID = 'tn1'
+
+/** Rent is due on the 1st. Everything tenant-side counts from this. */
+export const RENT_DUE_DAY = 1
+
+export interface TenancyDetail {
+  /** Deposit held, in KES. Conventionally one month here. */
+  deposit: number
+  bedrooms: number
+  bathrooms: number
+  /** Square METRES. The previous pages used square feet, which is not the unit
+   *  anyone in Nairobi quotes. */
+  areaSqm: number
+  furnished: boolean
+  /** What the building actually offers. Deliberately short and plausible for a
+   *  Nairobi apartment block — the old page listed a swimming pool, a fitness
+   *  centre, a rooftop terrace, a community lounge and bike storage, which is a
+   *  US leasing brochure rather than this building. */
+  amenities: string[]
+  /** Who to contact about the unit. */
+  agent: { name: string; phone: string }
+}
+
+export const sampleTenancy: TenancyDetail = {
+  deposit: 72_000,
+  bedrooms: 2,
+  bathrooms: 1,
+  areaSqm: 78,
+  furnished: false,
+  amenities: ['Borehole water', 'Backup generator', 'Secure parking', '24-hour security', 'Lift'],
+  agent: { name: 'Mary Njoki', phone: '+254 711 402 118' },
+}
+
+/**
+ * Grace's own payment history.
+ *
+ * The landlord ledger holds one row per tenant for the current period, which is
+ * the right shape for that screen and useless for this one — a tenant opening
+ * Payments wants their own run of months, not everyone's September. These are
+ * the months she has been in the unit: moveIn is 2026-01-15, so January is a
+ * part month and the rest are full.
+ *
+ * September is the same payment as `pay3` / `t1`, same amount, same method,
+ * same timestamp, same reference. `verify:data` checks that, because the whole
+ * point of anchoring on a real tenant is lost if the two sides disagree about
+ * a payment they both show.
+ */
+export interface TenantPayment {
+  id: string
+  /** Period the rent covers, YYYY-MM. */
+  period: string
+  amount: number
+  status: Extract<PaymentStatus, 'paid' | 'pending' | 'late'>
+  method?: TxMethod
+  /** ISO timestamp of the successful attempt. Absent while pending. */
+  at?: string
+  reference?: string
+  /** Set where the month was not a full one. */
+  note?: string
+}
+
+export const sampleTenantPayments: TenantPayment[] = [
+  { id: 'tp9', period: '2026-09', amount: 72_000, status: 'paid', method: 'M-Pesa', at: '2026-09-15T09:12:00Z', reference: 'U2RHPDHPDN' },
+  { id: 'tp8', period: '2026-08', amount: 72_000, status: 'paid', method: 'M-Pesa', at: '2026-08-03T18:41:00Z', reference: 'QJ4T8XW2RK' },
+  { id: 'tp7', period: '2026-07', amount: 72_000, status: 'paid', method: 'M-Pesa', at: '2026-07-01T07:26:00Z', reference: 'B7MKD0PZ1C' },
+  { id: 'tp6', period: '2026-06', amount: 72_000, status: 'paid', method: 'M-Pesa', at: '2026-06-02T12:05:00Z', reference: 'LX53QW8NTE' },
+  { id: 'tp5', period: '2026-05', amount: 72_000, status: 'paid', method: 'Bank transfer', at: '2026-05-01T10:18:00Z', reference: 'TRF-556219' },
+  { id: 'tp4', period: '2026-04', amount: 72_000, status: 'paid', method: 'M-Pesa', at: '2026-04-01T06:52:00Z', reference: 'R9CVH2KDAM' },
+  { id: 'tp3', period: '2026-03', amount: 72_000, status: 'paid', method: 'M-Pesa', at: '2026-03-04T19:33:00Z', reference: 'ZP1ND6QGYB' },
+  { id: 'tp2', period: '2026-02', amount: 72_000, status: 'paid', method: 'M-Pesa', at: '2026-02-01T08:09:00Z', reference: 'KD8WR3JVLQ' },
+  { id: 'tp1', period: '2026-01', amount: 39_484, status: 'paid', method: 'M-Pesa', at: '2026-01-15T15:47:00Z', reference: 'MN2XB7TQFD', note: 'Part month from 15 January' },
+]

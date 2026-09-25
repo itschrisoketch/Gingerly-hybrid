@@ -45,6 +45,8 @@ const diary = read('sampleDiary')
 const conversations = read('sampleConversations')
 const documents = read('sampleDocuments')
 const cases = read('sampleSupportCases')
+const tenantPayments = read('sampleTenantPayments')
+const tenancy = read('sampleTenancy')
 
 const sum = (xs, f) => xs.reduce((n, x) => n + f(x), 0)
 const failures = []
@@ -280,6 +282,34 @@ check('nothing was opened in the future', cases.filter((c) => c.opened > TODAY).
 // A case cannot be touched before it existed, and cannot be updated after today.
 check('updated is on or after opened, and not in the future', cases.filter((c) => c.updated < c.opened || c.updated > TODAY).length, 0)
 check('every case has a subject and a detail', cases.filter((c) => !c.subject?.trim() || !c.detail?.trim()).length, 0)
+
+console.log('\nthe signed-in tenant')
+const me = tenants.find((t) => t.id === 'tn1')
+check('SIGNED_IN_TENANT_ID points at a real tenant', me ? 1 : 0, 1)
+check('payment ids unique', new Set(tenantPayments.map((p) => p.id)).size, tenantPayments.length)
+check('periods unique', new Set(tenantPayments.map((p) => p.period)).size, tenantPayments.length)
+check('periods are all YYYY-MM', tenantPayments.filter((p) => !/^\d{4}-\d{2}$/.test(p.period)).length, 0)
+check('nothing is paid in the future', tenantPayments.filter((p) => p.at && p.at.slice(0, 10) > TODAY).length, 0)
+check('a paid month carries a method, a time and a reference',
+  tenantPayments.filter((p) => p.status === 'paid' && !(p.method && p.at && p.reference)).length, 0)
+// A full month must be the rent on the tenancy; only a part month may differ,
+// and it must be smaller. This is what stops the history drifting from the unit.
+check('full months equal the rent on the tenancy',
+  tenantPayments.filter((p) => !p.note && p.amount !== me.rent).length, 0)
+check('a part month is less than a full one',
+  tenantPayments.filter((p) => p.note && !(p.amount < me.rent)).length, 0)
+check('no month precedes the move-in',
+  tenantPayments.filter((p) => p.period < me.moveIn.slice(0, 7)).length, 0)
+// The landlord ledger and the tenant's own history show the SAME September
+// payment. If these ever disagree the two dashboards are lying to each other.
+const ledger = payments.find((p) => p.tenant === me.name)
+const mine = tenantPayments.find((p) => p.period === '2026-09')
+check('September matches the landlord ledger row', 
+  ledger && mine && ledger.amount === mine.amount && ledger.method === mine.method
+    && ledger.at === mine.at && ledger.reference === mine.reference ? 1 : 0, 1)
+check('deposit is a positive amount', tenancy.deposit > 0 ? 1 : 0, 1)
+check('the unit has at least one room of each kind',
+  tenancy.bedrooms > 0 && tenancy.bathrooms > 0 ? 1 : 0, 1)
 
 if (failures.length > 0) {
   console.error(`\n${failures.length} failed:\n` + failures.map((f) => `  - ${f}`).join('\n'))
