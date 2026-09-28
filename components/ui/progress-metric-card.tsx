@@ -29,6 +29,15 @@ export interface ProgressMetricCardProps {
   deltaLabel?: string
   percent?: string
   trend?: 'up' | 'down'
+  /**
+   * Hides the percentage chip beside the headline. Default true.
+   *
+   * For a cumulative series a growth percentage is nonsense — rent paid to date
+   * rises from the first month's part payment to nine months of rent, which the
+   * card reported as "+1458.8%". The footer's "+Ksh 72,000 vs last month" is
+   * the honest reading of the same series, so that stays.
+   */
+  showTrend?: boolean
   unit?: string
   period?: string
   periodOptions?: PeriodOption[]
@@ -93,6 +102,7 @@ export default function ProgressMetricCard({
   delta,
   deltaLabel = 'today',
   percent,
+  showTrend = true,
   trend,
   unit,
   period = 'Past 30 days',
@@ -265,16 +275,18 @@ export default function ProgressMetricCard({
             ) : null}
           </div>
 
-          <span
-            className="flex shrink-0 items-center gap-1 pb-1 text-sm font-medium tabular-nums"
-            style={{ color: color.text }}
-          >
-            <Icon name={trendIcon} className="h-4 w-4" />
-            <span>
-              {displayPercent}
-              <span className="sr-only"> {trendWord}</span>
+          {showTrend ? (
+            <span
+              className="flex shrink-0 items-center gap-1 pb-1 text-sm font-medium tabular-nums"
+              style={{ color: color.text }}
+            >
+              <Icon name={trendIcon} className="h-4 w-4" />
+              <span>
+                {displayPercent}
+                <span className="sr-only"> {trendWord}</span>
+              </span>
             </span>
-          </span>
+          ) : null}
         </div>
 
         {isMulti ? (
