@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import { Icon } from '@/components/ui/icon'
+import { cn } from '@/lib/utils'
+import type { IconName } from '@/lib/icons/icon-map'
 
 /**
  * The navy banner that opens a dashboard screen.
@@ -34,6 +36,8 @@ export function PageBanner({
   description,
   action,
   leading,
+  tone = 'attention',
+  icon,
 }: {
   id: string
   eyebrow: string
@@ -42,27 +46,69 @@ export function PageBanner({
   action?: { href: string; label: string }
   /** Optional visual before the copy, e.g. a group of avatars. */
   leading?: React.ReactNode
+  /**
+   * `attention` is the teal ground above — something is outstanding.
+   * `calm` is the same object on a card ground, for when nothing is.
+   *
+   * A settled state used to render as a thin one-line strip, which said the
+   * right words in a shape that read as a footnote. Nothing being owed is worth
+   * the same room as something being owed: a tenant opening this page to check
+   * whether they have paid is asking the same question either way, and the
+   * answer should not be harder to find when it is good news. Same geometry,
+   * different register.
+   */
+  tone?: 'attention' | 'calm'
+  /** Shown before the copy on the calm tone, e.g. a tick. */
+  icon?: IconName
 }) {
+  const attention = tone === 'attention'
+
   return (
     <section
       aria-labelledby={id}
-      className="overflow-hidden rounded-2xl bg-teal-600 px-5 py-5 text-white sm:px-6"
+      className={cn(
+        'overflow-hidden rounded-2xl px-5 py-5 sm:px-6',
+        attention ? 'bg-teal-600 text-white' : 'border border-border bg-card',
+      )}
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-center gap-4">
           {leading}
+          {!attention && icon ? (
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-success/10">
+              <Icon name={icon} className="h-5 w-5 text-success-text" />
+            </span>
+          ) : null}
 
           <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal-50">
+            <p
+              className={cn(
+                'text-xs font-semibold uppercase tracking-[0.14em]',
+                attention ? 'text-teal-50' : 'text-muted-foreground',
+              )}
+            >
               {eyebrow}
             </p>
 
-            <h2 id={id} className="mt-2 text-lg font-medium sm:text-xl">
+            <h2
+              id={id}
+              className={cn(
+                'mt-2 text-lg font-medium sm:text-xl',
+                !attention && 'text-foreground',
+              )}
+            >
               {title}
             </h2>
 
             {description ? (
-              <p className="mt-1 text-sm text-white/80">{description}</p>
+              <p
+                className={cn(
+                  'mt-1 text-sm',
+                  attention ? 'text-white/80' : 'text-muted-foreground',
+                )}
+              >
+                {description}
+              </p>
             ) : null}
           </div>
         </div>
@@ -70,7 +116,12 @@ export function PageBanner({
         {action ? (
           <Link
             href={action.href}
-            className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-5 text-sm font-medium text-navy-500 transition-colors hover:bg-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-600"
+            className={cn(
+              'inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl px-5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+              attention
+                ? 'bg-white text-navy-500 hover:bg-white/90 focus-visible:ring-white/70 focus-visible:ring-offset-teal-600'
+                : 'bg-accent text-accent-foreground hover:bg-accent/90 focus-visible:ring-accent/40 focus-visible:ring-offset-background',
+            )}
           >
             {action.label}
             <Icon name="ArrowRight" className="h-4 w-4" />

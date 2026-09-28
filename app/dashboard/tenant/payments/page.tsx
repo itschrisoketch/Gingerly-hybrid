@@ -50,6 +50,7 @@ export default function TenantPaymentsPage() {
   const due = rentDueDate(AS_OF)
   const daysToDue = daysBetween(AS_OF, due)
   const upcoming = upcomingPayments(AS_OF)
+  const thisPeriod = myPayments.find((p) => p.period === periodOf(AS_OF))
 
   const paid = myPayments.filter((p) => p.status === 'paid')
   const remaining = upcoming.reduce((sum, u) => sum + u.amount, 0)
@@ -117,18 +118,20 @@ export default function TenantPaymentsPage() {
       </header>
 
       {settled ? (
-        <section
-          aria-labelledby="rent-state"
-          className="flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-card px-5 py-4 sm:px-6"
-        >
-          <Icon name="CheckCircle" className="h-5 w-5 shrink-0 text-success-text" />
-          <h2 id="rent-state" className="text-sm font-medium text-foreground">
-            {formatPeriod(periodOf(AS_OF))} rent is paid
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Nothing is owed. Your next rent is due {formatDueDate(due)}.
-          </p>
-        </section>
+        <PageBanner
+          id="rent-state"
+          tone="calm"
+          icon="CheckCircle"
+          eyebrow="Nothing owed"
+          title={<>{formatPeriod(periodOf(AS_OF))} rent is paid</>}
+          description={
+            <>
+              {formatKes(thisPeriod?.amount ?? me.rent)} received
+              {thisPeriod?.method ? ` by ${thisPeriod.method}` : null} &middot; next rent due{' '}
+              {formatDueDate(due)}
+            </>
+          }
+        />
       ) : (
         <PageBanner
           id="rent-state"
