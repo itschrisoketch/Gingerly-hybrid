@@ -169,3 +169,47 @@ export function paidToDate(): number {
     .filter((p) => p.status === 'paid')
     .reduce((sum, p) => sum + p.amount, 0)
 }
+
+/**
+ * The rent still to fall due before the lease ends.
+ *
+ * Derived from the lease rather than listed, so it cannot drift from the
+ * tenancy: every 1st between the next due date and `leaseEnd`. The page this
+ * replaces hardcoded three upcoming months as "May, June, July 2024", which
+ * stopped being true the moment the date passed.
+ *
+ * Oldest first.
+ */
+export function upcomingPayments(
+  asOf: string,
+): { period: string; due: string; amount: number; partMonth?: boolean }[] {
+  const out: { period: string; due: string; amount: number; partMonth?: boolean }[] = []
+  const end = me.leaseEnd.slice(0, 10)
+  const [endY, endM, endD] = end.split('-').map(Number)
+
+  let [y, m] = rentDueDate(asOf).slice(0, 10).split('-').map(Number)
+  // Cap the walk so a bad lease date can never spin forever.
+  for (let i = 0; i < 60; i++) {
+    const due = `${y}-${String(m).padStart(2, '0')}-${String(RENT_DUE_DAY).padStart(2, '0')}`
+    if (due > end) break
+
+    // The month the lease ends in is a part month, and is charged as one — the
+    // same way the move-in month was. Without this the last row billed a full
+    // Ksh 72,000 for a fortnight and "left on lease" was overstated by the
+    // difference, which is the kind of number a tenant plans around.
+    const isLast = y === endY && m === endM
+    const daysInMonth = new Date(Date.UTC(y, m, 0)).getUTCDate()
+    const amount = isLast ? Math.round((me.rent * endD) / daysInMonth) : me.rent
+
+    out.push({
+      period: `${y}-${String(m).padStart(2, '0')}`,
+      due,
+      amount,
+      ...(isLast ? { partMonth: true } : {}),
+    })
+
+    m = m === 12 ? 1 : m + 1
+    if (m === 1) y += 1
+  }
+  return out
+}
