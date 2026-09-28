@@ -74,9 +74,14 @@ export function PageBanner({
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-center gap-4">
           {leading}
+          {/* Brand teal, not success green. The tick was the only non-brand
+              colour on the screen, and "nothing outstanding" is a state of this
+              product rather than a semantic success — green here competed with
+              the paid pills in the table below, which ARE semantic. Matches the
+              icon square in stat-tiles.tsx. */}
           {!attention && icon ? (
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-success/10">
-              <Icon name={icon} className="h-5 w-5 text-success-text" />
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
+              <Icon name={icon} className="h-5 w-5" />
             </span>
           ) : null}
 
