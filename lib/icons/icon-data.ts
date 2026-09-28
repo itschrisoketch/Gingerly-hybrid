@@ -29,6 +29,7 @@ import ChevronLeftOutlineRoundedIcon from '@iconify-icons/material-symbols/chevr
 import ChevronRightOutlineRoundedIcon from '@iconify-icons/material-symbols/chevron-right-outline-rounded'
 import CircleOutlineRoundedIcon from '@iconify-icons/material-symbols/circle-outline-rounded'
 import CloseOutlineRoundedIcon from '@iconify-icons/material-symbols/close-outline-rounded'
+import ContentCopyOutlineRoundedIcon from '@iconify-icons/material-symbols/content-copy-outline-rounded'
 import CreditCardOutlineRoundedIcon from '@iconify-icons/material-symbols/credit-card-outline-rounded'
 import DarkModeOutlineRoundedIcon from '@iconify-icons/material-symbols/dark-mode-outline-rounded'
 import DashboardOutlineRoundedIcon from '@iconify-icons/material-symbols/dashboard-outline-rounded'
@@ -122,6 +123,7 @@ const icons: Record<string, unknown> = {
   'chevron-right-outline-rounded': ChevronRightOutlineRoundedIcon,
   'circle-outline-rounded': CircleOutlineRoundedIcon,
   'close-outline-rounded': CloseOutlineRoundedIcon,
+  'content-copy-outline-rounded': ContentCopyOutlineRoundedIcon,
   'credit-card-outline-rounded': CreditCardOutlineRoundedIcon,
   'dark-mode-outline-rounded': DarkModeOutlineRoundedIcon,
   'dashboard-outline-rounded': DashboardOutlineRoundedIcon,

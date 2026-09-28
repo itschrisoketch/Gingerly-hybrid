@@ -40,6 +40,7 @@ export const ICON_MAP = {
   ChevronUp: 'expand-less',
   Circle: 'circle-outline-rounded',
   Clock: 'schedule-outline-rounded',
+  Copy: 'content-copy-outline-rounded',
   CreditCard: 'credit-card-outline-rounded',
   DollarSign: 'attach-money-outline-rounded',
   Dot: 'fiber-manual-record-outline-rounded',
