@@ -66,8 +66,9 @@ export function LedgerTable({
   primaryHeading: string
   whenHeading?: string
   rows: LedgerRow[]
-  href: string
-  viewAllLabel: string
+  /** Omit on a page that IS the full list — it should not link to itself. */
+  href?: string
+  viewAllLabel?: string
   /** How a timestamp reads on this screen — relative for an agent watching
    *  today, an actual date for a tenant looking back over a year. */
   formatWhen: (at: string) => string
@@ -80,13 +81,15 @@ export function LedgerTable({
           <CardTitle>{title}</CardTitle>
           <CardDescription>{description}</CardDescription>
         </div>
-        <Link
-          href={href}
-          className="hidden h-9 shrink-0 items-center gap-1.5 rounded-lg px-3 text-sm font-medium text-accent transition-colors hover:bg-accent/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 sm:ml-auto sm:flex"
-        >
-          View all
-          <Icon name="ArrowRight" className="h-4 w-4" />
-        </Link>
+        {href ? (
+          <Link
+            href={href}
+            className="hidden h-9 shrink-0 items-center gap-1.5 rounded-lg px-3 text-sm font-medium text-accent transition-colors hover:bg-accent/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 sm:ml-auto sm:flex"
+          >
+            View all
+            <Icon name="ArrowRight" className="h-4 w-4" />
+          </Link>
+        ) : null}
       </CardHeader>
 
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
@@ -206,13 +209,15 @@ export function LedgerTable({
 
             {/* The header's "View all" is hidden below sm, so the link lives here
                 on a phone rather than being unreachable. */}
-            <Link
-              href={href}
-              className="mt-2 flex h-11 items-center justify-center gap-1.5 rounded-xl text-sm font-medium text-accent transition-colors hover:bg-accent/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 sm:hidden"
-            >
-              {viewAllLabel}
-              <Icon name="ArrowRight" className="h-4 w-4" />
-            </Link>
+            {href ? (
+              <Link
+                href={href}
+                className="mt-2 flex h-11 items-center justify-center gap-1.5 rounded-xl text-sm font-medium text-accent transition-colors hover:bg-accent/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 sm:hidden"
+              >
+                {viewAllLabel}
+                <Icon name="ArrowRight" className="h-4 w-4" />
+              </Link>
+            ) : null}
           </>
         )}
       </CardContent>
