@@ -139,3 +139,33 @@ const MONTHS = [
   'November',
   'December',
 ]
+
+/**
+ * Rent paid so far, month by month, as a running total.
+ *
+ * A cumulative series rather than the monthly figure, deliberately. Grace pays
+ * the same 72,000 every month, so plotting the monthly amount draws a flat line
+ * that says nothing — the same mistake as the occupancy sparkline that was
+ * tried and removed on the landlord dashboard. The running total actually
+ * moves, and "how much have I paid into this tenancy" is a question a tenant
+ * genuinely asks, usually when a deposit is being discussed.
+ *
+ * Oldest first, because that is the direction a chart reads.
+ */
+export function paidToDateSeries(): { value: number; date: string }[] {
+  const oldestFirst = [...myPayments].reverse()
+  let running = 0
+  return oldestFirst
+    .filter((p) => p.status === 'paid')
+    .map((p) => {
+      running += p.amount
+      return { value: running, date: formatPeriod(p.period) }
+    })
+}
+
+/** Everything paid into this tenancy so far, in KES. */
+export function paidToDate(): number {
+  return myPayments
+    .filter((p) => p.status === 'paid')
+    .reduce((sum, p) => sum + p.amount, 0)
+}

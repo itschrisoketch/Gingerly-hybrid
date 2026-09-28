@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { SampleDataChip } from '@/components/dashboard/sample-data-notice'
 import { TenancyBento } from '@/components/dashboard/tenant/tenancy-bento'
-import { TenantHomePanel } from '@/components/dashboard/tenant/tenant-home-panel'
+import { TenantMetrics } from '@/components/dashboard/tenant/tenant-metrics'
+import { LedgerTable, type LedgerRow } from '@/components/dashboard/ledger-table'
 import { Icon } from '@/components/ui/icon'
 import { formatKes } from '@/lib/format'
 import { IS_SAMPLE_DATA } from '@/lib/dashboard/sample-data'
@@ -16,9 +17,10 @@ import {
   myJobs,
   myPayments,
   myThread,
+  paidToDate,
+  paidToDateSeries,
   rentDueDate,
   periodOf,
-  tenancy,
 } from '@/lib/dashboard/tenant-view'
 
 /**
@@ -57,7 +59,19 @@ export default function TenantHome() {
   const thisPeriod = myPayments.find((p) => p.period === periodOf(AS_OF))
 
   const openJobs = myJobs.filter((j) => j.status !== 'resolved')
-  const lastPaid = myPayments.find((p) => p.status === 'paid')
+
+  // Her own history in the shared ledger shape. The first column is the period
+  // rather than a name: on this screen the tenant is not the question, the
+  // month is.
+  const ledger: LedgerRow[] = myPayments.slice(0, 6).map((p) => ({
+    id: p.id,
+    primary: formatPeriod(p.period),
+    secondary: p.note ?? p.reference,
+    method: p.method,
+    at: p.at,
+    status: p.status,
+    amount: p.amount,
+  }))
 
   // Lease progress in whole months, from the tenancy itself rather than a
   // hardcoded twelve — a lease is not always a year.
@@ -120,12 +134,25 @@ export default function TenantHome() {
         unreadMessages={myThread?.unread ?? 0}
       />
 
-      <TenantHomePanel
-        payments={myPayments.slice(0, 6)}
-        documents={myDocuments}
-        tenant={me}
-        tenancy={tenancy}
-        lastPaidMethod={lastPaid?.method}
+      <TenantMetrics
+        series={paidToDateSeries()}
+        paidToDate={paidToDate()}
+        monthsPaid={myPayments.filter((p) => p.status === 'paid').length}
+      />
+
+      <LedgerTable
+        title="Your payments"
+        description={`Unit ${me.unit}, ${me.property}`}
+        primaryHeading="Period"
+        whenHeading="Paid"
+        rows={ledger}
+        href="/dashboard/tenant/payments"
+        viewAllLabel="View all payments"
+        formatWhen={(at) => formatFullDate(at)}
+        empty={{
+          title: 'No payments yet',
+          detail: 'Your rent will appear here once the first payment goes through.',
+        }}
       />
     </div>
   )
