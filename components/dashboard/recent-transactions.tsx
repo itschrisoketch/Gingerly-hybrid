@@ -15,6 +15,8 @@ export function RecentTransactions({ rows }: { rows: Transaction[] }) {
     id: r.id,
     primary: r.tenant,
     secondary: `${r.unit}, ${r.property}`,
+    reference: r.reference,
+    referenceLabel: `${r.method} reference`,
     method: r.method,
     at: r.at,
     status: r.status,

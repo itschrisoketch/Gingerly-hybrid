@@ -283,6 +283,20 @@ check('nothing was opened in the future', cases.filter((c) => c.opened > TODAY).
 check('updated is on or after opened, and not in the future', cases.filter((c) => c.updated < c.opened || c.updated > TODAY).length, 0)
 check('every case has a subject and a detail', cases.filter((c) => !c.subject?.trim() || !c.detail?.trim()).length, 0)
 
+console.log('\ntransactions against the payment ledger')
+check('only paid transactions carry a reference',
+  transactions.filter((t) => t.reference && t.status !== 'paid').length, 0)
+check('every paid transaction carries one',
+  transactions.filter((t) => t.status === 'paid' && !t.reference).length, 0)
+// The recents feed and the payments ledger show the SAME payment, so a
+// reference that differs between them would have an agent quoting one code to
+// support and reading another on screen.
+check('references match the ledger row for the same payment',
+  transactions.filter((t) => {
+    const pay = payments.find((p) => p.tenant === t.tenant && p.at === t.at)
+    return pay && pay.reference !== t.reference
+  }).length, 0)
+
 console.log('\nthe signed-in tenant')
 const me = tenants.find((t) => t.id === 'tn1')
 check('SIGNED_IN_TENANT_ID points at a real tenant', me ? 1 : 0, 1)

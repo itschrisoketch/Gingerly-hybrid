@@ -27,16 +27,21 @@ export interface LedgerRow {
   id: string
   /** First column, bold: a tenant's name, or the period a payment covers. */
   primary: string
-  /** Under it, quieter: the unit and property, or the M-Pesa reference. */
+  /** Under it, quieter: the unit and property, or a note about the month. */
   secondary?: string
   /**
-   * Set when `secondary` is a payment reference rather than a description. It
-   * gets a copy control, because a reference is the one string here meant to
-   * leave the screen — a tenant sends it to their agent when a payment has not
-   * landed. `copyLabel` names it in the button's accessible name.
+   * The payment reference, on its own line with a copy control.
+   *
+   * Its own field rather than a flag on `secondary`, because the two are
+   * different kinds of thing and a row often wants both — an agent needs the
+   * unit AND the code. A reference is the one string on these screens meant to
+   * leave them: a tenant sends it to their agent when a payment has not landed,
+   * an agent quotes it to support, and retyping ten mixed-case characters is
+   * where transcription errors come from.
    */
-  copyable?: boolean
-  copyLabel?: string
+  reference?: string
+  /** Names it in the copy button's accessible name: "M-Pesa reference". */
+  referenceLabel?: string
   method?: TxMethod
   /** ISO timestamp. Absent where nothing was attempted. */
   at?: string
@@ -195,17 +200,16 @@ export function LedgerTable({
                       <th scope="row" className="py-3 pr-6 text-left font-normal">
                         <span className="block font-medium text-foreground">{row.primary}</span>
                         {row.secondary ? (
-                          row.copyable ? (
-                            <span className="flex items-center gap-1 text-muted-foreground">
-                              <span className="tabular-nums">{row.secondary}</span>
-                              <CopyButton
-                                value={row.secondary}
-                                label={row.copyLabel ?? 'reference'}
-                              />
-                            </span>
-                          ) : (
-                            <span className="block text-muted-foreground">{row.secondary}</span>
-                          )
+                          <span className="block text-muted-foreground">{row.secondary}</span>
+                        ) : null}
+                        {row.reference ? (
+                          <span className="flex items-center gap-1 text-muted-foreground">
+                            <span className="tabular-nums">{row.reference}</span>
+                            <CopyButton
+                              value={row.reference}
+                              label={row.referenceLabel ?? 'reference'}
+                            />
+                          </span>
                         ) : null}
                       </th>
                       <td className="whitespace-nowrap py-3 pr-6">
@@ -249,17 +253,16 @@ export function LedgerTable({
                     <div className="min-w-0">
                       <p className="truncate font-medium text-foreground">{row.primary}</p>
                       {row.secondary ? (
-                        row.copyable ? (
-                          <span className="flex items-center gap-1 text-sm text-muted-foreground">
-                            <span className="truncate tabular-nums">{row.secondary}</span>
-                            <CopyButton
-                              value={row.secondary}
-                              label={row.copyLabel ?? 'reference'}
-                            />
-                          </span>
-                        ) : (
-                          <p className="truncate text-sm text-muted-foreground">{row.secondary}</p>
-                        )
+                        <p className="truncate text-sm text-muted-foreground">{row.secondary}</p>
+                      ) : null}
+                      {row.reference ? (
+                        <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                          <span className="truncate tabular-nums">{row.reference}</span>
+                          <CopyButton
+                            value={row.reference}
+                            label={row.referenceLabel ?? 'reference'}
+                          />
+                        </span>
                       ) : null}
                     </div>
                     <p
