@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Icon } from '@/components/ui/icon'
+import { CopyButton } from '@/components/ui/copy-button'
 import { StatusBadge, type StatusTone } from '@/components/ui/status-badge'
 import type { IconName } from '@/lib/icons/icon-map'
 import { cn } from '@/lib/utils'
@@ -28,6 +29,14 @@ export interface LedgerRow {
   primary: string
   /** Under it, quieter: the unit and property, or the M-Pesa reference. */
   secondary?: string
+  /**
+   * Set when `secondary` is a payment reference rather than a description. It
+   * gets a copy control, because a reference is the one string here meant to
+   * leave the screen — a tenant sends it to their agent when a payment has not
+   * landed. `copyLabel` names it in the button's accessible name.
+   */
+  copyable?: boolean
+  copyLabel?: string
   method?: TxMethod
   /** ISO timestamp. Absent where nothing was attempted. */
   at?: string
@@ -186,7 +195,17 @@ export function LedgerTable({
                       <th scope="row" className="py-3 pr-6 text-left font-normal">
                         <span className="block font-medium text-foreground">{row.primary}</span>
                         {row.secondary ? (
-                          <span className="block text-muted-foreground">{row.secondary}</span>
+                          row.copyable ? (
+                            <span className="flex items-center gap-1 text-muted-foreground">
+                              <span className="tabular-nums">{row.secondary}</span>
+                              <CopyButton
+                                value={row.secondary}
+                                label={row.copyLabel ?? 'reference'}
+                              />
+                            </span>
+                          ) : (
+                            <span className="block text-muted-foreground">{row.secondary}</span>
+                          )
                         ) : null}
                       </th>
                       <td className="whitespace-nowrap py-3 pr-6">
@@ -230,7 +249,17 @@ export function LedgerTable({
                     <div className="min-w-0">
                       <p className="truncate font-medium text-foreground">{row.primary}</p>
                       {row.secondary ? (
-                        <p className="truncate text-sm text-muted-foreground">{row.secondary}</p>
+                        row.copyable ? (
+                          <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                            <span className="truncate tabular-nums">{row.secondary}</span>
+                            <CopyButton
+                              value={row.secondary}
+                              label={row.copyLabel ?? 'reference'}
+                            />
+                          </span>
+                        ) : (
+                          <p className="truncate text-sm text-muted-foreground">{row.secondary}</p>
+                        )
                       ) : null}
                     </div>
                     <p
