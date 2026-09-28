@@ -1,7 +1,9 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Icon } from '@/components/ui/icon'
-import { StatusBadge } from '@/components/ui/status-badge'
+import { StatusBadge, type StatusTone } from '@/components/ui/status-badge'
+import type { IconName } from '@/lib/icons/icon-map'
 import { cn } from '@/lib/utils'
 import { formatKes } from '@/lib/format'
 import type { PaymentStatus, TxMethod } from '@/lib/dashboard/sample-data'
@@ -35,18 +37,71 @@ export interface LedgerRow {
   amount: number
 }
 
-const TONE: Record<PaymentStatus, 'success' | 'warning' | 'danger' | 'neutral'> = {
-  paid: 'success',
-  pending: 'warning',
-  late: 'danger',
-  failed: 'danger',
+/**
+ * The status pill, matching payments-table.tsx exactly — same words, same
+ * tones, same icons, same hint on `failed`.
+ *
+ * The icons are load-bearing rather than decorative. PRODUCT.md rule 5: the
+ * state must not be carried by colour alone, and while the label already names
+ * it, `failed` and `late` share the `danger` tone and are only told apart at a
+ * glance by the mark beside the word.
+ *
+ * Tones are the contrast-checked `-text` tokens, since `--success` and
+ * `--warning` are fill colours and measure 3.33 and 2.79 against the 4.5 floor
+ * when used as text.
+ */
+const STATUS: Record<
+  PaymentStatus,
+  { label: string; tone: StatusTone; icon: IconName; hint?: string }
+> = {
+  late: { label: 'Late', tone: 'danger', icon: 'AlertTriangle' },
+  failed: {
+    label: 'Failed',
+    tone: 'danger',
+    icon: 'XCircle',
+    hint: 'Attempted, did not go through',
+  },
+  pending: { label: 'Pending', tone: 'warning', icon: 'Clock' },
+  paid: { label: 'Paid', tone: 'success', icon: 'CheckCircle' },
 }
 
-const LABEL: Record<PaymentStatus, string> = {
-  paid: 'Paid',
-  pending: 'Pending',
-  late: 'Late',
-  failed: 'Failed',
+function StatusPill({ status }: { status: PaymentStatus }) {
+  const s = STATUS[status]
+  return (
+    <StatusBadge tone={s.tone} icon={s.icon} title={s.hint}>
+      {s.label}
+    </StatusBadge>
+  )
+}
+
+/**
+ * The method, as the M-Pesa mark where it is M-Pesa.
+ *
+ * The asset is a flat PNG with no alpha, so it carries its own white ground.
+ * That is invisible on the light card and a white slab in dark mode, hence the
+ * explicit white chip around it — the ground becomes deliberate rather than an
+ * artefact, and the mark keeps the clear space a logo is supposed to have.
+ *
+ * The name stays in the accessible name rather than beside the mark: the column
+ * already has a heading, and "M-Pesa M-PESA" is what a screen reader would
+ * otherwise announce.
+ */
+function MethodCell({ method }: { method?: TxMethod }) {
+  if (!method) return <span className="text-muted-foreground">—</span>
+  if (method !== 'M-Pesa') return <span className="text-muted-foreground">{method}</span>
+
+  return (
+    <span className="inline-flex items-center rounded-md bg-white px-2 py-1.5 ring-1 ring-border">
+      <Image
+        src="/mpesa-logo.png"
+        alt="M-Pesa"
+        width={270}
+        height={148}
+        className="h-5 w-auto"
+        unoptimized
+      />
+    </span>
+  )
 }
 
 export function LedgerTable({
@@ -134,16 +189,14 @@ export function LedgerTable({
                           <span className="block text-muted-foreground">{row.secondary}</span>
                         ) : null}
                       </th>
-                      <td className="whitespace-nowrap py-3 pr-6 text-muted-foreground">
-                        {row.method ?? '—'}
+                      <td className="whitespace-nowrap py-3 pr-6">
+                        <MethodCell method={row.method} />
                       </td>
                       <td className="whitespace-nowrap py-3 pr-6 text-muted-foreground tabular-nums">
                         {row.at ? formatWhen(row.at) : '—'}
                       </td>
                       <td className="py-3 pr-6">
-                        <StatusBadge tone={TONE[row.status]} size="sm">
-                          {LABEL[row.status]}
-                        </StatusBadge>
+                        <StatusPill status={row.status} />
                         {row.note ? (
                           <span className="mt-1 block text-xs text-muted-foreground">
                             {row.note}
@@ -193,12 +246,10 @@ export function LedgerTable({
                   </div>
 
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-                    <StatusBadge tone={TONE[row.status]} size="sm">
-                      {LABEL[row.status]}
-                    </StatusBadge>
-                    <span className="text-sm text-muted-foreground tabular-nums">
-                      {row.method ?? '—'}
-                      {row.at ? ` · ${formatWhen(row.at)}` : null}
+                    <StatusPill status={row.status} />
+                    <span className="flex items-center gap-1.5 text-sm text-muted-foreground tabular-nums">
+                      <MethodCell method={row.method} />
+                      {row.at ? <span>&middot; {formatWhen(row.at)}</span> : null}
                     </span>
                   </div>
 
