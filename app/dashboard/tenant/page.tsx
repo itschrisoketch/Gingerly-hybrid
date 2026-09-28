@@ -66,10 +66,9 @@ export default function TenantHome() {
   const ledger: LedgerRow[] = myPayments.slice(0, 6).map((p) => ({
     id: p.id,
     primary: formatPeriod(p.period),
-    // The reference is copyable; the part-month note is prose and is not.
-    secondary: p.note ?? p.reference,
-    copyable: !p.note && Boolean(p.reference),
-    copyLabel: `${p.method ?? 'payment'} reference`,
+    secondary: p.note,
+    reference: p.reference,
+    referenceLabel: `${p.method ?? 'payment'} reference`,
     method: p.method,
     at: p.at,
     status: p.status,
