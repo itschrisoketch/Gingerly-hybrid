@@ -535,7 +535,15 @@ export const PromptInput = React.forwardRef<HTMLDivElement, PromptInputProps>(
               placeholder={placeholder}
               aria-label={placeholder}
               disabled={isRecording}
-              className="absolute inset-x-0 top-0 w-full resize-none bg-transparent py-3.5 pl-4 pr-12 text-sm leading-[22px] text-foreground outline-none placeholder:text-muted-foreground disabled:opacity-70"
+              // The focus-visible cancellations are load-bearing. globals.css
+              // has a bare `:focus-visible` rule applying `ring-2
+              // ring-primary/40 ring-offset-2`, which painted a second, offset
+              // navy ring around the textarea INSIDE the wrapper that already
+              // shows focus. The result was two nested rectangles with a gap
+              // between them — the composer looked like an unloaded skeleton
+              // the moment you clicked it. Focus is shown by the wrapper, once.
+              // Same fix as components/auth/auth-input.tsx.
+              className="absolute inset-x-0 top-0 w-full resize-none bg-transparent py-3.5 pl-4 pr-12 text-sm leading-[22px] text-foreground outline-none placeholder:text-muted-foreground disabled:opacity-70 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
             />
 
             {/* Toolbar */}
