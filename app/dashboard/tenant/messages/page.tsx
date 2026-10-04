@@ -152,7 +152,7 @@ export default function TenantMessagesPage() {
               className="mt-4 flex h-10 items-center justify-center gap-2 rounded-lg bg-accent px-4 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
             >
               <Icon name="Phone" className="h-4 w-4" />
-              <span className="tabular-nums">{tenancy.agent.phone}</span>
+              <span className="whitespace-nowrap tabular-nums">{tenancy.agent.phone}</span>
             </a>
           </section>
 
