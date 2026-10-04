@@ -24,6 +24,8 @@ import type {
   ForgotPasswordResponse,
   VerifyOtpResponse,
   ChangePasswordResponse,
+  CustomerUpdateData,
+  CustomerUpdateResponse,
 } from '@/lib/api/types'
 import type {
   MerchantUpdateData,
@@ -218,6 +220,35 @@ export function useUpdateMerchant(
   return useMutation<MerchantUpdateResponse, { id: string } & MerchantUpdateData>(
     async ({ id, ...data }) => {
       const response = await merchantService.update(id, data)
+      await refreshUser()
+      return response
+    },
+    {
+      successMessage: 'Saved',
+      ...options,
+    }
+  )
+}
+
+/**
+ * Update the logged-in customer.
+ *
+ * The endpoint accepts TWO fields — `first_name` and `last_name` — and nothing
+ * else. Email, phone, apartment, unit and rent are all on the customer record
+ * and all read-only, which is why the tenant settings screen shows them as
+ * stored and says so rather than offering inputs that cannot save.
+ *
+ * Refreshes the session afterwards so the sidebar and the greeting pick up a
+ * changed name without a reload, the same way useUpdateMerchant does.
+ */
+export function useUpdateCustomer(
+  options?: MutationOptions<CustomerUpdateResponse, { id: string } & CustomerUpdateData>
+) {
+  const { refreshUser } = useAuth()
+
+  return useMutation<CustomerUpdateResponse, { id: string } & CustomerUpdateData>(
+    async ({ id, ...data }) => {
+      const response = await customerService.update(id, data)
       await refreshUser()
       return response
     },

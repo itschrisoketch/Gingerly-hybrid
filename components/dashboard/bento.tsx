@@ -102,7 +102,8 @@ export function BentoPanel({
         'md:col-span-3 md:row-span-2 flex flex-col justify-between gap-6 rounded-2xl p-6',
         attention
           ? 'relative overflow-hidden bg-teal-600 text-white'
-          : 'border border-border bg-card',
+          // Same teal tint as PageBanner's calm tone, so the two objects agree.
+          : 'border border-accent/20 bg-accent/[0.05]',
       )}
     >
       {attention ? (
