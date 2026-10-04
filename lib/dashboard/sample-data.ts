@@ -509,6 +509,11 @@ export interface MaintenanceRequest {
  * in-progress job with no contractor is a status nobody can act on.
  */
 export const sampleMaintenance: MaintenanceRequest[] = [
+  // Two more for the signed-in tenant, so her own maintenance screen has a
+  // live job and a history rather than a single resolved row. They show on the
+  // agent's board too, which is the point: one dataset, two readings of it.
+  { id: 'mr21', title: 'Bedroom socket has stopped working', category: 'electrical', priority: 'normal', status: 'scheduled', tenant: 'Grace Wanjiku', unit: 'A2', property: 'Brookside Apartments', raisedAt: '2026-09-18T19:40:00Z', scheduledFor: '2026-09-24', scheduledTime: '10:00', assignee: 'Bright Spark Electrical', note: 'Two sockets on the same wall; the lights on that circuit are fine' },
+  { id: 'mr22', title: 'Front door lock stiff to turn', category: 'security', priority: 'low', status: 'resolved', tenant: 'Grace Wanjiku', unit: 'A2', property: 'Brookside Apartments', raisedAt: '2026-03-05T07:15:00Z', resolvedAt: '2026-03-09T13:30:00Z', assignee: 'Fix-It Nairobi' },
   { id: 'mr1', title: 'Kitchen tap dripping continuously', category: 'plumbing', priority: 'normal', status: 'resolved', tenant: 'Grace Wanjiku', unit: 'A2', property: 'Brookside Apartments', raisedAt: '2026-08-14T08:20:00Z', resolvedAt: '2026-08-16T11:05:00Z', assignee: 'Otieno Plumbing' },
   { id: 'mr2', title: 'No hot water in the shower', category: 'heating', priority: 'urgent', status: 'in_progress', tenant: 'Peter Njoroge', unit: 'B4', property: 'Brookside Apartments', raisedAt: '2026-09-17T06:45:00Z', scheduledFor: '2026-09-22', scheduledTime: '09:00', assignee: 'Kamau Heating', note: 'Replacement element ordered, fitting Tuesday' },
   { id: 'mr3', title: 'Bedroom socket sparking', category: 'electrical', priority: 'urgent', status: 'open', tenant: 'Esther Nyambura', unit: 'A1', property: 'Brookside Apartments', raisedAt: '2026-09-20T19:10:00Z', note: 'Tenant advised to stop using the socket' },
