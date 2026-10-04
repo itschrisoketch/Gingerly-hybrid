@@ -3,6 +3,7 @@ import { PageBanner } from '@/components/dashboard/page-banner'
 import { SampleDataChip } from '@/components/dashboard/sample-data-notice'
 import { StatTiles, type Figure } from '@/components/dashboard/stat-tiles'
 import { Icon } from '@/components/ui/icon'
+import { UnavailableButton } from '@/components/ui/unavailable-button'
 import { cn } from '@/lib/utils'
 import { formatKes } from '@/lib/format'
 import { IS_SAMPLE_DATA } from '@/lib/dashboard/sample-data'
@@ -60,6 +61,18 @@ export default function TenantPaymentsPage() {
   }, {})
   const usualMethod =
     Object.entries(methodCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '—'
+
+  /* Derived from what has actually been paid, not a card on file. There is no
+     stored-payment-method endpoint, and inventing a saved Visa — which the old
+     page showed as "Visa •••• 4242" — would claim a capability that does not
+     exist. What IS true is which methods she has used and when. */
+  const methodsUsed = Object.entries(methodCounts)
+    .map(([method, count]) => ({
+      method,
+      count,
+      last: paid.find((p) => p.method === method)?.at ?? '',
+    }))
+    .sort((a, b) => b.count - a.count)
 
   const monthsTotal = paid.length + upcoming.length
 
@@ -177,11 +190,73 @@ export default function TenantPaymentsPage() {
         whenHeading="Paid"
         rows={ledger}
         formatWhen={formatFullDate}
+        rowAction={(row) =>
+          row.status === 'paid' ? (
+            <UnavailableButton
+              icon="Download"
+              iconOnly
+              reason="No receipts endpoint yet, so there is nothing to download"
+            >
+              {`Download receipt for ${row.primary}`}
+            </UnavailableButton>
+          ) : null
+        }
         empty={{
           title: 'No payments yet',
           detail: 'Your rent will appear here once the first payment goes through.',
         }}
       />
+
+      <section className="rounded-2xl border border-border bg-card">
+        <header className="flex flex-wrap items-center justify-between gap-3 p-5">
+          <div>
+            <h2 className="text-sm font-medium text-foreground">How you pay</h2>
+            <p className="text-sm text-muted-foreground">
+              The methods your rent has actually arrived by.
+            </p>
+          </div>
+          <UnavailableButton
+            icon="Plus"
+            reason="No stored payment methods on the API — rent is sent to your agent directly"
+          >
+            Add a method
+          </UnavailableButton>
+        </header>
+
+        <ul>
+          {methodsUsed.map((m, i) => (
+            <li
+              key={m.method}
+              className={cn(
+                'flex items-center justify-between gap-4 px-5 py-3',
+                i < methodsUsed.length - 1 && 'rule-b',
+              )}
+            >
+              <div className="flex min-w-0 items-center gap-3">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+                  <Icon
+                    name={m.method === 'M-Pesa' ? 'Smartphone' : m.method === 'Card' ? 'CreditCard' : 'Building'}
+                    className="h-4 w-4"
+                  />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-foreground">{m.method}</p>
+                  <p className="text-xs text-muted-foreground">
+                    Used for{' '}
+                    <span className="tabular-nums">{m.count}</span>{' '}
+                    {m.count === 1 ? 'month' : 'months'} &middot; last {formatFullDate(m.last)}
+                  </p>
+                </div>
+              </div>
+              {m.method === usualMethod ? (
+                <span className="shrink-0 rounded-md bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent-text">
+                  Usual
+                </span>
+              ) : null}
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <section className="rounded-2xl border border-border bg-card">
         <header className="p-5">

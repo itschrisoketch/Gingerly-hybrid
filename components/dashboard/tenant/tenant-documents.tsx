@@ -3,6 +3,7 @@
 import * as React from 'react'
 import { Icon } from '@/components/ui/icon'
 import { StatusBadge } from '@/components/ui/status-badge'
+import { UnavailableButton } from '@/components/ui/unavailable-button'
 import { cn } from '@/lib/utils'
 import {
   CATEGORY,
@@ -27,8 +28,12 @@ import { formatFullDate } from '@/lib/dashboard/tenant-view'
  * handful of documents usefully; filtering five items by status would be a
  * control that mostly returns everything.
  *
- * ⚠️ Nothing opens. There is no document store, so Download and Share are not
- * offered at all rather than offered and dead. The page says so once, above.
+ * ⚠️ Nothing opens yet. Download and Share are present but disabled, each
+ * carrying the reason. They were briefly deleted on the grounds that a dead
+ * button is worse than none, which was the wrong call: removing a control
+ * because its endpoint is missing loses the fact that the feature is meant to
+ * exist, and the next person reads the page as the spec. Every feature survives
+ * a rebuild — see components/ui/unavailable-button.tsx.
  */
 export function TenantDocuments({ documents }: { documents: StoredDocument[] }) {
   const [query, setQuery] = React.useState('')
@@ -150,9 +155,25 @@ export function TenantDocuments({ documents }: { documents: StoredDocument[] }) 
                   </p>
                 </div>
 
-                <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
-                  {formatBytes(d.bytes)}
-                </span>
+                <div className="flex shrink-0 items-center gap-2">
+                  <span className="text-xs text-muted-foreground tabular-nums">
+                    {formatBytes(d.bytes)}
+                  </span>
+                  <UnavailableButton
+                    icon="Download"
+                    iconOnly
+                    reason="No document store connected yet, so there is nothing to download"
+                  >
+                    {`Download ${d.title}`}
+                  </UnavailableButton>
+                  <UnavailableButton
+                    icon="Share"
+                    iconOnly
+                    reason="No document store connected yet, so there is nothing to share"
+                  >
+                    {`Share ${d.title}`}
+                  </UnavailableButton>
+                </div>
               </li>
             )
           })}
