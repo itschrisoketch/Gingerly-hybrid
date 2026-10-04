@@ -1,6 +1,7 @@
 import { PageBanner } from '@/components/dashboard/page-banner'
 import { SampleDataChip } from '@/components/dashboard/sample-data-notice'
 import { StatTiles, type Figure } from '@/components/dashboard/stat-tiles'
+import { ReportIssue } from '@/components/dashboard/tenant/report-issue'
 import { TenantRequests } from '@/components/dashboard/tenant/tenant-requests'
 import { Icon } from '@/components/ui/icon'
 import { IS_SAMPLE_DATA } from '@/lib/dashboard/sample-data'
@@ -117,19 +118,14 @@ export default function TenantMaintenancePage() {
 
       <StatTiles figures={figures} label="Your requests" id="maintenance-figures" />
 
-      {/* The old page's report form could not submit anywhere. This points at
-          the person who can act instead of collecting text into nothing. */}
-      <div className="flex items-start gap-2 rounded-xl border border-dashed border-border bg-muted/40 px-4 py-3">
-        <Icon name="Info" className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
-        <p className="text-sm text-muted-foreground">
-          Requests cannot be raised from here yet — there is no maintenance endpoint. Call{' '}
-          <span className="font-medium text-foreground">{tenancy.agent.name}</span> on{' '}
-          <span className="font-medium tabular-nums text-foreground">{tenancy.agent.phone}</span>,
-          or message them, and it will appear below once logged.
-        </p>
+      <div className="grid gap-4 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <TenantRequests requests={jobs} />
+        </div>
+        <div>
+          <ReportIssue agentName={tenancy.agent.name} agentPhone={tenancy.agent.phone} />
+        </div>
       </div>
-
-      <TenantRequests requests={jobs} />
     </div>
   )
 }

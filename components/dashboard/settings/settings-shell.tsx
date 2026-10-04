@@ -2,6 +2,9 @@
 
 import * as React from 'react'
 import { Icon } from '@/components/ui/icon'
+// Re-exported so existing imports from this module keep working; the component
+// itself is shared now, because every rebuilt page needs the same answer.
+export { UnavailableButton } from '@/components/ui/unavailable-button'
 import { StatusBadge } from '@/components/ui/status-badge'
 import { Switch } from '@/components/ui/switch'
 import { cn } from '@/lib/utils'
@@ -125,29 +128,6 @@ export function PrimaryButton({
   )
 }
 
-/** A control with no endpoint. Disabled, with the reason on hover. */
-export function UnavailableButton({
-  children,
-  reason,
-  icon,
-}: {
-  children: string
-  reason: string
-  icon?: IconName
-}) {
-  return (
-    <button
-      type="button"
-      disabled
-      title={reason}
-      aria-label={`${children} — ${reason}`}
-      className="flex h-10 items-center gap-2 rounded-lg border border-border px-4 text-sm font-medium text-muted-foreground disabled:pointer-events-none disabled:opacity-50"
-    >
-      {icon ? <Icon name={icon} className="h-4 w-4" /> : null}
-      {children}
-    </button>
-  )
-}
 
 /**
  * A labelled on/off row.

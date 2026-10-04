@@ -128,6 +128,7 @@ export function LedgerTable({
   viewAllLabel,
   formatWhen,
   empty,
+  rowAction,
 }: {
   title: string
   description: string
@@ -142,6 +143,9 @@ export function LedgerTable({
    *  today, an actual date for a tenant looking back over a year. */
   formatWhen: (at: string) => string
   empty: { title: string; detail: string }
+  /** An optional control per row — a receipt, say. Omitted by callers that have
+   *  nothing to offer, so no column appears where there is no action. */
+  rowAction?: (row: LedgerRow) => React.ReactNode
 }) {
   return (
     <Card className="overflow-hidden">
@@ -189,6 +193,11 @@ export function LedgerTable({
                     >
                       Amount
                     </th>
+                    {rowAction ? (
+                      <th scope="col" className="pb-3">
+                        <span className="sr-only">Actions</span>
+                      </th>
+                    ) : null}
                   </tr>
                 </thead>
                 <tbody>
@@ -236,6 +245,9 @@ export function LedgerTable({
                       >
                         {formatKes(row.amount)}
                       </td>
+                      {rowAction ? (
+                        <td className="py-3 pl-3 text-right">{rowAction(row)}</td>
+                      ) : null}
                     </tr>
                   ))}
                 </tbody>
@@ -286,6 +298,7 @@ export function LedgerTable({
                   </div>
 
                   {row.note ? <p className="text-sm text-muted-foreground">{row.note}</p> : null}
+                  {rowAction ? <div className="pt-1">{rowAction(row)}</div> : null}
                 </li>
               ))}
             </ul>
