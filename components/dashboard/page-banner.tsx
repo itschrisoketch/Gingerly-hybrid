@@ -68,7 +68,12 @@ export function PageBanner({
       aria-labelledby={id}
       className={cn(
         'overflow-hidden rounded-2xl px-5 py-5 sm:px-6',
-        attention ? 'bg-teal-600 text-white' : 'border border-border bg-card',
+        // Calm is a teal TINT, not a plain card. It was `bg-card` first, which
+        // meant most screens — anything settled, nothing owed — carried no
+        // brand colour at all and read as an unstyled notice. The two tones are
+        // still clearly different: solid teal is something to deal with, a 5%
+        // wash is the same object saying there is nothing to deal with.
+        attention ? 'bg-teal-600 text-white' : 'border border-accent/20 bg-accent/[0.05]',
       )}
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
