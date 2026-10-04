@@ -182,7 +182,7 @@ export default function TenantUnitPage() {
                 key={j.id}
                 className={cn(
                   'flex flex-col gap-1.5 px-5 py-4',
-                  i < history.length - 1 && 'rule-b [--rule-inset:0px]',
+                  i < history.length - 1 && 'rule-b',
                 )}
               >
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
@@ -211,7 +211,7 @@ function Row({ label, value, last }: { label: string; value: string; last?: bool
     <div
       className={cn(
         'flex items-center justify-between gap-4 pb-3',
-        !last && 'rule-b [--rule-inset:0px]',
+        !last && 'rule-b',
       )}
     >
       <dt className="text-sm text-muted-foreground">{label}</dt>

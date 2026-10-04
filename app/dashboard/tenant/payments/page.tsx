@@ -202,7 +202,7 @@ export default function TenantPaymentsPage() {
                 key={u.period}
                 className={cn(
                   'flex items-center justify-between gap-4 px-5 py-3',
-                  i < upcoming.length - 1 && 'rule-b [--rule-inset:0px]',
+                  i < upcoming.length - 1 && 'rule-b',
                 )}
               >
                 <div>

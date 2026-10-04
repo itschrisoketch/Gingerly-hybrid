@@ -152,7 +152,7 @@ export function TenantRequests({ requests }: { requests: MaintenanceRequest[] })
                 key={r.id}
                 className={cn(
                   'flex flex-col gap-2 px-5 py-4',
-                  i < rows.length - 1 && 'rule-b [--rule-inset:0px]',
+                  i < rows.length - 1 && 'rule-b',
                 )}
               >
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-2">

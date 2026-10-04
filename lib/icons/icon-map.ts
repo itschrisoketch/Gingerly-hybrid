@@ -61,6 +61,7 @@ export const ICON_MAP = {
   Info: 'info-outline-rounded',
   LayoutDashboard: 'dashboard-outline-rounded',
   LineChart: 'show-chart-outline-rounded',
+  List: 'format-list-bulleted-outline-rounded',
   Loader2: 'progress-activity-outline-rounded',
   Lock: 'lock-outline-rounded',
   LogOut: 'logout-outline-rounded',

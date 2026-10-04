@@ -194,7 +194,7 @@ function AnswersTab() {
 
 function AnswerRow({ answer }: { answer: HelpAnswer }) {
   return (
-    <AccordionItem value={answer.id} className="rule-b border-b-0 [--rule-inset:0px]">
+    <AccordionItem value={answer.id} className="rule-b border-b-0">
       <AccordionTrigger className="gap-4 py-4 text-left hover:no-underline">
         <span className="flex min-w-0 flex-1 flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
           <span className="text-sm font-medium text-foreground">{answer.question}</span>
@@ -269,7 +269,7 @@ function CasesTab({ cases }: { cases: SupportCase[] }) {
             key={c.id}
             className={cn(
               'flex flex-col gap-2 p-5',
-              i < cases.length - 1 && 'rule-b [--rule-inset:0px]',
+              i < cases.length - 1 && 'rule-b',
             )}
           >
             <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
