@@ -209,17 +209,31 @@ export function ReportIssue({
                 href={`tel:${agentPhone.replace(/\s/g, '')}`}
                 className="font-medium text-accent underline underline-offset-2 hover:text-accent/80"
               >
-                <span className="tabular-nums">{agentPhone}</span>
+                <span className="whitespace-nowrap tabular-nums">{agentPhone}</span>
               </a>{' '}
               and read them out.
             </p>
           </div>
         ) : (
-          <p className="flex items-start gap-2 text-xs text-muted-foreground">
-            <Icon name="Info" className="mt-px h-3.5 w-3.5 shrink-0" />
-            Requests cannot be submitted yet — there is no maintenance endpoint. Call{' '}
-            {agentName} on <span className="tabular-nums">{agentPhone}</span>.
-          </p>
+          /* The icon and the prose are siblings in a flex ROW; the sentence
+             itself is one paragraph. Making the <p> the flex container turns
+             every text node and inline element into its own flex item with the
+             gap between them, which is what pushed the phone number onto a line
+             of its own mid-sentence. */
+          <div className="flex items-start gap-2">
+            <Icon name="Info" className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+            <p className="text-xs text-muted-foreground">
+              Requests cannot be submitted yet — there is no maintenance endpoint. Call{' '}
+              {agentName} on{' '}
+              <a
+                href={`tel:${agentPhone.replace(/\s/g, '')}`}
+                className="font-medium text-accent underline underline-offset-2 hover:text-accent/80"
+              >
+                <span className="whitespace-nowrap tabular-nums">{agentPhone}</span>
+              </a>
+              .
+            </p>
+          </div>
         )}
       </form>
     </section>
