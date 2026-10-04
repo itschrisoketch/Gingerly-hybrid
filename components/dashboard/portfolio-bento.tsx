@@ -70,8 +70,8 @@ export function PortfolioBento({
         >
           {/* Deliberately not congratulatory: no trophy, no exclamation mark,
               on a screen about other people's housing. */}
-          <p className="flex items-start gap-2 text-sm text-muted-foreground">
-            <Icon name="CheckCircle" className="mt-0.5 h-5 w-5 shrink-0 text-success-text" />
+          <p className="relative flex items-start gap-2 text-sm text-white/80">
+            <Icon name="CheckCircle" className="mt-0.5 h-5 w-5 shrink-0 text-white" />
             Nothing is outstanding this period.
           </p>
         </BentoPanel>

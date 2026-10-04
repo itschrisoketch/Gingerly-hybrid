@@ -47,34 +47,28 @@ export function PageBanner({
   /** Optional visual before the copy, e.g. a group of avatars. */
   leading?: React.ReactNode
   /**
-   * `attention` is the teal ground above — something is outstanding.
-   * `calm` is the same object on a card ground, for when nothing is.
-   *
-   * A settled state used to render as a thin one-line strip, which said the
-   * right words in a shape that read as a footnote. Nothing being owed is worth
-   * the same room as something being owed: a tenant opening this page to check
-   * whether they have paid is asking the same question either way, and the
-   * answer should not be harder to find when it is good news. Same geometry,
-   * different register.
+   * Kept so callers need not all change at once, but it no longer alters the
+   * ground. Every banner is the solid teal one — Chris's call, stated twice:
+   * the tinted variant did not read as the same object, and a settled state is
+   * worth the same presence as an outstanding one. What the tone still does is
+   * decide the ICON treatment, since a tick belongs on a settled banner and
+   * nothing belongs on one that already carries an action.
    */
   tone?: 'attention' | 'calm'
   /** Shown before the copy on the calm tone, e.g. a tick. */
   icon?: IconName
 }) {
+  // The ground no longer varies. `attention` only decides whether the leading
+  // icon square is drawn.
   const attention = tone === 'attention'
 
   return (
     <section
       aria-labelledby={id}
-      className={cn(
-        'overflow-hidden rounded-2xl px-5 py-5 sm:px-6',
-        // Calm is a teal TINT, not a plain card. It was `bg-card` first, which
-        // meant most screens — anything settled, nothing owed — carried no
-        // brand colour at all and read as an unstyled notice. The two tones are
-        // still clearly different: solid teal is something to deal with, a 5%
-        // wash is the same object saying there is nothing to deal with.
-        attention ? 'bg-teal-600 text-white' : 'border border-accent/20 bg-accent/[0.05]',
-      )}
+      // One ground for every banner, solid teal — the treatment the maintenance
+      // screen uses. A tinted variant was tried for settled states and did not
+      // read as the same object beside it.
+      className="overflow-hidden rounded-2xl bg-teal-600 px-5 py-5 text-white sm:px-6"
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-center gap-4">
@@ -85,40 +79,22 @@ export function PageBanner({
               the paid pills in the table below, which ARE semantic. Matches the
               icon square in stat-tiles.tsx. */}
           {!attention && icon ? (
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/15 text-white">
               <Icon name={icon} className="h-5 w-5" />
             </span>
           ) : null}
 
           <div className="min-w-0">
-            <p
-              className={cn(
-                'text-xs font-semibold uppercase tracking-[0.14em]',
-                attention ? 'text-teal-50' : 'text-muted-foreground',
-              )}
-            >
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal-50">
               {eyebrow}
             </p>
 
-            <h2
-              id={id}
-              className={cn(
-                'mt-2 text-lg font-medium sm:text-xl',
-                !attention && 'text-foreground',
-              )}
-            >
+            <h2 id={id} className="mt-2 text-lg font-medium sm:text-xl">
               {title}
             </h2>
 
             {description ? (
-              <p
-                className={cn(
-                  'mt-1 text-sm',
-                  attention ? 'text-white/80' : 'text-muted-foreground',
-                )}
-              >
-                {description}
-              </p>
+              <p className="mt-1 text-sm text-white/80">{description}</p>
             ) : null}
           </div>
         </div>
@@ -126,12 +102,7 @@ export function PageBanner({
         {action ? (
           <Link
             href={action.href}
-            className={cn(
-              'inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl px-5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
-              attention
-                ? 'bg-white text-navy-500 hover:bg-white/90 focus-visible:ring-white/70 focus-visible:ring-offset-teal-600'
-                : 'bg-accent text-accent-foreground hover:bg-accent/90 focus-visible:ring-accent/40 focus-visible:ring-offset-background',
-            )}
+            className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-5 text-sm font-medium text-navy-500 transition-colors hover:bg-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-600"
           >
             {action.label}
             <Icon name="ArrowRight" className="h-4 w-4" />
