@@ -185,7 +185,7 @@ export function ToggleRow({
     <div
       className={cn(
         'flex items-start justify-between gap-4 py-3',
-        !last && 'rule-b [--rule-inset:0px]',
+        !last && 'rule-b',
       )}
     >
       <div className="min-w-0">

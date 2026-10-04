@@ -52,6 +52,10 @@ export function EventDialog({
   onOpenChange,
   onCreate,
   properties,
+  kinds = CREATABLE_KINDS,
+  title: dialogTitle = 'New entry',
+  titlePlaceholder = 'Quarterly inspection',
+  notePlaceholder = 'Anything the contractor or tenant needs to know',
 }: {
   /** `YYYY-MM-DD` the entry will land on. */
   date: string
@@ -59,24 +63,46 @@ export function EventDialog({
   onOpenChange: (next: boolean) => void
   onCreate: (event: CalendarEvent) => void
   properties: string[]
+  /** Which kinds this caller may create. Defaults to the agent's set, so the
+   *  landlord calendar is unchanged; the tenant passes a narrower one. */
+  kinds?: EventKind[]
+  title?: string
+  /** The two placeholders are written in the agent's voice by default. A tenant
+   *  is not scheduling a quarterly inspection, so the caller can re-voice them
+   *  rather than this dialog guessing who is reading it. */
+  titlePlaceholder?: string
+  notePlaceholder?: string
 }) {
-  const [kind, setKind] = React.useState<EventKind>('inspection')
+  const [kind, setKind] = React.useState<EventKind>(kinds[0])
   const [title, setTitle] = React.useState('')
-  const [property, setProperty] = React.useState('')
+  const [property, setProperty] = React.useState(properties.length === 1 ? properties[0] : '')
   const [time, setTime] = React.useState('')
   const [allDay, setAllDay] = React.useState(false)
   const [note, setNote] = React.useState('')
 
   // Reset each time it opens, so yesterday's half-filled entry never reappears.
+  //
+  // The kind resets to the FIRST OFFERED one, not a hardcoded 'inspection'.
+  // Once `kinds` became a prop, a caller offering a narrower set — the tenant
+  // offers only meeting and contractor — opened the dialog with a kind selected
+  // that was not among its own buttons, so none of them looked chosen and the
+  // first click appeared to do nothing.
+  //
+  // Property presets when there is only one. A tenant has a single property, so
+  // "Choose a property" was asking a question with one answer.
   React.useEffect(() => {
     if (open) {
-      setKind('inspection')
+      setKind(kinds[0])
       setTitle('')
-      setProperty('')
+      setProperty(properties.length === 1 ? properties[0] : '')
       setTime('')
       setAllDay(false)
       setNote('')
     }
+    // `kinds` and `properties` are array literals from the caller and would
+    // retrigger this on every render if watched; the values that matter are
+    // captured when `open` flips.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
   const canSave = title.trim().length > 0
@@ -100,7 +126,7 @@ export function EventDialog({
       <DialogContent className="max-h-[90vh] gap-0 overflow-y-auto rounded-2xl p-0 sm:max-w-[520px] sm:rounded-2xl">
         <DialogHeader className="space-y-1 p-6 pb-4 pr-12">
           <DialogTitle className="text-lg font-semibold tracking-tight text-foreground">
-            New entry
+            {dialogTitle}
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
             {formatLongDate(date)}
@@ -111,7 +137,7 @@ export function EventDialog({
           <fieldset>
             <legend className="mb-2 text-sm font-medium text-foreground">Kind</legend>
             <div className="grid grid-cols-2 gap-2">
-              {CREATABLE_KINDS.map((k) => {
+              {kinds.map((k) => {
                 const selected = kind === k
                 return (
                   <label
@@ -155,7 +181,7 @@ export function EventDialog({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className={FIELD}
-              placeholder="Quarterly inspection"
+              placeholder={titlePlaceholder}
               autoFocus
             />
           </div>
@@ -219,7 +245,7 @@ export function EventDialog({
               value={note}
               onChange={(e) => setNote(e.target.value)}
               className={cn(FIELD, 'h-auto py-2')}
-              placeholder="Anything the contractor or tenant needs to know"
+              placeholder={notePlaceholder}
             />
           </div>
 
