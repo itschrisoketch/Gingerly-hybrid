@@ -283,6 +283,19 @@ check('nothing was opened in the future', cases.filter((c) => c.opened > TODAY).
 check('updated is on or after opened, and not in the future', cases.filter((c) => c.updated < c.opened || c.updated > TODAY).length, 0)
 check('every case has a subject and a detail', cases.filter((c) => !c.subject?.trim() || !c.detail?.trim()).length, 0)
 
+// A works report is the write-up of a finished job. One attached to a job that
+// is still open would be a document describing work nobody has done.
+check(
+  'every works report names a resolved maintenance job',
+  documents.filter((d) => {
+    const m = /^Works report — (.+)$/.exec(d.title)
+    if (!m) return false
+    const job = maintenance.find((j) => j.title === m[1])
+    return !job || job.status !== 'resolved'
+  }).length,
+  0,
+)
+
 console.log('\ntransactions against the payment ledger')
 check('only paid transactions carry a reference',
   transactions.filter((t) => t.reference && t.status !== 'paid').length, 0)
