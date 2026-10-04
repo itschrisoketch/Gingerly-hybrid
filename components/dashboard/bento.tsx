@@ -100,10 +100,9 @@ export function BentoPanel({
     <div
       className={cn(
         'md:col-span-3 md:row-span-2 flex flex-col justify-between gap-6 rounded-2xl p-6',
-        attention
-          ? 'relative overflow-hidden bg-teal-600 text-white'
-          // Same teal tint as PageBanner's calm tone, so the two objects agree.
-          : 'border border-accent/20 bg-accent/[0.05]',
+        // One ground, like PageBanner. `tone` now only decides whether the
+        // hatch is drawn and how the body copy is coloured against it.
+        'relative overflow-hidden bg-teal-600 text-white',
       )}
     >
       {attention ? (
@@ -116,8 +115,7 @@ export function BentoPanel({
       <div className="relative">
         <span
           className={cn(
-            'inline-block rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em]',
-            attention ? 'bg-white/10 text-teal-50' : 'bg-muted text-muted-foreground',
+            'inline-block rounded-full bg-white/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-teal-50',
           )}
         >
           {eyebrow}
@@ -125,18 +123,13 @@ export function BentoPanel({
 
         {/* The figure leads, not the sentence. */}
         <p
-          className={cn(
-            'mt-4 text-3xl font-semibold tracking-tight tabular-nums sm:text-4xl',
-            !attention && 'text-foreground',
-          )}
+          className="mt-4 text-3xl font-semibold tracking-tight tabular-nums sm:text-4xl"
         >
           {figure}
         </p>
 
         {supporting ? (
-          <p className={cn('mt-2 text-sm', attention ? 'text-white/80' : 'text-muted-foreground')}>
-            {supporting}
-          </p>
+          <p className="mt-2 text-sm text-white/80">{supporting}</p>
         ) : null}
       </div>
 
@@ -147,18 +140,14 @@ export function BentoPanel({
               href={action.href}
               className={cn(
                 'inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl px-5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
-                attention
-                  ? 'bg-white text-navy-500 hover:bg-white/90 focus-visible:ring-white/70 focus-visible:ring-offset-teal-600'
-                  : 'bg-accent text-accent-foreground hover:bg-accent/90 focus-visible:ring-accent/40 focus-visible:ring-offset-background',
+                'bg-white text-navy-500 hover:bg-white/90 focus-visible:ring-white/70 focus-visible:ring-offset-teal-600',
               )}
             >
               {action.label}
               <Icon name="ArrowRight" className="h-4 w-4" />
             </Link>
             {footnote ? (
-              <p className={cn('text-sm', attention ? 'text-white/80' : 'text-muted-foreground')}>
-                {footnote}
-              </p>
+              <p className="text-sm text-white/80">{footnote}</p>
             ) : null}
           </div>
         ) : null
