@@ -45,6 +45,7 @@ const diary = read('sampleDiary')
 const conversations = read('sampleConversations')
 const documents = read('sampleDocuments')
 const cases = read('sampleSupportCases')
+const tenantCases = read('sampleTenantCases')
 const tenantPayments = read('sampleTenantPayments')
 const tenancy = read('sampleTenancy')
 
@@ -282,6 +283,19 @@ check('nothing was opened in the future', cases.filter((c) => c.opened > TODAY).
 // A case cannot be touched before it existed, and cannot be updated after today.
 check('updated is on or after opened, and not in the future', cases.filter((c) => c.updated < c.opened || c.updated > TODAY).length, 0)
 check('every case has a subject and a detail', cases.filter((c) => !c.subject?.trim() || !c.detail?.trim()).length, 0)
+
+// The tenant's own cases follow the same rules as the agent's.
+const allCases = [...cases, ...tenantCases]
+check('tenant case ids unique and distinct from the agent queue',
+  new Set(allCases.map((c) => c.id)).size, allCases.length)
+check('tenant case statuses are known',
+  tenantCases.filter((c) => !['open', 'waiting', 'resolved'].includes(c.status)).length, 0)
+check('tenant case priorities are known',
+  tenantCases.filter((c) => !['low', 'normal', 'high'].includes(c.priority)).length, 0)
+check('tenant cases are dated YYYY-MM-DD, opened before updated, not in the future',
+  tenantCases.filter((c) =>
+    !/^\d{4}-\d{2}-\d{2}$/.test(c.opened) || !/^\d{4}-\d{2}-\d{2}$/.test(c.updated)
+    || c.updated < c.opened || c.opened > TODAY || c.updated > TODAY).length, 0)
 
 // A works report is the write-up of a finished job. One attached to a job that
 // is still open would be a document describing work nobody has done.

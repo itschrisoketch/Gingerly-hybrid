@@ -989,3 +989,48 @@ export const sampleTenantPayments: TenantPayment[] = [
   { id: 'tp2', period: '2026-02', amount: 72_000, status: 'paid', method: 'M-Pesa', at: '2026-02-01T08:09:00Z', reference: 'KD8WR3JVLQ' },
   { id: 'tp1', period: '2026-01', amount: 39_484, status: 'paid', method: 'M-Pesa', at: '2026-01-15T15:47:00Z', reference: 'MN2XB7TQFD', note: 'Part month from 15 January' },
 ]
+
+/**
+ * A tenant's own support cases.
+ *
+ * Separate from `sampleSupportCases`, which is the agent's queue. The two
+ * screens show different sides of support: an agent raises cases about tenants,
+ * a tenant raises them about their own flat and their own account.
+ *
+ * The set the old page showed was a noise complaint about Unit 3C, a key card
+ * that would not open a fitness centre, and a lease renewal question — a
+ * different building with facilities this one does not have. These are the
+ * three a tenant here actually opens.
+ */
+export const sampleTenantCases: SupportCase[] = [
+  {
+    id: 'GIN-3182',
+    subject: 'September rent not showing as paid',
+    detail:
+      'Sent Ksh 72,000 by M-Pesa on 15 September, reference U2RHPDHPDN. The month still showed as open the next morning.',
+    status: 'resolved',
+    priority: 'high',
+    opened: '2026-09-16',
+    updated: '2026-09-17',
+  },
+  {
+    id: 'GIN-3205',
+    subject: 'Change the phone number on my account',
+    detail:
+      'Moved to a new number and need it updated, which Settings does not allow. Aware it is tied to M-Pesa and the one-time codes.',
+    status: 'waiting',
+    priority: 'normal',
+    opened: '2026-09-19',
+    updated: '2026-09-20',
+  },
+  {
+    id: 'GIN-3211',
+    subject: 'Copy of the lease for my employer',
+    detail:
+      'HR need a copy of the tenancy agreement for a housing allowance claim. Cannot download it from Documents.',
+    status: 'open',
+    priority: 'low',
+    opened: '2026-09-20',
+    updated: '2026-09-20',
+  },
+]
