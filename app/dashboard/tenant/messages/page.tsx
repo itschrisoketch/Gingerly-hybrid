@@ -2,9 +2,12 @@ import { PageBanner } from '@/components/dashboard/page-banner'
 import { SampleDataChip } from '@/components/dashboard/sample-data-notice'
 import { StatTiles, type Figure } from '@/components/dashboard/stat-tiles'
 import { TenantThread } from '@/components/dashboard/tenant/tenant-thread'
+import { Icon } from '@/components/ui/icon'
+import Link from 'next/link'
 import { IS_SAMPLE_DATA, sampleConversations } from '@/lib/dashboard/sample-data'
 import { TOPIC, lastMessage } from '@/lib/dashboard/message-meta'
 import { me, tenancy } from '@/lib/dashboard/tenant-view'
+import { cn } from '@/lib/utils'
 
 /**
  * The tenant's messages.
@@ -113,7 +116,110 @@ export default function TenantMessagesPage() {
 
       <StatTiles figures={figures} label="Your messages" id="messages-figures" />
 
-      <TenantThread conversations={mine} asOf={AS_OF} agentName={tenancy.agent.name} />
+      {/* The thread beside its context rather than alone. On its own it ran the
+          full width of the page and was the only thing on it, which made a
+          quiet conversation look like the whole job. The two cards here are the
+          questions a tenant actually has next to a message box: how else do I
+          reach this person, and is messaging even the right way to ask. */}
+      <div className="grid gap-4 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <TenantThread conversations={mine} asOf={AS_OF} agentName={tenancy.agent.name} />
+        </div>
+
+        <aside className="space-y-4">
+          <section className="rounded-2xl border border-border bg-card p-5">
+            <h2 className="text-sm font-medium text-foreground">Other ways to reach them</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Messages here are not delivered yet, so for anything urgent use the phone.
+            </p>
+
+            <div className="mt-4 flex items-center gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent/10 text-sm font-semibold text-accent-text">
+                {tenancy.agent.name
+                  .split(' ')
+                  .slice(0, 2)
+                  .map((w) => w[0])
+                  .join('')}
+              </span>
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-foreground">{tenancy.agent.name}</p>
+                <p className="text-xs text-muted-foreground">Your agent</p>
+              </div>
+            </div>
+
+            <a
+              href={`tel:${tenancy.agent.phone.replace(/\s/g, '')}`}
+              className="mt-4 flex h-10 items-center justify-center gap-2 rounded-lg bg-accent px-4 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+            >
+              <Icon name="Phone" className="h-4 w-4" />
+              <span className="tabular-nums">{tenancy.agent.phone}</span>
+            </a>
+          </section>
+
+          <section className="rounded-2xl border border-border bg-card">
+            <header className="p-5 pb-3">
+              <h2 className="text-sm font-medium text-foreground">Try this first</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Some things have their own screen, and get dealt with faster there than in a
+                message.
+              </p>
+            </header>
+
+            <ul className="pb-2">
+              {ROUTES.map((r, i) => (
+                <li key={r.href}>
+                  <Link
+                    href={r.href}
+                    className={cn(
+                      'group flex items-start gap-3 px-5 py-3 transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/40',
+                      i < ROUTES.length - 1 && 'rule-b',
+                    )}
+                  >
+                    <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+                      <Icon name={r.icon} className="h-4 w-4" />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="flex items-center gap-1.5 text-sm font-medium text-foreground">
+                        {r.label}
+                        <Icon
+                          name="ArrowRight"
+                          className="h-3.5 w-3.5 text-muted-foreground transition-transform group-hover:translate-x-0.5"
+                        />
+                      </span>
+                      <span className="mt-0.5 block text-xs text-muted-foreground">
+                        {r.detail}
+                      </span>
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </aside>
+      </div>
     </div>
   )
 }
+
+/** Where a question belongs when it is not really a message. Every one of these
+ *  screens exists and does the thing described. */
+const ROUTES: { href: string; label: string; detail: string; icon: 'Wrench' | 'CreditCard' | 'FileText' }[] = [
+  {
+    href: '/dashboard/tenant/maintenance',
+    label: 'Something is broken',
+    detail: 'Raise it as a request so it is tracked and a contractor can be booked.',
+    icon: 'Wrench',
+  },
+  {
+    href: '/dashboard/tenant/payments',
+    label: 'A payment question',
+    detail: 'Check the reference and status of every month you have paid.',
+    icon: 'CreditCard',
+  },
+  {
+    href: '/dashboard/tenant/documents',
+    label: 'Your lease or deposit',
+    detail: 'The agreement and anything else filed against your tenancy.',
+    icon: 'FileText',
+  },
+]
