@@ -16,6 +16,7 @@ import {
   HELP_ANSWERS,
   PRODUCT_LINKS,
   SUPPORT_CONTACT,
+  type ProductLink,
   type HelpAnswer,
   type HelpTopic,
 } from '@/lib/dashboard/help-content'
@@ -53,8 +54,6 @@ const TABS: { value: HelpTab; label: string; icon: 'HelpCircle' | 'MessageSquare
   { value: 'contact', label: 'Contact', icon: 'Phone' },
 ]
 
-const TOPICS: HelpTopic[] = ['Payments', 'Tenants', 'Properties', 'Documents', 'Account']
-
 /**
  * Folds case, hyphens and spaces away before matching.
  *
@@ -71,9 +70,16 @@ function normalise(value: string) {
 export function HelpPanel({
   cases,
   initialTab = 'answers',
+  answers = HELP_ANSWERS,
+  links = PRODUCT_LINKS,
+  casesNote,
 }: {
   cases: SupportCase[]
   initialTab?: HelpTab
+  /** Defaults to the agent's set, so the landlord screen is unchanged. */
+  answers?: HelpAnswer[]
+  links?: ProductLink[]
+  casesNote?: string
 }) {
   const [tab, setTab] = React.useState<HelpTab>(initialTab)
 
@@ -93,15 +99,15 @@ export function HelpPanel({
       </TabsList>
 
       <TabsContent value="answers">
-        <AnswersTab />
+        <AnswersTab answers={answers} />
       </TabsContent>
 
       <TabsContent value="cases">
-        <CasesTab cases={cases} />
+        <CasesTab cases={cases} note={casesNote} />
       </TabsContent>
 
       <TabsContent value="guide">
-        <GuideTab />
+        <GuideTab links={links} />
       </TabsContent>
 
       <TabsContent value="contact">
@@ -113,20 +119,25 @@ export function HelpPanel({
 
 /* ------------------------------------------------------------------ */
 
-function AnswersTab() {
+function AnswersTab({ answers }: { answers: HelpAnswer[] }) {
+  const topics = React.useMemo(
+    () => [...new Set(answers.map((a) => a.topic))],
+    [answers],
+  )
+
   const [query, setQuery] = React.useState('')
   const [topic, setTopic] = React.useState<HelpTopic | 'all'>('all')
 
   const results = React.useMemo(() => {
     const q = normalise(query)
-    return HELP_ANSWERS.filter((a) => {
+    return answers.filter((a) => {
       if (topic !== 'all' && a.topic !== topic) return false
       if (!q) return true
       // The answer body is searched too, not just the question. Someone typing
       // "mpesa" is describing their situation, not quoting our heading.
       return normalise(`${a.question} ${a.answer} ${a.topic}`).includes(q)
     })
-  }, [query, topic])
+  }, [answers, query, topic])
 
   const reset = () => {
     setQuery('')
@@ -157,7 +168,7 @@ function AnswersTab() {
           <TopicChip active={topic === 'all'} onClick={() => setTopic('all')}>
             All
           </TopicChip>
-          {TOPICS.map((t) => (
+          {topics.map((t) => (
             <TopicChip key={t} active={topic === t} onClick={() => setTopic(t)}>
               {t}
             </TopicChip>
@@ -252,15 +263,17 @@ const CASE_LABEL = {
   resolved: 'Resolved',
 } as const
 
-function CasesTab({ cases }: { cases: SupportCase[] }) {
+function CasesTab({ cases, note }: { cases: SupportCase[]; note?: string }) {
   return (
     <section className="space-y-4">
       {/* Says plainly that the button cannot do anything yet, rather than
           offering a control that silently discards what someone types. */}
       <p className="flex items-start gap-2 rounded-xl border border-dashed border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
         <Icon name="Info" className="mt-0.5 h-4 w-4 shrink-0" />
-        There is no support endpoint on the API yet, so cases cannot be opened from here. These
-        three are placeholders showing how they will read.
+        <span>
+          {note ??
+            'There is no support endpoint on the API yet, so cases cannot be opened from here. These are placeholders showing how they will read.'}
+        </span>
       </p>
 
       <div className="rounded-2xl border border-border bg-card">
@@ -292,10 +305,10 @@ function CasesTab({ cases }: { cases: SupportCase[] }) {
 
 /* ------------------------------------------------------------------ */
 
-function GuideTab() {
+function GuideTab({ links }: { links: ProductLink[] }) {
   return (
     <section className="grid gap-4 sm:grid-cols-2">
-      {PRODUCT_LINKS.map((l) => (
+      {links.map((l) => (
         <Link
           key={l.id}
           href={l.href}

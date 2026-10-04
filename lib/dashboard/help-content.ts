@@ -25,7 +25,21 @@
  * wrong and must change with it.
  */
 
-export type HelpTopic = 'Payments' | 'Tenants' | 'Properties' | 'Documents' | 'Account'
+export type HelpTopic =
+  // The agent's topics.
+  | 'Payments'
+  | 'Tenants'
+  | 'Properties'
+  | 'Documents'
+  | 'Account'
+  // A tenant's. Different words because they are a different job: an agent
+  // chases rent across a portfolio, a tenant pays their own and lives in the
+  // flat. The chips on each screen are derived from the answers shown there,
+  // so neither side sees a filter that matches nothing.
+  | 'Rent'
+  | 'Repairs'
+  | 'Your home'
+  | 'Moving out'
 
 export interface HelpAnswer {
   id: string
@@ -166,3 +180,150 @@ export const SUPPORT_CONTACT = {
   email: null as string | null,
   hours: null as string | null,
 }
+
+
+/**
+ * The tenant's answers.
+ *
+ * Same rule as the agent's: every one names a screen, a control or an API limit
+ * that exists. The page this replaces asked whether guests could stay overnight
+ * and how to open the fitness centre door — a community handbook for a building
+ * that is not this one.
+ *
+ * The awkward ones are here for the same reason they are on the agent's side.
+ * A tenant cannot pay rent through Gingerly yet, cannot download a receipt and
+ * cannot raise a repair from the app; those are the three things they will try
+ * first, so the answers say so plainly and point at what does work.
+ */
+export const TENANT_ANSWERS: HelpAnswer[] = [
+  {
+    id: 't-pay-rent',
+    topic: 'Rent',
+    question: 'How do I actually pay my rent?',
+    answer:
+      'Send it to your agent the way you already do — M-Pesa or a bank transfer. Gingerly cannot take the payment itself yet, so there is no Pay button that moves money. Once your agent records it, the month turns Paid on your Payments screen and the reference appears beside it.',
+  },
+  {
+    id: 't-not-showing',
+    topic: 'Rent',
+    question: 'I paid but it still says the month is unpaid',
+    answer:
+      'It is recorded by your agent rather than matched automatically, so there is usually a gap between paying and seeing it. Check Payments first — if the month is still open after a day, message your agent with the M-Pesa reference from your confirmation SMS. There is a copy button beside every reference on that screen for exactly this.',
+  },
+  {
+    id: 't-receipt',
+    topic: 'Rent',
+    question: 'Can I get a receipt?',
+    answer:
+      'Not from here yet — there is no receipts endpoint, so the download button on each payment is shown but cannot do anything. Your M-Pesa confirmation SMS is the proof in the meantime, and the reference on your Payments screen matches it. Ask your agent if you need something on letterhead.',
+  },
+  {
+    id: 't-late',
+    topic: 'Rent',
+    question: 'What happens if I pay late?',
+    answer:
+      'Your unit shows as late on your agent\u2019s screen the day after rent was due, and they will usually message you. Gingerly does not charge a late fee itself — whatever your lease says is between you and your agent, so tell them early if a month is going to be difficult.',
+  },
+  {
+    id: 't-repair',
+    topic: 'Repairs',
+    question: 'How do I report something broken?',
+    answer:
+      'The form on Maintenance has every field your agent needs, but it cannot submit yet — there is no maintenance endpoint. Fill it in to gather your thoughts if that helps, then call your agent and read it out. Once they log it, it appears in your list and you can follow it through to the visit.',
+  },
+  {
+    id: 't-visit',
+    topic: 'Repairs',
+    question: 'When is the contractor coming?',
+    answer:
+      'Once a visit is booked it is on Maintenance and on your Calendar, with the firm and the time. Somebody needs to be in to let them in — if the day does not work, tell your agent rather than the contractor, because the booking is theirs to move.',
+  },
+  {
+    id: 't-emergency',
+    topic: 'Repairs',
+    question: 'Something is actually dangerous. What now?',
+    answer:
+      'Do not use this app. A burst pipe, a smell of gas, exposed wiring or a security failure is a phone call to your agent, and to the building caretaker if it is quicker. Gingerly records work; it does not dispatch anyone, and nothing you type here reaches a person faster than a call.',
+  },
+  {
+    id: 't-details',
+    topic: 'Your home',
+    question: 'Where do I find my lease and deposit?',
+    answer:
+      'Documents holds everything filed against your tenancy — the lease, your move-in inventory, the deposit receipt and any works reports. They cannot be downloaded yet, as no document store is connected, so ask your agent for a copy of anything you need to send on.',
+  },
+  {
+    id: 't-change-details',
+    topic: 'Account',
+    question: 'How do I change my phone number or email?',
+    answer:
+      'You cannot do it yourself. The update endpoint accepts your first and last name and nothing else, which is why the rest of Settings shows your details as stored. Your phone number is what M-Pesa and your one-time codes are tied to, so it goes through your agent.',
+  },
+  {
+    id: 't-notifications',
+    topic: 'Account',
+    question: 'Are my notification settings saved?',
+    answer:
+      'Not yet. There is no preferences endpoint, so the toggles in Settings are remembered in this browser only and do not change what Gingerly actually sends. Clearing your browser data resets them, and they will not follow you to another device.',
+  },
+  {
+    id: 't-lease-end',
+    topic: 'Moving out',
+    question: 'My lease is ending. What do I need to do?',
+    answer:
+      'Documents shows the exact date and warns you once it is within ninety days. Renewing or leaving is a conversation with your agent rather than a button here — start it early, because a replacement tenant and an inspection both take time to arrange.',
+  },
+  {
+    id: 't-deposit-back',
+    topic: 'Moving out',
+    question: 'How do I get my deposit back?',
+    answer:
+      'Through your agent, against the move-in inventory filed in Documents. That inventory is the record of what the flat was like when you took it, which is why it is worth reading before you move out rather than after.',
+  },
+]
+
+/** Where a tenant should go instead of asking. */
+export const TENANT_LINKS: ProductLink[] = [
+  {
+    id: 'payments',
+    label: 'Payments',
+    description: 'Every month you have paid, the method and the reference.',
+    href: '/dashboard/tenant/payments',
+    icon: 'CreditCard',
+  },
+  {
+    id: 'maintenance',
+    label: 'Maintenance',
+    description: 'What you have reported and when somebody is coming.',
+    href: '/dashboard/tenant/maintenance',
+    icon: 'Wrench',
+  },
+  {
+    id: 'unit',
+    label: 'Your unit',
+    description: 'Your lease, deposit, the building and who your agent is.',
+    href: '/dashboard/tenant/home',
+    icon: 'Building2',
+  },
+  {
+    id: 'documents',
+    label: 'Documents',
+    description: 'The lease, your inventory and anything else on file.',
+    href: '/dashboard/tenant/documents',
+    icon: 'FileText',
+  },
+  {
+    id: 'messages',
+    label: 'Messages',
+    description: 'Your thread with your agent, and their number.',
+    href: '/dashboard/tenant/messages',
+    icon: 'Users',
+  },
+  {
+    id: 'settings',
+    label: 'Settings',
+    description: 'Your name and password, and what else can be changed.',
+    href: '/dashboard/tenant/settings',
+    icon: 'Settings',
+  },
+]
