@@ -72,7 +72,7 @@ export function DateCheck({
           initialFocus
         />
 
-        <div className="flex items-center justify-between gap-3 border-t border-border px-3 py-3">
+        <div className="rule-t flex items-center justify-between gap-3 px-3 py-3 [--rule-inset:0.75rem]">
           <p className="max-w-[24ch] text-xs text-muted-foreground">
             Leases ending within 60 days of this date are marked for renewal.
           </p>

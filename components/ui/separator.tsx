@@ -18,8 +18,12 @@ const Separator = React.forwardRef<
       decorative={decorative}
       orientation={orientation}
       className={cn(
-        "shrink-0 bg-border",
-        orientation === "horizontal" ? "h-[1px] w-full" : "h-full w-[1px]",
+        // A dashed BORDER, not a solid `bg-border` block. Separators are dashed
+        // everywhere in this product, and a 1px filled div cannot be dashed —
+        // it has to be a border to take a dash pattern. Height/width go to zero
+        // because the border itself now supplies the line's thickness.
+        "shrink-0 border-dashed border-border",
+        orientation === "horizontal" ? "h-0 w-full border-t" : "h-full w-0 border-l",
         className
       )}
       {...props}

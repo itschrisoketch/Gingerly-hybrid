@@ -60,7 +60,12 @@ function SignupContent() {
             value="landlord"
             className="h-11 cursor-pointer rounded-lg text-sm font-medium data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=active]:shadow-sm"
           >
-            Agent
+            {/* "Landlord", not "Agent". This tab registers a `merchant`, which
+                the API models as the property owner — one property_name, one
+                num_units, their own payout account. The login toggle and the
+                sidebar both say Landlord; this was the only place that did
+                not, and it was the first thing a new user read. */}
+            Landlord
           </TabsTrigger>
         </TabsList>
 

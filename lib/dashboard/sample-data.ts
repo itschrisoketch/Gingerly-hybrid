@@ -50,15 +50,19 @@ export interface Transaction {
   at: string
   /** Present on failures, so the row can say what to do about it. */
   note?: string
+  /** The M-Pesa or bank reference. Present only on `paid`: nothing settled
+   *  means there is no reference to quote. Must match the same payment's
+   *  reference in `samplePayments` — verify:data checks it. */
+  reference?: string
 }
 
 export const sampleTransactions: Transaction[] = [
-  { id: 't1', tenant: 'Grace Wanjiku', unit: 'A2', property: 'Brookside Apartments', amount: 72_000, method: 'M-Pesa', status: 'paid', at: '2026-09-15T09:12:00Z' },
-  { id: 't2', tenant: 'Daniel Kimani', unit: '9', property: 'Kileleshwa Court', amount: 64_000, method: 'M-Pesa', status: 'paid', at: '2026-09-15T07:48:00Z' },
+  { id: 't1', tenant: 'Grace Wanjiku', unit: 'A2', property: 'Brookside Apartments', amount: 72_000, method: 'M-Pesa', status: 'paid', at: '2026-09-15T09:12:00Z', reference: 'U2RHPDHPDN' },
+  { id: 't2', tenant: 'Daniel Kimani', unit: '9', property: 'Kileleshwa Court', amount: 64_000, method: 'M-Pesa', status: 'paid', at: '2026-09-15T07:48:00Z', reference: '0EQKX7LAMF' },
   { id: 't3', tenant: 'Peter Njoroge', unit: 'B4', property: 'Brookside Apartments', amount: 85_000, method: 'Bank transfer', status: 'failed', at: '2026-09-14T16:20:00Z', note: 'Insufficient funds' },
   { id: 't4', tenant: 'Mercy Achieng', unit: '7C', property: 'Riverside Gardens', amount: 55_000, method: 'M-Pesa', status: 'pending', at: '2026-09-14T14:05:00Z' },
-  { id: 't5', tenant: 'Samuel Otieno', unit: '14', property: 'Kileleshwa Court', amount: 68_000, method: 'Card', status: 'paid', at: '2026-09-14T11:32:00Z' },
-  { id: 't6', tenant: 'Alice Muthoni', unit: 'C1', property: 'Riverside Gardens', amount: 60_000, method: 'M-Pesa', status: 'paid', at: '2026-09-13T18:55:00Z' },
+  { id: 't5', tenant: 'Samuel Otieno', unit: '14', property: 'Kileleshwa Court', amount: 68_000, method: 'Card', status: 'paid', at: '2026-09-14T11:32:00Z', reference: 'HNBH74TYEE' },
+  { id: 't6', tenant: 'Alice Muthoni', unit: 'C1', property: 'Riverside Gardens', amount: 60_000, method: 'M-Pesa', status: 'paid', at: '2026-09-13T18:55:00Z', reference: 'VXGFVXKU3F' },
 ]
 
 export const samplePortfolio = {
@@ -505,6 +509,11 @@ export interface MaintenanceRequest {
  * in-progress job with no contractor is a status nobody can act on.
  */
 export const sampleMaintenance: MaintenanceRequest[] = [
+  // Two more for the signed-in tenant, so her own maintenance screen has a
+  // live job and a history rather than a single resolved row. They show on the
+  // agent's board too, which is the point: one dataset, two readings of it.
+  { id: 'mr21', title: 'Bedroom socket has stopped working', category: 'electrical', priority: 'normal', status: 'scheduled', tenant: 'Grace Wanjiku', unit: 'A2', property: 'Brookside Apartments', raisedAt: '2026-09-18T19:40:00Z', scheduledFor: '2026-09-24', scheduledTime: '10:00', assignee: 'Bright Spark Electrical', note: 'Two sockets on the same wall; the lights on that circuit are fine' },
+  { id: 'mr22', title: 'Front door lock stiff to turn', category: 'security', priority: 'low', status: 'resolved', tenant: 'Grace Wanjiku', unit: 'A2', property: 'Brookside Apartments', raisedAt: '2026-03-05T07:15:00Z', resolvedAt: '2026-03-09T13:30:00Z', assignee: 'Fix-It Nairobi' },
   { id: 'mr1', title: 'Kitchen tap dripping continuously', category: 'plumbing', priority: 'normal', status: 'resolved', tenant: 'Grace Wanjiku', unit: 'A2', property: 'Brookside Apartments', raisedAt: '2026-08-14T08:20:00Z', resolvedAt: '2026-08-16T11:05:00Z', assignee: 'Otieno Plumbing' },
   { id: 'mr2', title: 'No hot water in the shower', category: 'heating', priority: 'urgent', status: 'in_progress', tenant: 'Peter Njoroge', unit: 'B4', property: 'Brookside Apartments', raisedAt: '2026-09-17T06:45:00Z', scheduledFor: '2026-09-22', scheduledTime: '09:00', assignee: 'Kamau Heating', note: 'Replacement element ordered, fitting Tuesday' },
   { id: 'mr3', title: 'Bedroom socket sparking', category: 'electrical', priority: 'urgent', status: 'open', tenant: 'Esther Nyambura', unit: 'A1', property: 'Brookside Apartments', raisedAt: '2026-09-20T19:10:00Z', note: 'Tenant advised to stop using the socket' },
@@ -563,4 +572,465 @@ export const sampleDiary: DiaryEntry[] = [
   { id: 'dy5', kind: 'inspection', title: 'Check-out inspection', date: '2026-10-02', time: '11:00', property: 'South B Maisonettes', note: 'Vacant unit, ahead of re-letting' },
   { id: 'dy6', kind: 'viewing', title: 'Viewing — Kilimani Heights', date: '2026-09-30', time: '16:00', property: 'Kilimani Heights', note: 'One vacant unit' },
   { id: 'dy7', kind: 'meeting', title: 'Landlord review — Q3 figures', date: '2026-10-06', property: 'Lavington Mews', note: 'All-day: three landlords, portfolio walkthrough' },
+]
+
+export type MessageTopic = 'maintenance' | 'payment' | 'lease' | 'general'
+
+export interface ChatMessage {
+  id: string
+  /** Who sent it. The agent is "us". */
+  from: 'tenant' | 'agent'
+  text: string
+  /** ISO timestamp. */
+  at: string
+}
+
+export interface Conversation {
+  id: string
+  /** A real `sampleTenants` name, on that tenant's own unit. */
+  tenant: string
+  unit: string
+  property: string
+  topic: MessageTopic
+  /** Messages the agent has not opened. */
+  unread: number
+  /** Oldest first, which is the order a thread is read in. */
+  messages: ChatMessage[]
+}
+
+/**
+ * Tenant conversations.
+ *
+ * Every thread belongs to a real tenant on their own unit, and the maintenance
+ * ones quote jobs that exist in `sampleMaintenance` — Peter Njoroge really is
+ * waiting on a hot water element, and Esther Nyambura really did report a
+ * sparking socket. A messages screen that referenced repairs the maintenance
+ * page had never heard of would be the fastest way to make the whole dashboard
+ * feel invented.
+ *
+ * The page this replaced had six conversations and message threads for two of
+ * them, so four of the six opened blank. `pnpm verify:data` now checks that
+ * every conversation has messages, which is the specific failure that shipped.
+ *
+ * Nothing stores an "awaiting reply" flag: it is derived from whether the last
+ * message came from the tenant. A stored flag is a second source of truth that
+ * goes stale the first time someone replies.
+ */
+export const sampleConversations: Conversation[] = [
+  {
+    id: 'cv1',
+    tenant: 'Peter Njoroge',
+    unit: 'B4',
+    property: 'Brookside Apartments',
+    topic: 'maintenance',
+    unread: 2,
+    messages: [
+      { id: 'cv1m1', from: 'tenant', text: 'Morning. There has been no hot water in the shower since Tuesday. I reported it but wanted to check someone has seen it.', at: '2026-09-17T06:52:00Z' },
+      { id: 'cv1m2', from: 'agent', text: 'Morning Peter — yes, it is logged. Kamau Heating have looked at it and the element needs replacing.', at: '2026-09-17T08:20:00Z' },
+      { id: 'cv1m3', from: 'agent', text: 'The part is ordered. They are booked to fit it on Tuesday the 22nd at 09:00. Will you be in?', at: '2026-09-18T09:05:00Z' },
+      { id: 'cv1m4', from: 'tenant', text: 'I can be there until 10. After that my neighbour in B3 has a key.', at: '2026-09-18T12:40:00Z' },
+      { id: 'cv1m5', from: 'tenant', text: 'Also — my rent transfer bounced this month. The bank says insufficient funds but I have since topped up. How do I retry it?', at: '2026-09-19T17:15:00Z' },
+    ],
+  },
+  {
+    id: 'cv2',
+    tenant: 'Esther Nyambura',
+    unit: 'A1',
+    property: 'Brookside Apartments',
+    topic: 'maintenance',
+    unread: 1,
+    messages: [
+      { id: 'cv2m1', from: 'tenant', text: 'The socket in the main bedroom sparked when I unplugged a lamp tonight. I have stopped using it.', at: '2026-09-20T19:12:00Z' },
+      { id: 'cv2m2', from: 'agent', text: 'Thank you for telling us straight away, and you did the right thing leaving it alone. I have marked this urgent.', at: '2026-09-20T19:40:00Z' },
+      { id: 'cv2m3', from: 'tenant', text: 'Understood. Please let me know when an electrician can come — I am working from home all week.', at: '2026-09-20T20:02:00Z' },
+    ],
+  },
+  {
+    id: 'cv3',
+    tenant: 'Lucy Njeri',
+    unit: '3',
+    property: 'Kileleshwa Court',
+    topic: 'lease',
+    unread: 1,
+    messages: [
+      { id: 'cv3m1', from: 'agent', text: 'Hello Lucy — your lease is up on 31 October. Would you like to renew on the same terms?', at: '2026-09-16T10:00:00Z' },
+      { id: 'cv3m2', from: 'tenant', text: 'I would, yes. Is the rent staying at 66,000?', at: '2026-09-16T13:25:00Z' },
+      { id: 'cv3m3', from: 'agent', text: 'It is. I have put a meeting in for the 26th at 15:00 to sign — does that suit?', at: '2026-09-17T09:10:00Z' },
+      { id: 'cv3m4', from: 'tenant', text: 'That works. One thing — the water pressure in the mornings is still very low. Is that being looked at?', at: '2026-09-19T07:30:00Z' },
+    ],
+  },
+  {
+    id: 'cv4',
+    tenant: 'Mercy Achieng',
+    unit: '7C',
+    property: 'Riverside Gardens',
+    topic: 'payment',
+    unread: 0,
+    messages: [
+      { id: 'cv4m1', from: 'tenant', text: 'I sent the rent by M-Pesa this afternoon but it still shows as pending. Has it come through?', at: '2026-09-14T14:20:00Z' },
+      { id: 'cv4m2', from: 'agent', text: 'It is showing as pending on our side too — M-Pesa can take a few hours to confirm. I will watch it.', at: '2026-09-14T15:05:00Z' },
+      { id: 'cv4m3', from: 'tenant', text: 'Thank you.', at: '2026-09-14T15:07:00Z' },
+      { id: 'cv4m4', from: 'agent', text: 'Confirmed — it cleared this morning. Receipt is on your payments page.', at: '2026-09-15T08:30:00Z' },
+    ],
+  },
+  {
+    id: 'cv5',
+    tenant: 'Sylvia Cherono',
+    unit: '2A',
+    property: 'Kilimani Heights',
+    topic: 'maintenance',
+    unread: 0,
+    messages: [
+      { id: 'cv5m1', from: 'tenant', text: 'The balcony railing moves when you lean on it. I have kept the children off it.', at: '2026-09-19T10:05:00Z' },
+      { id: 'cv5m2', from: 'agent', text: 'That is serious — please keep the balcony out of use entirely until it is fixed. Mwangi Builders are coming Tuesday at 08:00.', at: '2026-09-19T10:45:00Z' },
+      { id: 'cv5m3', from: 'tenant', text: 'Will do. Thank you for moving quickly.', at: '2026-09-19T11:02:00Z' },
+      { id: 'cv5m4', from: 'agent', text: 'No trouble. I will confirm here once they have been and signed it off.', at: '2026-09-19T11:20:00Z' },
+    ],
+  },
+  {
+    id: 'cv6',
+    tenant: 'James Mwangi',
+    unit: 'A3',
+    property: 'Brookside Apartments',
+    topic: 'lease',
+    unread: 0,
+    messages: [
+      { id: 'cv6m1', from: 'agent', text: 'Hello James — your lease ends on 31 October. Are you planning to stay on?', at: '2026-09-15T11:00:00Z' },
+      { id: 'cv6m2', from: 'tenant', text: 'I am, but I may want to move to a two-bed if one comes up in the block.', at: '2026-09-15T18:30:00Z' },
+      { id: 'cv6m3', from: 'agent', text: 'Noted. Nothing free right now, but I will tell you first if that changes. Shall we meet on the 28th at 09:30 either way?', at: '2026-09-16T08:15:00Z' },
+      { id: 'cv6m4', from: 'tenant', text: 'Perfect, see you then.', at: '2026-09-16T08:44:00Z' },
+      { id: 'cv6m5', from: 'agent', text: 'Booked. I will bring the renewal papers with me.', at: '2026-09-16T09:02:00Z' },
+    ],
+  },
+  {
+    id: 'cv7',
+    tenant: 'Grace Wanjiku',
+    unit: 'A2',
+    property: 'Brookside Apartments',
+    topic: 'general',
+    unread: 0,
+    messages: [
+      { id: 'cv7m1', from: 'tenant', text: 'Is the gate being locked at night now? It was open again when I came home.', at: '2026-09-12T21:10:00Z' },
+      { id: 'cv7m2', from: 'agent', text: 'It should be locked from 22:00. I will speak to the caretaker this week.', at: '2026-09-13T08:00:00Z' },
+      { id: 'cv7m3', from: 'tenant', text: 'Thank you — it has been locked the last two nights.', at: '2026-09-16T20:15:00Z' },
+      { id: 'cv7m4', from: 'agent', text: 'Good to hear. Tell me straight away if it slips again.', at: '2026-09-17T07:45:00Z' },
+    ],
+  },
+  {
+    id: 'cv8',
+    tenant: 'Victor Omondi',
+    unit: 'A3',
+    property: 'Riverside Gardens',
+    topic: 'payment',
+    unread: 3,
+    messages: [
+      { id: 'cv8m1', from: 'agent', text: 'Hello Victor — this month\'s rent of 58,000 has not come through and is now past due.', at: '2026-09-16T09:00:00Z' },
+      { id: 'cv8m2', from: 'tenant', text: 'I know, I am sorry. My employer paid late this month.', at: '2026-09-18T16:20:00Z' },
+      { id: 'cv8m3', from: 'tenant', text: 'Can I pay half now and the rest on the 30th?', at: '2026-09-18T16:22:00Z' },
+      { id: 'cv8m4', from: 'tenant', text: 'Also the gate intercom is still not working, I have had to call people down to let me in.', at: '2026-09-18T16:25:00Z' },
+    ],
+  },
+]
+
+export type DocumentCategory = 'legal' | 'finance' | 'tenant' | 'property' | 'marketing'
+export type DocumentKind =
+  | 'lease'
+  | 'application'
+  | 'insurance'
+  | 'statement'
+  | 'report'
+  | 'photos'
+export type DocumentStatus = 'active' | 'approved' | 'final' | 'draft' | 'archived'
+
+export interface StoredDocument {
+  id: string
+  title: string
+  kind: DocumentKind
+  category: DocumentCategory
+  status: DocumentStatus
+  /** A real property name, or "All properties" for portfolio-wide files. */
+  property: string
+  unit?: string
+  tenant?: string
+  /** ISO date. Never in the future. */
+  uploadedAt: string
+  /** ISO date. Only leases and insurance run out. */
+  expiresAt?: string
+  /** Real byte count, formatted at the edge — the page it replaced stored
+   *  pre-formatted strings like "3.2 MB", which cannot be sorted or summed. */
+  bytes: number
+  format: 'pdf' | 'xlsx' | 'jpg' | 'zip'
+  note?: string
+}
+
+/**
+ * The document store, newest first.
+ *
+ * Generated from the records the documents describe, so the filing cabinet and
+ * the rest of the dashboard agree: a lease belongs to a tenant who exists on
+ * that unit, a works report belongs to a maintenance job that was actually
+ * resolved and names the contractor who did it, and listing photos exist only
+ * for properties that genuinely have a vacancy.
+ *
+ * Expiry is tracked, which the page this replaced did not do. It is the one
+ * thing a document store is uniquely able to warn about — an insurance policy
+ * that lapses is a real exposure and nothing else in the product would notice.
+ */
+export const sampleDocuments: StoredDocument[] = [
+  { id: 'doc1', title: 'Rent statement — September 2026', kind: 'statement', category: 'finance', status: 'draft', property: 'All properties', uploadedAt: '2026-09-21', bytes: 87_835, format: 'xlsx', note: 'Collection by property and unit' },
+  { id: 'doc2', title: 'Works report — Blocked kitchen sink', kind: 'report', category: 'property', status: 'final', property: 'Riverside Gardens', unit: 'C1', tenant: 'Alice Muthoni', uploadedAt: '2026-09-09', bytes: 2_484_715, format: 'jpg', note: 'Completed by Otieno Plumbing' },
+  { id: 'doc3', title: 'Listing photos — Riverside Gardens', kind: 'photos', category: 'marketing', status: 'active', property: 'Riverside Gardens', uploadedAt: '2026-09-08', bytes: 8_132_407, format: 'zip', note: 'For the vacant unit' },
+  { id: 'doc4', title: 'Listing photos — Kilimani Heights', kind: 'photos', category: 'marketing', status: 'active', property: 'Kilimani Heights', uploadedAt: '2026-09-08', bytes: 7_865_619, format: 'zip', note: 'For the vacant unit' },
+  { id: 'doc5', title: 'Listing photos — South B Maisonettes', kind: 'photos', category: 'marketing', status: 'active', property: 'South B Maisonettes', uploadedAt: '2026-09-08', bytes: 8_447_400, format: 'zip', note: 'For the vacant unit' },
+  { id: 'doc6', title: 'Works report — Security light at the gate not working', kind: 'report', category: 'property', status: 'final', property: 'Kileleshwa Court', unit: '14', tenant: 'Samuel Otieno', uploadedAt: '2026-09-07', bytes: 1_110_633, format: 'pdf', note: 'Completed by Bright Spark Electrical' },
+  { id: 'doc7', title: 'Works report — Toilet cistern running', kind: 'report', category: 'property', status: 'final', property: 'Brookside Apartments', unit: 'A3', tenant: 'James Mwangi', uploadedAt: '2026-09-03', bytes: 408_610, format: 'jpg', note: 'Completed by Otieno Plumbing' },
+  { id: 'doc8', title: 'Tenant application — Anthony Mutua', kind: 'application', category: 'tenant', status: 'approved', property: 'Kileleshwa Court', unit: '5', tenant: 'Anthony Mutua', uploadedAt: '2026-09-01', bytes: 234_262, format: 'pdf', note: 'Application, references and ID' },
+  { id: 'doc9', title: 'Rent statement — August 2026', kind: 'statement', category: 'finance', status: 'final', property: 'All properties', uploadedAt: '2026-08-28', bytes: 127_777, format: 'xlsx', note: 'Collection by property and unit' },
+  { id: 'doc10', title: 'Works report — Kitchen tap dripping continuously', kind: 'report', category: 'property', status: 'final', property: 'Brookside Apartments', unit: 'A2', tenant: 'Grace Wanjiku', uploadedAt: '2026-08-16', bytes: 537_965, format: 'jpg', note: 'Completed by Otieno Plumbing' },
+  { id: 'doc11', title: 'Lease agreement — Faith Wairimu', kind: 'lease', category: 'legal', status: 'active', property: 'Brookside Apartments', unit: 'B2', tenant: 'Faith Wairimu', uploadedAt: '2026-08-01', expiresAt: '2027-07-31', bytes: 390_864, format: 'pdf', note: 'Signed by both parties' },
+  { id: 'doc12', title: 'Rent statement — July 2026', kind: 'statement', category: 'finance', status: 'final', property: 'All properties', uploadedAt: '2026-07-28', bytes: 104_816, format: 'xlsx', note: 'Collection by property and unit' },
+  { id: 'doc13', title: 'Lease agreement — Samuel Otieno', kind: 'lease', category: 'legal', status: 'active', property: 'Kileleshwa Court', unit: '14', tenant: 'Samuel Otieno', uploadedAt: '2026-07-01', expiresAt: '2027-06-30', bytes: 334_803, format: 'pdf', note: 'Signed by both parties' },
+  { id: 'doc14', title: 'Lease agreement — Caroline Chebet', kind: 'lease', category: 'legal', status: 'active', property: 'Brookside Apartments', unit: 'A4', tenant: 'Caroline Chebet', uploadedAt: '2026-06-01', expiresAt: '2027-05-31', bytes: 209_302, format: 'pdf', note: 'Signed by both parties' },
+  { id: 'doc15', title: 'Lease agreement — Daniel Kimani', kind: 'lease', category: 'legal', status: 'active', property: 'Kileleshwa Court', unit: '9', tenant: 'Daniel Kimani', uploadedAt: '2026-05-01', expiresAt: '2027-04-30', bytes: 210_582, format: 'pdf', note: 'Signed by both parties' },
+  { id: 'doc16', title: 'Lease agreement — Esther Nyambura', kind: 'lease', category: 'legal', status: 'active', property: 'Brookside Apartments', unit: 'A1', tenant: 'Esther Nyambura', uploadedAt: '2026-04-01', expiresAt: '2027-03-31', bytes: 361_551, format: 'pdf', note: 'Signed by both parties' },
+  { id: 'doc17', title: 'Tenant application — Collins Kiprop', kind: 'application', category: 'tenant', status: 'approved', property: 'Kileleshwa Court', unit: '12', tenant: 'Collins Kiprop', uploadedAt: '2026-04-01', bytes: 183_032, format: 'pdf', note: 'Application, references and ID' },
+  { id: 'doc18', title: 'Lease agreement — Brian Ochieng', kind: 'lease', category: 'legal', status: 'active', property: 'Brookside Apartments', unit: 'B1', tenant: 'Brian Ochieng', uploadedAt: '2026-03-01', expiresAt: '2027-02-28', bytes: 402_632, format: 'pdf', note: 'Signed by both parties' },
+  { id: 'doc19', title: 'Tenant application — Mercy Achieng', kind: 'application', category: 'tenant', status: 'approved', property: 'Riverside Gardens', unit: '7C', tenant: 'Mercy Achieng', uploadedAt: '2026-03-01', bytes: 238_911, format: 'pdf', note: 'Application, references and ID' },
+  { id: 'doc20', title: 'Tenant application — Winnie Adhiambo', kind: 'application', category: 'tenant', status: 'approved', property: 'Kileleshwa Court', unit: '11', tenant: 'Winnie Adhiambo', uploadedAt: '2026-02-01', bytes: 218_368, format: 'pdf', note: 'Application, references and ID' },
+  // Three more filed against the signed-in tenant, so her own documents screen
+  // has enough to search and filter. Each one is tied to a record that already
+  // exists: the works report matches the resolved lock repair (mr22) the way
+  // doc10 matches the resolved tap (mr1), and the inventory and deposit receipt
+  // are dated to her move-in.
+  { id: 'doc35', title: 'Works report — Front door lock stiff to turn', kind: 'report', category: 'property', status: 'final', property: 'Brookside Apartments', unit: 'A2', tenant: 'Grace Wanjiku', uploadedAt: '2026-03-10', bytes: 412_880, format: 'pdf', note: 'Lock replaced, two keys cut' },
+  { id: 'doc36', title: 'Move-in inventory — A2', kind: 'report', category: 'tenant', status: 'approved', property: 'Brookside Apartments', unit: 'A2', tenant: 'Grace Wanjiku', uploadedAt: '2026-01-15', bytes: 1_284_033, format: 'pdf', note: 'Condition of every room at handover, signed by both sides' },
+  { id: 'doc37', title: 'Deposit receipt — Grace Wanjiku', kind: 'statement', category: 'finance', status: 'final', property: 'Brookside Apartments', unit: 'A2', tenant: 'Grace Wanjiku', uploadedAt: '2026-01-15', bytes: 96_412, format: 'pdf', note: 'One month held, Ksh 72,000' },
+  { id: 'doc21', title: 'Lease agreement — Grace Wanjiku', kind: 'lease', category: 'legal', status: 'active', property: 'Brookside Apartments', unit: 'A2', tenant: 'Grace Wanjiku', uploadedAt: '2026-01-15', expiresAt: '2027-01-14', bytes: 320_579, format: 'pdf', note: 'Signed by both parties' },
+  { id: 'doc22', title: 'Lease agreement — Dennis Kariuki', kind: 'lease', category: 'legal', status: 'active', property: 'Brookside Apartments', unit: 'B3', tenant: 'Dennis Kariuki', uploadedAt: '2026-01-01', expiresAt: '2026-12-31', bytes: 365_354, format: 'pdf', note: 'Signed by both parties' },
+  { id: 'doc23', title: 'Lease agreement — Peter Njoroge', kind: 'lease', category: 'legal', status: 'active', property: 'Brookside Apartments', unit: 'B4', tenant: 'Peter Njoroge', uploadedAt: '2025-12-01', expiresAt: '2026-11-30', bytes: 388_837, format: 'pdf', note: 'Signed by both parties' },
+  { id: 'doc24', title: 'Tenant application — Alice Muthoni', kind: 'application', category: 'tenant', status: 'approved', property: 'Riverside Gardens', unit: 'C1', tenant: 'Alice Muthoni', uploadedAt: '2025-12-01', bytes: 176_571, format: 'pdf', note: 'Application, references and ID' },
+  { id: 'doc25', title: 'Lease agreement — James Mwangi', kind: 'lease', category: 'legal', status: 'active', property: 'Brookside Apartments', unit: 'A3', tenant: 'James Mwangi', uploadedAt: '2025-11-01', expiresAt: '2026-10-31', bytes: 311_068, format: 'pdf', note: 'Signed by both parties' },
+  { id: 'doc26', title: 'Tenant application — Lucy Njeri', kind: 'application', category: 'tenant', status: 'approved', property: 'Kileleshwa Court', unit: '3', tenant: 'Lucy Njeri', uploadedAt: '2025-11-01', bytes: 174_263, format: 'pdf', note: 'Application, references and ID' },
+  { id: 'doc27', title: 'Buildings insurance — Brookside Apartments', kind: 'insurance', category: 'legal', status: 'active', property: 'Brookside Apartments', uploadedAt: '2025-10-01', expiresAt: '2026-10-14', bytes: 550_481, format: 'pdf', note: 'Comprehensive cover, including communal areas' },
+  { id: 'doc28', title: 'Buildings insurance — Kileleshwa Court', kind: 'insurance', category: 'legal', status: 'active', property: 'Kileleshwa Court', uploadedAt: '2025-10-01', expiresAt: '2026-11-30', bytes: 588_736, format: 'pdf', note: 'Comprehensive cover, including communal areas' },
+  { id: 'doc29', title: 'Buildings insurance — Riverside Gardens', kind: 'insurance', category: 'legal', status: 'active', property: 'Riverside Gardens', uploadedAt: '2025-10-01', expiresAt: '2027-02-28', bytes: 1_088_499, format: 'pdf', note: 'Comprehensive cover, including communal areas' },
+  { id: 'doc30', title: 'Buildings insurance — Lavington Mews', kind: 'insurance', category: 'legal', status: 'active', property: 'Lavington Mews', uploadedAt: '2025-10-01', expiresAt: '2027-05-31', bytes: 783_964, format: 'pdf', note: 'Comprehensive cover, including communal areas' },
+  { id: 'doc31', title: 'Buildings insurance — Kilimani Heights', kind: 'insurance', category: 'legal', status: 'active', property: 'Kilimani Heights', uploadedAt: '2025-10-01', expiresAt: '2026-10-05', bytes: 1_157_510, format: 'pdf', note: 'Comprehensive cover, including communal areas' },
+  { id: 'doc32', title: 'Buildings insurance — Ngong Road Villas', kind: 'insurance', category: 'legal', status: 'active', property: 'Ngong Road Villas', uploadedAt: '2025-10-01', expiresAt: '2027-08-31', bytes: 958_458, format: 'pdf', note: 'Comprehensive cover, including communal areas' },
+  { id: 'doc33', title: 'Buildings insurance — Parklands Terrace', kind: 'insurance', category: 'legal', status: 'active', property: 'Parklands Terrace', uploadedAt: '2025-10-01', expiresAt: '2027-01-31', bytes: 1_219_325, format: 'pdf', note: 'Comprehensive cover, including communal areas' },
+  { id: 'doc34', title: 'Lease agreement — previous tenant, South B', kind: 'lease', category: 'legal', status: 'archived', property: 'South B Maisonettes', unit: '2', uploadedAt: '2024-03-01', expiresAt: '2026-02-28', bytes: 204_563, format: 'pdf', note: 'Superseded — unit now vacant' },
+]
+
+/* ------------------------------------------------------------------ */
+/* Support cases                                                       */
+/* ------------------------------------------------------------------ */
+
+export type CaseStatus = 'open' | 'waiting' | 'resolved'
+export type CasePriority = 'low' | 'normal' | 'high'
+
+export interface SupportCase {
+  id: string
+  subject: string
+  detail: string
+  status: CaseStatus
+  priority: CasePriority
+  opened: string
+  updated: string
+}
+
+/**
+ * Placeholder cases, and the reason the page carries a sample-data chip.
+ *
+ * The three here are the three a Kenyan letting agent actually opens, and two
+ * of them exist because of real gaps: changing your email or phone has no
+ * endpoint at all, and the payout tab is not yet wired to /bank-accounts, so
+ * both currently go through support. The
+ * set this replaced was about QuickBooks integration, bulk-importing 50+
+ * properties and tenant-screening API criteria — none of which this product
+ * has.
+ */
+export const sampleSupportCases: SupportCase[] = [
+  {
+    id: 'GIN-2041',
+    subject: 'M-Pesa payment not showing against a unit',
+    detail:
+      'Tenant in B4, Brookside Apartments sent Ksh 85,000 on 14 Sept and has the confirmation SMS, but the unit still reads as unpaid.',
+    status: 'open',
+    priority: 'high',
+    opened: '2026-09-15',
+    updated: '2026-09-19',
+  },
+  {
+    id: 'GIN-2038',
+    subject: 'Change the payout bank account',
+    detail:
+      'Moving the business account to a different bank and need the payout details updated, which Settings does not allow.',
+    status: 'waiting',
+    priority: 'normal',
+    opened: '2026-09-11',
+    updated: '2026-09-18',
+  },
+  {
+    id: 'GIN-2027',
+    subject: 'Invited tenant never received the SMS',
+    detail:
+      'Invite sent twice to a Safaricom number with no code arriving. Resolved — the number had a leading zero and a country code.',
+    status: 'resolved',
+    priority: 'normal',
+    opened: '2026-09-02',
+    updated: '2026-09-04',
+  },
+]
+
+/* ------------------------------------------------------------------ */
+/* The signed-in tenant                                                */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Who "you" are on the tenant dashboard.
+ *
+ * The tenant screens need a single person to be about, the way the landlord
+ * screens are about the whole portfolio. Rather than invent one — the old
+ * tenant pages were about "Sarah" on "Main Street" paying "$1,200", a person
+ * and a currency that exist nowhere else in this product — this points at a
+ * tenant who is already in `sampleTenants` and already cross-referenced by
+ * maintenance, conversations, documents and the payment ledger. Every tenant
+ * screen derives from her, so the two sides of the product tell one story: the
+ * landlord sees Grace's payment in their ledger, and Grace sees the same
+ * payment in hers.
+ *
+ * Grace specifically because she is the most completely connected tenant in
+ * the data (a resolved plumbing job, a lease, a works report, a conversation
+ * thread and a paid September), and because `paid` is the honest common case.
+ * A tenant dashboard permanently showing a crisis would be a demo, not a
+ * design.
+ */
+export const SIGNED_IN_TENANT_ID = 'tn1'
+
+/** Rent is due on the 1st. Everything tenant-side counts from this. */
+export const RENT_DUE_DAY = 1
+
+export interface TenancyDetail {
+  /** Deposit held, in KES. Conventionally one month here. */
+  deposit: number
+  bedrooms: number
+  bathrooms: number
+  /** Square METRES. The previous pages used square feet, which is not the unit
+   *  anyone in Nairobi quotes. */
+  areaSqm: number
+  furnished: boolean
+  /** Which floor the unit is on. Ground is 0. */
+  floor: number
+  /** What the building actually offers, and when it can be used — the page
+   *  this replaced listed access hours, so they are kept rather than dropped.
+   *  Deliberately short and plausible for a Nairobi apartment block: the old
+   *  list was a swimming pool, a fitness centre, a rooftop terrace, a community
+   *  lounge and bike storage, which is a US leasing brochure, not this
+   *  building. */
+  amenities: { name: string; access: string }[]
+  /** Who to contact about the unit. */
+  agent: { name: string; phone: string }
+}
+
+export const sampleTenancy: TenancyDetail = {
+  deposit: 72_000,
+  bedrooms: 2,
+  bathrooms: 1,
+  areaSqm: 78,
+  furnished: false,
+  floor: 2,
+  amenities: [
+    { name: 'Borehole water', access: 'Always' },
+    { name: 'Backup generator', access: 'Automatic on outage' },
+    { name: 'Secure parking', access: 'Always, one bay' },
+    { name: '24-hour security', access: 'Always' },
+    { name: 'Lift', access: 'Always' },
+    { name: 'Rooftop drying area', access: '6am – 8pm' },
+  ],
+  agent: { name: 'Mary Njoki', phone: '+254 711 402 118' },
+}
+
+/**
+ * Grace's own payment history.
+ *
+ * The landlord ledger holds one row per tenant for the current period, which is
+ * the right shape for that screen and useless for this one — a tenant opening
+ * Payments wants their own run of months, not everyone's September. These are
+ * the months she has been in the unit: moveIn is 2026-01-15, so January is a
+ * part month and the rest are full.
+ *
+ * September is the same payment as `pay3` / `t1`, same amount, same method,
+ * same timestamp, same reference. `verify:data` checks that, because the whole
+ * point of anchoring on a real tenant is lost if the two sides disagree about
+ * a payment they both show.
+ */
+export interface TenantPayment {
+  id: string
+  /** Period the rent covers, YYYY-MM. */
+  period: string
+  amount: number
+  status: Extract<PaymentStatus, 'paid' | 'pending' | 'late'>
+  method?: TxMethod
+  /** ISO timestamp of the successful attempt. Absent while pending. */
+  at?: string
+  reference?: string
+  /** Set where the month was not a full one. */
+  note?: string
+}
+
+export const sampleTenantPayments: TenantPayment[] = [
+  { id: 'tp9', period: '2026-09', amount: 72_000, status: 'paid', method: 'M-Pesa', at: '2026-09-15T09:12:00Z', reference: 'U2RHPDHPDN' },
+  { id: 'tp8', period: '2026-08', amount: 72_000, status: 'paid', method: 'M-Pesa', at: '2026-08-03T18:41:00Z', reference: 'QJ4T8XW2RK' },
+  { id: 'tp7', period: '2026-07', amount: 72_000, status: 'paid', method: 'M-Pesa', at: '2026-07-01T07:26:00Z', reference: 'B7MKD0PZ1C' },
+  { id: 'tp6', period: '2026-06', amount: 72_000, status: 'paid', method: 'M-Pesa', at: '2026-06-02T12:05:00Z', reference: 'LX53QW8NTE' },
+  { id: 'tp5', period: '2026-05', amount: 72_000, status: 'paid', method: 'Bank transfer', at: '2026-05-01T10:18:00Z', reference: 'TRF-556219' },
+  { id: 'tp4', period: '2026-04', amount: 72_000, status: 'paid', method: 'M-Pesa', at: '2026-04-01T06:52:00Z', reference: 'R9CVH2KDAM' },
+  { id: 'tp3', period: '2026-03', amount: 72_000, status: 'paid', method: 'M-Pesa', at: '2026-03-04T19:33:00Z', reference: 'ZP1ND6QGYB' },
+  { id: 'tp2', period: '2026-02', amount: 72_000, status: 'paid', method: 'M-Pesa', at: '2026-02-01T08:09:00Z', reference: 'KD8WR3JVLQ' },
+  { id: 'tp1', period: '2026-01', amount: 39_484, status: 'paid', method: 'M-Pesa', at: '2026-01-15T15:47:00Z', reference: 'MN2XB7TQFD', note: 'Part month from 15 January' },
+]
+
+/**
+ * A tenant's own support cases.
+ *
+ * Separate from `sampleSupportCases`, which is the agent's queue. The two
+ * screens show different sides of support: an agent raises cases about tenants,
+ * a tenant raises them about their own flat and their own account.
+ *
+ * The set the old page showed was a noise complaint about Unit 3C, a key card
+ * that would not open a fitness centre, and a lease renewal question — a
+ * different building with facilities this one does not have. These are the
+ * three a tenant here actually opens.
+ */
+export const sampleTenantCases: SupportCase[] = [
+  {
+    id: 'GIN-3182',
+    subject: 'September rent not showing as paid',
+    detail:
+      'Sent Ksh 72,000 by M-Pesa on 15 September, reference U2RHPDHPDN. The month still showed as open the next morning.',
+    status: 'resolved',
+    priority: 'high',
+    opened: '2026-09-16',
+    updated: '2026-09-17',
+  },
+  {
+    id: 'GIN-3205',
+    subject: 'Change the phone number on my account',
+    detail:
+      'Moved to a new number and need it updated, which Settings does not allow. Aware it is tied to M-Pesa and the one-time codes.',
+    status: 'waiting',
+    priority: 'normal',
+    opened: '2026-09-19',
+    updated: '2026-09-20',
+  },
+  {
+    id: 'GIN-3211',
+    subject: 'Copy of the lease for my employer',
+    detail:
+      'HR need a copy of the tenancy agreement for a housing allowance claim. Cannot download it from Documents.',
+    status: 'open',
+    priority: 'low',
+    opened: '2026-09-20',
+    updated: '2026-09-20',
+  },
 ]

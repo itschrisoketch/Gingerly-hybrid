@@ -1,3 +1,34 @@
+> [!WARNING]
+> **STALE — do not treat this file as the source of truth.**
+>
+> Verified 2026-09-23 against the live spec at
+> `https://api.gingerly.africa/apispec.json`, which serves **44 paths**. This
+> file documents **13** of them, and at least one body it does document is
+> wrong (`/merchants/register` here lists `id_passport` / `tax_pin` / `erp`;
+> the live endpoint takes `full_name`, `business_name`, `property_name`,
+> `num_units`, `address`, `city`, `state`, `zip_code` and the bank fields).
+>
+> Whole groups are missing from this file:
+>
+> | Group | Live paths | Documented here |
+> |---|---|---|
+> | `auth` | 13 | 7 |
+> | `accounts` (admin-only account types & sub-accounts) | 10 | 0 |
+> | `admin` | 7 | 0 |
+> | `bank-accounts` (add / update / remove / list) | 5 | 0 |
+> | `merchants` | 6 | 3 |
+> | `customers` | 3 | 3 |
+>
+> Two consequences that already bit us, so check for them before writing any
+> claim about what the API can do:
+>
+> - `login_type` is `['customer', 'merchant', 'admin']`. **There is a third
+>   role**, and the client's `LoginType` only has two.
+> - `/bank-accounts` exists. The settings screen and the help page both used to
+>   state that payout details had no update endpoint, which was false.
+
+---
+
 Below is a **clean, structured Markdown version** of the API specification, optimized so tools like **Cursor** can clearly understand endpoints, methods, headers, request bodies, and responses for API calls.
 
 You can save this as `gingerly-api.md`.

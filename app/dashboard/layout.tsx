@@ -24,7 +24,19 @@ export default function DashboardLayout({
 }) {
   return (
     <SidebarProvider>
-      <div data-brand-font className="flex h-screen overflow-hidden bg-background font-body">
+      {/* flex-col, not flex. The outer container was a flex ROW with MobileNav
+          as its first child, so on a phone the header took WIDTH beside the
+          content instead of stacking above it — squeezing every dashboard page
+          into roughly a third of the screen, with text wrapping a word per
+          line. It did not show as a horizontal scrollbar, because the page
+          still fitted; the content was simply being crushed.
+
+          On a screen MobileNav is `md:hidden` and renders nothing, so the
+          column has a single child and behaves exactly as the row did. */}
+      <div
+        data-brand-font
+        className="flex h-screen flex-col overflow-hidden bg-background font-body"
+      >
         <MobileNav />
         <div className="flex flex-1 overflow-hidden">
           <DashboardSidebar />

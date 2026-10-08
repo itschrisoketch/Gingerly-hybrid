@@ -83,7 +83,26 @@ export default async function PaymentsPage({
           }
           action={{ href: '/dashboard/landlord/payments?filter=late', label: 'Show them' }}
         />
-      ) : null}
+      ) : (
+        /* Rendered rather than omitted. With no banner at all a clear month
+           looked the same as a page that had failed to load its arrears — the
+           absence of work is itself worth reporting, in the same object and the
+           same place, just a quieter register. */
+        <PageBanner
+          id="payments-banner"
+          tone="calm"
+          icon="CheckCircle"
+          eyebrow="Nothing past due"
+          title={<>All rent for {sampleCollection.periodLabel} is accounted for</>}
+          description={
+            <>
+              <span className="tabular-nums">{formatKes(collected)}</span> collected, with{' '}
+              <span className="tabular-nums">{sampleCollection.daysLeft}</span>{' '}
+              {sampleCollection.daysLeft === 1 ? 'day' : 'days'} left in the period
+            </>
+          }
+        />
+      )}
 
       <StatTiles
         figures={

@@ -42,6 +42,12 @@ const payments = read('samplePayments')
 const mix = read('sampleCollectionMix')
 const maintenance = read('sampleMaintenance')
 const diary = read('sampleDiary')
+const conversations = read('sampleConversations')
+const documents = read('sampleDocuments')
+const cases = read('sampleSupportCases')
+const tenantCases = read('sampleTenantCases')
+const tenantPayments = read('sampleTenantPayments')
+const tenancy = read('sampleTenancy')
 
 const sum = (xs, f) => xs.reduce((n, x) => n + f(x), 0)
 const failures = []
@@ -210,6 +216,145 @@ check(
   maintenance.filter((m) => m.scheduledFor && !m.scheduledTime).length,
   0,
 )
+
+console.log('\nconversations')
+check('conversation ids unique', new Set(conversations.map((c) => c.id)).size, conversations.length)
+// The bug that shipped: six conversations, message threads for two of them.
+check('every conversation has messages', conversations.filter((c) => !c.messages?.length).length, 0)
+check(
+  'every conversation is a real tenant on their own unit',
+  conversations.filter(
+    (c) => !tenants.some((t) => t.name === c.tenant && t.unit === c.unit && t.property === c.property),
+  ).length,
+  0,
+)
+check('message ids unique across all threads', new Set(conversations.flatMap((c) => c.messages.map((m) => m.id))).size, conversations.reduce((n, c) => n + c.messages.length, 0))
+check(
+  'messages are oldest-first within a thread',
+  conversations.filter((c) => c.messages.some((m, i) => i > 0 && m.at < c.messages[i - 1].at)).length,
+  0,
+)
+check(
+  'senders are all known',
+  conversations.flatMap((c) => c.messages).filter((m) => !['tenant', 'agent'].includes(m.from)).length,
+  0,
+)
+check('topics are all known', conversations.filter((c) => !['maintenance', 'payment', 'lease', 'general'].includes(c.topic)).length, 0)
+check(
+  'unread never exceeds the tenant messages in the thread',
+  conversations.filter((c) => c.unread > c.messages.filter((m) => m.from === 'tenant').length).length,
+  0,
+)
+
+console.log('\ndocuments')
+const TODAY = '2026-09-21'
+check('document ids unique', new Set(documents.map((d) => d.id)).size, documents.length)
+check(
+  'every document names a real property',
+  documents.filter((d) => d.property !== 'All properties' && !names.has(d.property)).length,
+  0,
+)
+check(
+  'documents naming a tenant name a real one, on that unit',
+  documents.filter(
+    (d) => d.tenant && !tenants.some((t) => t.name === d.tenant && t.unit === d.unit && t.property === d.property),
+  ).length,
+  0,
+)
+// Caught during authoring: the September statement was dated the 28th.
+check('nothing is uploaded in the future', documents.filter((d) => d.uploadedAt > TODAY).length, 0)
+check('nothing expires before it was uploaded', documents.filter((d) => d.expiresAt && d.expiresAt < d.uploadedAt).length, 0)
+check('only leases and insurance expire', documents.filter((d) => d.expiresAt && !['lease', 'insurance'].includes(d.kind)).length, 0)
+check('every size is a positive byte count', documents.filter((d) => !(d.bytes > 0)).length, 0)
+check('categories are all known', documents.filter((d) => !['legal', 'finance', 'tenant', 'property', 'marketing'].includes(d.category)).length, 0)
+check('statuses are all known', documents.filter((d) => !['active', 'approved', 'final', 'draft', 'archived'].includes(d.status)).length, 0)
+check(
+  'listing photos only exist for properties with a vacancy',
+  documents.filter((d) => d.kind === 'photos' && !properties.some((p) => p.name === d.property && p.occupied < p.units)).length,
+  0,
+)
+
+console.log('\nsupport cases')
+check('case ids unique', new Set(cases.map((c) => c.id)).size, cases.length)
+check('statuses are all known', cases.filter((c) => !['open', 'waiting', 'resolved'].includes(c.status)).length, 0)
+check('priorities are all known', cases.filter((c) => !['low', 'normal', 'high'].includes(c.priority)).length, 0)
+check('dates are all YYYY-MM-DD', cases.filter((c) => !/^\d{4}-\d{2}-\d{2}$/.test(c.opened) || !/^\d{4}-\d{2}-\d{2}$/.test(c.updated)).length, 0)
+check('nothing was opened in the future', cases.filter((c) => c.opened > TODAY).length, 0)
+// A case cannot be touched before it existed, and cannot be updated after today.
+check('updated is on or after opened, and not in the future', cases.filter((c) => c.updated < c.opened || c.updated > TODAY).length, 0)
+check('every case has a subject and a detail', cases.filter((c) => !c.subject?.trim() || !c.detail?.trim()).length, 0)
+
+// The tenant's own cases follow the same rules as the agent's.
+const allCases = [...cases, ...tenantCases]
+check('tenant case ids unique and distinct from the agent queue',
+  new Set(allCases.map((c) => c.id)).size, allCases.length)
+check('tenant case statuses are known',
+  tenantCases.filter((c) => !['open', 'waiting', 'resolved'].includes(c.status)).length, 0)
+check('tenant case priorities are known',
+  tenantCases.filter((c) => !['low', 'normal', 'high'].includes(c.priority)).length, 0)
+check('tenant cases are dated YYYY-MM-DD, opened before updated, not in the future',
+  tenantCases.filter((c) =>
+    !/^\d{4}-\d{2}-\d{2}$/.test(c.opened) || !/^\d{4}-\d{2}-\d{2}$/.test(c.updated)
+    || c.updated < c.opened || c.opened > TODAY || c.updated > TODAY).length, 0)
+
+// A works report is the write-up of a finished job. One attached to a job that
+// is still open would be a document describing work nobody has done.
+check(
+  'every works report names a resolved maintenance job',
+  documents.filter((d) => {
+    const m = /^Works report — (.+)$/.exec(d.title)
+    if (!m) return false
+    const job = maintenance.find((j) => j.title === m[1])
+    return !job || job.status !== 'resolved'
+  }).length,
+  0,
+)
+
+console.log('\ntransactions against the payment ledger')
+check('only paid transactions carry a reference',
+  transactions.filter((t) => t.reference && t.status !== 'paid').length, 0)
+check('every paid transaction carries one',
+  transactions.filter((t) => t.status === 'paid' && !t.reference).length, 0)
+// The recents feed and the payments ledger show the SAME payment, so a
+// reference that differs between them would have an agent quoting one code to
+// support and reading another on screen.
+check('references match the ledger row for the same payment',
+  transactions.filter((t) => {
+    const pay = payments.find((p) => p.tenant === t.tenant && p.at === t.at)
+    return pay && pay.reference !== t.reference
+  }).length, 0)
+
+console.log('\nthe signed-in tenant')
+const me = tenants.find((t) => t.id === 'tn1')
+check('SIGNED_IN_TENANT_ID points at a real tenant', me ? 1 : 0, 1)
+check('payment ids unique', new Set(tenantPayments.map((p) => p.id)).size, tenantPayments.length)
+check('periods unique', new Set(tenantPayments.map((p) => p.period)).size, tenantPayments.length)
+check('periods are all YYYY-MM', tenantPayments.filter((p) => !/^\d{4}-\d{2}$/.test(p.period)).length, 0)
+check('nothing is paid in the future', tenantPayments.filter((p) => p.at && p.at.slice(0, 10) > TODAY).length, 0)
+check('a paid month carries a method, a time and a reference',
+  tenantPayments.filter((p) => p.status === 'paid' && !(p.method && p.at && p.reference)).length, 0)
+// A full month must be the rent on the tenancy; only a part month may differ,
+// and it must be smaller. This is what stops the history drifting from the unit.
+check('full months equal the rent on the tenancy',
+  tenantPayments.filter((p) => !p.note && p.amount !== me.rent).length, 0)
+check('a part month is less than a full one',
+  tenantPayments.filter((p) => p.note && !(p.amount < me.rent)).length, 0)
+check('no month precedes the move-in',
+  tenantPayments.filter((p) => p.period < me.moveIn.slice(0, 7)).length, 0)
+// The landlord ledger and the tenant's own history show the SAME September
+// payment. If these ever disagree the two dashboards are lying to each other.
+const ledger = payments.find((p) => p.tenant === me.name)
+const mine = tenantPayments.find((p) => p.period === '2026-09')
+check('September matches the landlord ledger row', 
+  ledger && mine && ledger.amount === mine.amount && ledger.method === mine.method
+    && ledger.at === mine.at && ledger.reference === mine.reference ? 1 : 0, 1)
+check('deposit is a positive amount', tenancy.deposit > 0 ? 1 : 0, 1)
+check('the unit has at least one room of each kind',
+  tenancy.bedrooms > 0 && tenancy.bathrooms > 0 ? 1 : 0, 1)
+check('the floor is not below ground', tenancy.floor >= 0 ? 1 : 0, 1)
+check('every amenity says when it can be used',
+  tenancy.amenities.filter((a) => !a.name?.trim() || !a.access?.trim()).length, 0)
+check('amenity names unique', new Set(tenancy.amenities.map((a) => a.name)).size, tenancy.amenities.length)
 
 if (failures.length > 0) {
   console.error(`\n${failures.length} failed:\n` + failures.map((f) => `  - ${f}`).join('\n'))

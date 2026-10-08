@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Icon } from '@/components/ui/icon'
+import { CopyButton } from '@/components/ui/copy-button'
 import { StatusBadge, type StatusTone } from '@/components/ui/status-badge'
 import type { IconName } from '@/lib/icons/icon-map'
 import {
@@ -213,8 +214,12 @@ export function PaymentsTable({
                       <td className="whitespace-nowrap py-3 pr-6 text-muted-foreground">
                         {p.method ?? <span aria-label="No payment attempted">&mdash;</span>}
                         {p.reference ? (
-                          <span className="block font-mono text-xs text-muted-foreground/80">
+                          <span className="flex items-center gap-1 font-mono text-xs text-muted-foreground/80">
                             {p.reference}
+                            <CopyButton
+                              value={p.reference}
+                              label={`${p.method ?? 'payment'} reference`}
+                            />
                           </span>
                         ) : null}
                       </td>

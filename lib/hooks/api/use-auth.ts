@@ -24,7 +24,13 @@ import type {
   ForgotPasswordResponse,
   VerifyOtpResponse,
   ChangePasswordResponse,
+  CustomerUpdateData,
+  CustomerUpdateResponse,
 } from '@/lib/api/types'
+import type {
+  MerchantUpdateData,
+  MerchantUpdateResponse,
+} from '@/lib/api/types/merchant.types'
 
 /** Where each role lands after signing in. */
 export const DASHBOARD_PATHS = {
@@ -190,6 +196,69 @@ export function useResetPassword(
 /**
  * Change the password of the logged-in user.
  */
+/**
+ * Update the logged-in merchant.
+ *
+ * The endpoint accepts FOUR fields — `first_name`, `last_name`, `erp` and
+ * `erp_name` — and nothing else. Business address and tax identifiers have no
+ * endpoint anywhere on this API despite the settings screen having always
+ * shown inputs for them, so those stay read-only.
+ *
+ * Banking is a different case and was previously described wrongly here: the
+ * API DOES expose /bank-accounts (add, update, remove, list). It is simply not
+ * wired up in this client yet. Verified against the live /apispec.json, which
+ * has 44 paths — gingerly-api.md documents 13 and is stale.
+ *
+ * Refreshes the session afterwards so the sidebar and header pick up a changed
+ * name without a reload.
+ */
+export function useUpdateMerchant(
+  options?: MutationOptions<MerchantUpdateResponse, { id: string } & MerchantUpdateData>
+) {
+  const { refreshUser } = useAuth()
+
+  return useMutation<MerchantUpdateResponse, { id: string } & MerchantUpdateData>(
+    async ({ id, ...data }) => {
+      const response = await merchantService.update(id, data)
+      await refreshUser()
+      return response
+    },
+    {
+      successMessage: 'Saved',
+      ...options,
+    }
+  )
+}
+
+/**
+ * Update the logged-in customer.
+ *
+ * The endpoint accepts TWO fields — `first_name` and `last_name` — and nothing
+ * else. Email, phone, apartment, unit and rent are all on the customer record
+ * and all read-only, which is why the tenant settings screen shows them as
+ * stored and says so rather than offering inputs that cannot save.
+ *
+ * Refreshes the session afterwards so the sidebar and the greeting pick up a
+ * changed name without a reload, the same way useUpdateMerchant does.
+ */
+export function useUpdateCustomer(
+  options?: MutationOptions<CustomerUpdateResponse, { id: string } & CustomerUpdateData>
+) {
+  const { refreshUser } = useAuth()
+
+  return useMutation<CustomerUpdateResponse, { id: string } & CustomerUpdateData>(
+    async ({ id, ...data }) => {
+      const response = await customerService.update(id, data)
+      await refreshUser()
+      return response
+    },
+    {
+      successMessage: 'Saved',
+      ...options,
+    }
+  )
+}
+
 export function useChangePassword(
   options?: MutationOptions<
     ChangePasswordResponse,

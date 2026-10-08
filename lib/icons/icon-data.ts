@@ -29,6 +29,7 @@ import ChevronLeftOutlineRoundedIcon from '@iconify-icons/material-symbols/chevr
 import ChevronRightOutlineRoundedIcon from '@iconify-icons/material-symbols/chevron-right-outline-rounded'
 import CircleOutlineRoundedIcon from '@iconify-icons/material-symbols/circle-outline-rounded'
 import CloseOutlineRoundedIcon from '@iconify-icons/material-symbols/close-outline-rounded'
+import ContentCopyOutlineRoundedIcon from '@iconify-icons/material-symbols/content-copy-outline-rounded'
 import CreditCardOutlineRoundedIcon from '@iconify-icons/material-symbols/credit-card-outline-rounded'
 import DarkModeOutlineRoundedIcon from '@iconify-icons/material-symbols/dark-mode-outline-rounded'
 import DashboardOutlineRoundedIcon from '@iconify-icons/material-symbols/dashboard-outline-rounded'
@@ -45,6 +46,7 @@ import ExpandMoreIcon from '@iconify-icons/material-symbols/expand-more'
 import FactCheckOutlineRoundedIcon from '@iconify-icons/material-symbols/fact-check-outline-rounded'
 import FiberManualRecordOutlineRoundedIcon from '@iconify-icons/material-symbols/fiber-manual-record-outline-rounded'
 import FilterAltOutlineRoundedIcon from '@iconify-icons/material-symbols/filter-alt-outline-rounded'
+import FormatListBulletedOutlineRoundedIcon from '@iconify-icons/material-symbols/format-list-bulleted-outline-rounded'
 import GroupOutlineRoundedIcon from '@iconify-icons/material-symbols/group-outline-rounded'
 import HelpOutlineRoundedIcon from '@iconify-icons/material-symbols/help-outline-rounded'
 import HomeOutlineRoundedIcon from '@iconify-icons/material-symbols/home-outline-rounded'
@@ -122,6 +124,7 @@ const icons: Record<string, unknown> = {
   'chevron-right-outline-rounded': ChevronRightOutlineRoundedIcon,
   'circle-outline-rounded': CircleOutlineRoundedIcon,
   'close-outline-rounded': CloseOutlineRoundedIcon,
+  'content-copy-outline-rounded': ContentCopyOutlineRoundedIcon,
   'credit-card-outline-rounded': CreditCardOutlineRoundedIcon,
   'dark-mode-outline-rounded': DarkModeOutlineRoundedIcon,
   'dashboard-outline-rounded': DashboardOutlineRoundedIcon,
@@ -138,6 +141,7 @@ const icons: Record<string, unknown> = {
   'fact-check-outline-rounded': FactCheckOutlineRoundedIcon,
   'fiber-manual-record-outline-rounded': FiberManualRecordOutlineRoundedIcon,
   'filter-alt-outline-rounded': FilterAltOutlineRoundedIcon,
+  'format-list-bulleted-outline-rounded': FormatListBulletedOutlineRoundedIcon,
   'group-outline-rounded': GroupOutlineRoundedIcon,
   'help-outline-rounded': HelpOutlineRoundedIcon,
   'home-outline-rounded': HomeOutlineRoundedIcon,
