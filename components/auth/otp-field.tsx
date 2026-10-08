@@ -2,6 +2,7 @@
 
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp'
 import { cn } from '@/lib/utils'
+import { OTP_LENGTH } from '@/lib/validations'
 
 interface OtpFieldProps {
   value: string
@@ -12,9 +13,9 @@ interface OtpFieldProps {
 }
 
 /**
- * Six-slot verification code entry.
+ * Verification code entry, one slot per digit (OTP_LENGTH).
  *
- * Built on `input-otp` rather than six hand-rolled inputs, because the two
+ * Built on `input-otp` rather than hand-rolled per-digit inputs, because the two
  * things that matter here are the two things hand-rolled versions almost always
  * break: pasting a code, and iOS/Android autofilling it from the SMS. WCAG 2.2
  * "Accessible Authentication (Minimum)" treats requiring manual transcription
@@ -22,7 +23,7 @@ interface OtpFieldProps {
  *
  * Under the hood this is a single real input with the slots painted over it, so
  * paste, autofill, and the software keyboard all behave as they would on any
- * text field, and there is one tab stop rather than six.
+ * text field, and there is one tab stop rather than one per digit.
  *
  * Slot styling mirrors components/auth/auth-input.tsx — same height, radius,
  * resting fill and teal focus treatment — so the screen reads as one system.
@@ -31,7 +32,7 @@ export function OtpField({ value, onChange, disabled, invalid, describedBy }: Ot
   return (
     <InputOTP
       id="otp"
-      maxLength={6}
+      maxLength={OTP_LENGTH}
       value={value}
       onChange={onChange}
       disabled={disabled}
@@ -49,7 +50,7 @@ export function OtpField({ value, onChange, disabled, invalid, describedBy }: Ot
         percentage width resolving against that is circular.
       */}
       <InputOTPGroup className="flex w-full gap-2.5">
-        {Array.from({ length: 6 }, (_, i) => (
+        {Array.from({ length: OTP_LENGTH }, (_, i) => (
           <InputOTPSlot
             key={i}
             index={i}
