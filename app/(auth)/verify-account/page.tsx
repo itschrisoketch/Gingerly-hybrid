@@ -15,7 +15,7 @@ import { Icon } from '@/components/ui/icon'
 import { Label } from '@/components/ui/label'
 import { FieldError } from '@/components/auth/field-error'
 import { useVerifyAccount, useResendVerificationOtp } from '@/lib/hooks/api'
-import { verifyAccountSchema, type VerifyAccountFormData } from '@/lib/validations'
+import { OTP_LENGTH, verifyAccountSchema, type VerifyAccountFormData } from '@/lib/validations'
 
 /**
  * Account verification.
@@ -61,7 +61,7 @@ function VerifyAccountContent() {
   return (
     // No min-h-screen or max-w wrapper here: app/(auth)/layout.tsx owns page framing.
     <div className="space-y-8">
-      <AuthHeading accent="account" description="Enter the 6-digit code we sent by SMS.">
+      <AuthHeading accent="account" description={`Enter the ${OTP_LENGTH}-digit code we sent by SMS.`}>
         Verify your
       </AuthHeading>
 
