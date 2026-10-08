@@ -9,6 +9,20 @@ import { z } from 'zod'
 import { msisdnSchema, passwordSchema } from './customer.schema'
 
 /**
+ * Digits in every OTP the backend sends, for account verification and
+ * password reset alike. The spec's `otp` fields carry no length rule — only an
+ * example of "123456" — but the codes actually delivered by SMS are 4 digits.
+ * The OTP field, its validation and its copy all read from this.
+ */
+export const OTP_LENGTH = 4
+
+const otpSchema = z
+  .string()
+  .min(1, 'OTP is required')
+  .length(OTP_LENGTH, `OTP must be ${OTP_LENGTH} digits`)
+  .regex(/^[0-9]+$/, 'OTP must contain only numbers')
+
+/**
  * Login Schema
  */
 export const loginSchema = z.object({
@@ -39,11 +53,7 @@ export type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>
  * OTP Verification Schema
  */
 export const otpVerifySchema = z.object({
-  otp: z
-    .string()
-    .min(1, 'OTP is required')
-    .length(6, 'OTP must be 6 digits')
-    .regex(/^[0-9]+$/, 'OTP must contain only numbers'),
+  otp: otpSchema,
 })
 
 export type OtpVerifyFormData = z.infer<typeof otpVerifySchema>
@@ -71,11 +81,7 @@ export type ResetPasswordFormData = ChangePasswordFormData
  */
 export const verifyAccountSchema = z.object({
   msisdn: msisdnSchema,
-  otp: z
-    .string()
-    .min(1, 'OTP is required')
-    .length(6, 'OTP must be 6 digits')
-    .regex(/^[0-9]+$/, 'OTP must contain only numbers'),
+  otp: otpSchema,
 })
 
 export type VerifyAccountFormData = z.infer<typeof verifyAccountSchema>

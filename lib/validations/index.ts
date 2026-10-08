@@ -5,6 +5,7 @@
 
 // Auth schemas
 export {
+  OTP_LENGTH,
   loginSchema,
   forgotPasswordSchema,
   otpVerifySchema,

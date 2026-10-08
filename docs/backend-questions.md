@@ -98,6 +98,7 @@ the API goes dark that day.
 | Address fields | `merchants/register` asks for `routing_number`, `state`, `zip_code` | US-shaped for a Kenyan product — intentional? |
 | Login failure status | Bad credentials return `404` | `401` is the conventional code |
 | Malformed body | `POST /customers/register` with a login payload returns `500` | Should be `400` with field errors |
+| OTP length | Every `otp` field in the spec is a bare string with example `"123456"`; the codes actually delivered by SMS are 4 digits. The frontend now expects 4 (`OTP_LENGTH`) | Confirm 4 is fixed for every flow, and state it in the spec (`minLength`/`maxLength` or `pattern`) |
 
 ## Endpoints not yet wired up (22 of 44)
 
