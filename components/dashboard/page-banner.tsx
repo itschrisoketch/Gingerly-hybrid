@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import { Icon } from '@/components/ui/icon'
+import { cn } from '@/lib/utils'
+import type { IconName } from '@/lib/icons/icon-map'
 
 /**
  * The navy banner that opens a dashboard screen.
@@ -34,6 +36,8 @@ export function PageBanner({
   description,
   action,
   leading,
+  tone = 'attention',
+  icon,
 }: {
   id: string
   eyebrow: string
@@ -42,15 +46,43 @@ export function PageBanner({
   action?: { href: string; label: string }
   /** Optional visual before the copy, e.g. a group of avatars. */
   leading?: React.ReactNode
+  /**
+   * Kept so callers need not all change at once, but it no longer alters the
+   * ground. Every banner is the solid teal one — Chris's call, stated twice:
+   * the tinted variant did not read as the same object, and a settled state is
+   * worth the same presence as an outstanding one. What the tone still does is
+   * decide the ICON treatment, since a tick belongs on a settled banner and
+   * nothing belongs on one that already carries an action.
+   */
+  tone?: 'attention' | 'calm'
+  /** Shown before the copy on the calm tone, e.g. a tick. */
+  icon?: IconName
 }) {
+  // The ground no longer varies. `attention` only decides whether the leading
+  // icon square is drawn.
+  const attention = tone === 'attention'
+
   return (
     <section
       aria-labelledby={id}
+      // One ground for every banner, solid teal — the treatment the maintenance
+      // screen uses. A tinted variant was tried for settled states and did not
+      // read as the same object beside it.
       className="overflow-hidden rounded-2xl bg-teal-600 px-5 py-5 text-white sm:px-6"
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-center gap-4">
           {leading}
+          {/* Brand teal, not success green. The tick was the only non-brand
+              colour on the screen, and "nothing outstanding" is a state of this
+              product rather than a semantic success — green here competed with
+              the paid pills in the table below, which ARE semantic. Matches the
+              icon square in stat-tiles.tsx. */}
+          {!attention && icon ? (
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/15 text-white">
+              <Icon name={icon} className="h-5 w-5" />
+            </span>
+          ) : null}
 
           <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal-50">

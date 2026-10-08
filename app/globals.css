@@ -323,6 +323,50 @@
   }
 }
 
+@layer components {
+  /**
+   * Inset dashed rules.
+   *
+   * A divider does not have to reach the container's edge. Drawn on a
+   * pseudo-element rather than as a `border-b`, because a border always spans
+   * the whole box — the only way to pull a rule in from both sides is to paint
+   * it separately from the element that owns it.
+   *
+   * `--rule-inset` is the gap at each end, 1.25rem by default and overridable
+   * per element (`style={{ '--rule-inset': '0.75rem' }}` or an arbitrary
+   * variant). The line is dashed to match every other separator here, and
+   * `pointer-events: none` keeps it from swallowing clicks on the row beneath.
+   */
+  .rule-t,
+  .rule-b {
+    position: relative;
+  }
+
+  .rule-t::after,
+  .rule-b::after {
+    content: '';
+    position: absolute;
+    left: var(--rule-inset, 1.25rem);
+    right: var(--rule-inset, 1.25rem);
+    border-bottom: 1px dashed hsl(var(--border));
+    pointer-events: none;
+  }
+
+  .rule-t::after {
+    top: 0;
+  }
+
+  .rule-b::after {
+    bottom: 0;
+  }
+
+  /* Drops the rule off the final item of a list without needing last: variants
+     on a pseudo-element, which Tailwind cannot target directly. */
+  .rule-b:last-child::after {
+    content: none;
+  }
+}
+
 /* Modern utility classes */
 @layer utilities {
   .text-balance {

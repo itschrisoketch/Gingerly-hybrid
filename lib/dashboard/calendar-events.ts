@@ -33,6 +33,13 @@ export type EventKind =
  *  are consequences of other records, so they are not offered. */
 export const CREATABLE_KINDS: EventKind[] = ['inspection', 'meeting', 'viewing', 'visit']
 
+/** What a TENANT can put in their own diary. Narrower than an agent's for the
+ *  same reason: an inspection and a viewing are things done TO a tenancy by the
+ *  people who manage it, so a tenant adding one would be recording a decision
+ *  that is not theirs. What is left is the two they genuinely arrange — seeing
+ *  their agent, and letting someone in to do work. */
+export const TENANT_CREATABLE_KINDS: EventKind[] = ['meeting', 'visit']
+
 export interface CalendarEvent {
   id: string
   /** `YYYY-MM-DD`, local. */
@@ -246,4 +253,87 @@ export function eventsWithin(
     const d = new Date(`${e.date}T00:00:00`)
     return d >= start && d < end
   })
+}
+
+/**
+ * One tenant's diary, rather than the portfolio's.
+ *
+ * The agent's calendar aggregates 39 units; a tenant's shows four kinds of
+ * thing and all of them are about their own flat: when their rent falls due,
+ * when a contractor is coming, when they moved in, and when the lease ends.
+ *
+ * Rent here is the tenant's OWN rent on their OWN due day — the 1st, which is
+ * what `RENT_DUE_DAY` in tenant-view.ts says — not the portfolio's aggregate on
+ * the 5th. Two different facts that happen to share a word.
+ *
+ * Takes its data as arguments rather than importing tenant-view, because that
+ * module imports this one and a cycle between them would be resolved by
+ * whichever bundler got there first.
+ */
+export function tenancyEvents(input: {
+  unit: string
+  property: string
+  rent: number
+  moveIn: string
+  leaseEnd: string
+  /** The tenant's own maintenance, already filtered to them. */
+  jobs: { id: string; title: string; status: string; scheduledFor?: string; scheduledTime?: string; assignee?: string }[]
+  /** Months of rent to project either side of the move-in/lease window. */
+  dueDay?: number
+}): CalendarEvent[] {
+  const { unit, property, rent, moveIn, leaseEnd, jobs, dueDay = 1 } = input
+  const events: CalendarEvent[] = []
+  const where = `${unit}, ${property}`
+
+  events.push({
+    id: `move-${moveIn}`,
+    date: moveIn,
+    kind: 'moveIn',
+    title: 'You moved in',
+    detail: where,
+  })
+
+  events.push({
+    id: `lease-${leaseEnd}`,
+    date: leaseEnd,
+    kind: 'lease',
+    title: 'Lease ends',
+    detail: where,
+  })
+
+  // Rent on every due day inside the tenancy. Generated rather than listed so
+  // it cannot drift from the lease the way a hardcoded run of months would.
+  const [sy, sm] = moveIn.slice(0, 7).split('-').map(Number)
+  let y = sy
+  let m = sm
+  for (let i = 0; i < 60; i++) {
+    const date = iso(y, m, dueDay)
+    if (date > leaseEnd) break
+    if (date >= moveIn) {
+      events.push({
+        id: `rent-${date}`,
+        date,
+        kind: 'rent',
+        title: 'Rent due',
+        detail: where,
+        amount: rent,
+      })
+    }
+    m = m === 12 ? 1 : m + 1
+    if (m === 1) y += 1
+  }
+
+  for (const j of jobs) {
+    if (!j.scheduledFor) continue
+    events.push({
+      id: `visit-${j.id}`,
+      date: j.scheduledFor,
+      kind: 'visit',
+      title: j.assignee ? `${j.assignee} visiting` : 'Contractor visiting',
+      detail: j.title,
+      time: j.scheduledTime,
+    })
+  }
+
+  return events.sort(byDateThenTime)
 }

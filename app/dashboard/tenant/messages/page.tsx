@@ -1,287 +1,225 @@
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { 
-  PaperclipIcon, 
-  SendIcon, 
-  MessageSquare, 
-  User, 
-  Clock, 
-  CheckCircle2, 
-  Sparkles,
-  Phone,
-  Video,
-  MoreVertical
-} from "lucide-react"
+import { PageBanner } from '@/components/dashboard/page-banner'
+import { SampleDataChip } from '@/components/dashboard/sample-data-notice'
+import { StatTiles, type Figure } from '@/components/dashboard/stat-tiles'
+import { TenantThread } from '@/components/dashboard/tenant/tenant-thread'
+import { Icon } from '@/components/ui/icon'
+import Link from 'next/link'
+import { IS_SAMPLE_DATA, sampleConversations } from '@/lib/dashboard/sample-data'
+import { TOPIC, lastMessage } from '@/lib/dashboard/message-meta'
+import { me, tenancy } from '@/lib/dashboard/tenant-view'
+import { cn } from '@/lib/utils'
+
+/**
+ * The tenant's messages.
+ *
+ * One thread with their agent, not the agent's two-pane triage screen — see
+ * TenantThread for why the list pane is wrong on this side.
+ *
+ * The page it replaces had a thread with "John Doe" and two invented
+ * correspondents, "Property Management" and "Maintenance Team", neither of
+ * which is anything in this product. A tenant here talks to the agent who
+ * onboarded them, and the conversation is the one already in the data — the
+ * same thread the agent sees from their side.
+ *
+ * The banner answers the only question worth answering on arrival: is anyone
+ * waiting on me, or am I waiting on them.
+ */
+
+/** Relative headings are measured from here, so server and client agree. */
+const AS_OF = '2026-09-21T09:00:00Z'
 
 export default function TenantMessagesPage() {
+  const mine = sampleConversations.filter((c) => c.tenant === me.name)
+
+  const messages = mine.reduce((n, c) => n + c.messages.length, 0)
+  const unread = mine.reduce((n, c) => n + c.unread, 0)
+
+  // Whoever spoke last decides who the ball is with. Derived from the thread
+  // rather than stored, so it cannot go stale.
+  const latest = mine
+    .map(lastMessage)
+    .filter(Boolean)
+    .sort((a, b) => (a!.at < b!.at ? 1 : -1))[0]
+  const waitingOnAgent = latest?.from === 'tenant'
+
+  const hoursSince = latest
+    ? Math.max(
+        Math.floor((new Date(AS_OF).getTime() - new Date(latest.at).getTime()) / 3_600_000),
+        0,
+      )
+    : 0
+
+  const figures: Figure[] = [
+    { label: 'Messages', value: String(messages), icon: 'MessageSquare' },
+    { label: 'Unread', value: String(unread), icon: 'Bell' },
+    {
+      label: 'Last activity',
+      value: hoursSince < 24 ? `${hoursSince}h ago` : `${Math.floor(hoursSince / 24)}d ago`,
+      icon: 'Clock',
+      compact: true,
+    },
+    {
+      label: 'Topics',
+      value: String(new Set(mine.map((c) => c.topic)).size),
+      icon: 'Filter',
+    },
+  ]
+
   return (
-    <div className="space-y-6 md:space-y-8">
-      {/* Modern Header */}
-      <div className="relative overflow-hidden rounded-3xl glass-card border border-border/50 p-6 md:p-8">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-background to-purple-500/10" />
-        <div className="absolute top-4 right-4 w-32 h-32 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full blur-3xl" />
-        
-        <div className="relative">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-            <div className="p-3 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg">
-              <MessageSquare className="h-6 w-6" />
-            </div>
-            <div className="flex-1">
-              <h1 className="text-2xl md:text-3xl font-bold gradient-text">Messages</h1>
-              <p className="text-muted-foreground text-base md:text-lg">Communicate with your landlord and property management team.</p>
-            </div>
-            <Button className="btn-primary shadow-lg hover:shadow-xl w-full sm:w-auto">
-              <Sparkles className="mr-2 h-4 w-4" />
-              New Message
-            </Button>
-          </div>
+    <div className="space-y-6">
+      <header>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Messages</h1>
+          {IS_SAMPLE_DATA ? (
+            <SampleDataChip detail="This thread is a placeholder for design review. No messaging endpoint exists yet, so nothing sent from here reaches anybody." />
+          ) : null}
         </div>
-      </div>
+        <p className="mt-1 text-sm text-muted-foreground">
+          You and {tenancy.agent.name} about {me.unit}, {me.property}
+        </p>
+      </header>
 
-      <div className="grid h-[calc(100vh-16rem)] md:h-[calc(100vh-12rem)] grid-cols-1 gap-4 md:gap-6 lg:grid-cols-3">
-        {/* Conversations List */}
-        <Card className="glass-card border border-border/50 hover:border-primary/30 hover:shadow-xl transition-all duration-300 lg:col-span-1">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-xl font-bold flex items-center gap-2">
-              <div className="p-2 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white">
-                <User className="h-5 w-5" />
-              </div>
-              Conversations
-            </CardTitle>
-            <CardDescription>Your message history with property team</CardDescription>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="space-y-1">
-              {/* Active Conversation */}
-              <div className="glass-card border border-border/50 hover:border-blue-300 hover:shadow-lg transition-all duration-300 group m-2 rounded-2xl overflow-hidden">
-                <Button variant="ghost" className="w-full justify-start rounded-2xl p-4 h-auto text-left">
-                  <div className="flex w-full items-center gap-3">
-                    <div className="relative">
-                      <Avatar className="h-12 w-12 border-2 border-white shadow-lg">
-                        <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold">JD</AvatarFallback>
-                      </Avatar>
-                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
-                    </div>
-                    <div className="flex-1 space-y-1 overflow-hidden">
-                      <div className="flex items-center justify-between">
-                        <p className="truncate font-bold text-foreground group-hover:text-primary transition-colors">John Doe</p>
-                        <div className="flex items-center gap-2">
-                          <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 px-2 py-1 text-xs font-semibold">
-                            Landlord
-                          </Badge>
-                          <p className="text-xs text-muted-foreground">2h</p>
-                        </div>
-                      </div>
-                      <p className="truncate text-sm text-muted-foreground">
-                        Thanks for your message. I'll look into the maintenance issue right away.
-                      </p>
-                    </div>
-                  </div>
-                </Button>
-              </div>
+      {mine.length === 0 ? null : waitingOnAgent ? (
+        <PageBanner
+          id="messages-banner"
+          tone="calm"
+          icon="Clock"
+          eyebrow="Waiting on a reply"
+          title={<>{tenancy.agent.name} has not replied yet</>}
+          description={
+            <>
+              You sent the last message{' '}
+              {hoursSince < 24 ? (
+                <>
+                  <span className="tabular-nums">{hoursSince}</span>{' '}
+                  {hoursSince === 1 ? 'hour' : 'hours'} ago
+                </>
+              ) : (
+                <>
+                  <span className="tabular-nums">{Math.floor(hoursSince / 24)}</span> days ago
+                </>
+              )}
+              . If it is urgent, call {tenancy.agent.phone}.
+            </>
+          }
+        />
+      ) : (
+        <PageBanner
+          id="messages-banner"
+          tone="calm"
+          icon="CheckCircle"
+          eyebrow={`Last word · ${TOPIC[mine[0].topic].label}`}
+          title={<>{tenancy.agent.name} replied to you</>}
+          description="Nothing is waiting on either of you. Send a message below if you need anything."
+        />
+      )}
 
-              {/* Property Management */}
-              <div className="glass-card border border-border/50 hover:border-green-300 hover:shadow-lg transition-all duration-300 group m-2 rounded-2xl overflow-hidden bg-primary/5">
-                <Button variant="secondary" className="w-full justify-start rounded-2xl p-4 h-auto text-left bg-transparent hover:bg-primary/10">
-                  <div className="flex w-full items-center gap-3">
-                    <div className="relative">
-                      <Avatar className="h-12 w-12 border-2 border-white shadow-lg">
-                        <AvatarFallback className="bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold">PM</AvatarFallback>
-                      </Avatar>
-                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
-                    </div>
-                    <div className="flex-1 space-y-1 overflow-hidden">
-                      <div className="flex items-center justify-between">
-                        <p className="truncate font-bold text-foreground group-hover:text-primary transition-colors">Property Management</p>
-                        <div className="flex items-center gap-2">
-                          <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-green-200 px-2 py-1 text-xs font-semibold">
-                            Active
-                          </Badge>
-                          <p className="text-xs text-muted-foreground">1d</p>
-                        </div>
-                      </div>
-                      <p className="truncate text-sm text-muted-foreground">
-                        We've scheduled the plumber to visit your apartment tomorrow between 10am-12pm.
-                      </p>
-                    </div>
-                  </div>
-                </Button>
-              </div>
+      <StatTiles figures={figures} label="Your messages" id="messages-figures" />
 
-              {/* Maintenance Team */}
-              <div className="glass-card border border-border/50 hover:border-orange-300 hover:shadow-lg transition-all duration-300 group m-2 rounded-2xl overflow-hidden">
-                <Button variant="ghost" className="w-full justify-start rounded-2xl p-4 h-auto text-left">
-                  <div className="flex w-full items-center gap-3">
-                    <div className="relative">
-                      <Avatar className="h-12 w-12 border-2 border-white shadow-lg">
-                        <AvatarFallback className="bg-gradient-to-r from-orange-500 to-red-600 text-white font-bold">MT</AvatarFallback>
-                      </Avatar>
-                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-gray-400 rounded-full border-2 border-white"></div>
-                    </div>
-                    <div className="flex-1 space-y-1 overflow-hidden">
-                      <div className="flex items-center justify-between">
-                        <p className="truncate font-bold text-foreground group-hover:text-primary transition-colors">Maintenance Team</p>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200 px-2 py-1 text-xs font-semibold">
-                            Completed
-                          </Badge>
-                          <p className="text-xs text-muted-foreground">3d</p>
-                        </div>
-                      </div>
-                      <p className="truncate text-sm text-muted-foreground">
-                        Your maintenance request #1234 has been completed. Please let us know if you need anything else.
-                      </p>
-                    </div>
-                  </div>
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      {/* The thread beside its context rather than alone. On its own it ran the
+          full width of the page and was the only thing on it, which made a
+          quiet conversation look like the whole job. The two cards here are the
+          questions a tenant actually has next to a message box: how else do I
+          reach this person, and is messaging even the right way to ask. */}
+      <div className="grid gap-4 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <TenantThread conversations={mine} asOf={AS_OF} agentName={tenancy.agent.name} />
+        </div>
 
-        {/* Chat Area */}
-        <Card className="glass-card border border-border/50 hover:border-primary/30 hover:shadow-xl transition-all duration-300 flex flex-col lg:col-span-2">
-          {/* Chat Header */}
-          <CardHeader className="border-b border-border/50 pb-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="relative">
-                  <Avatar className="h-12 w-12 border-2 border-white shadow-lg">
-                    <AvatarFallback className="bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold">PM</AvatarFallback>
-                  </Avatar>
-                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
-                </div>
-                <div>
-                  <CardTitle className="text-lg font-bold text-foreground">Property Management</CardTitle>
-                  <CardDescription className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    Usually responds within 2 hours
-                  </CardDescription>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" className="btn-outline hover:shadow-md">
-                  <Phone className="h-4 w-4" />
-                </Button>
-                <Button variant="outline" size="sm" className="btn-outline hover:shadow-md">
-                  <Video className="h-4 w-4" />
-                </Button>
-                <Button variant="outline" size="sm" className="btn-outline hover:shadow-md">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </CardHeader>
-
-          {/* Messages */}
-          <CardContent className="flex-1 overflow-auto p-4 md:p-6 space-y-4">
-            {/* Incoming Message */}
-            <div className="flex items-start gap-3">
-              <Avatar className="mt-1 h-10 w-10 border-2 border-white shadow-lg">
-                <AvatarFallback className="bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold">PM</AvatarFallback>
-              </Avatar>
-              <div className="glass-card border border-border/50 rounded-2xl p-4 max-w-[80%] bg-background/80 backdrop-blur-sm">
-                <p className="text-sm text-foreground">Hello! How can we help you today?</p>
-                <div className="flex items-center gap-2 mt-2">
-                  <p className="text-xs text-muted-foreground">10:30 AM</p>
-                  <CheckCircle2 className="h-3 w-3 text-green-500" />
-                </div>
-              </div>
-            </div>
-
-            {/* Outgoing Message */}
-            <div className="flex items-start justify-end gap-3">
-              <div className="glass-card border border-primary/50 rounded-2xl p-4 max-w-[80%] bg-gradient-to-r from-primary to-accent text-white shadow-lg">
-                <p className="text-sm">
-                  Hi, I've noticed a leak under the kitchen sink. Could someone come take a look at it?
-                </p>
-                <div className="flex items-center gap-2 mt-2 justify-end">
-                  <CheckCircle2 className="h-3 w-3 text-white/70" />
-                  <p className="text-xs text-white/70">10:45 AM</p>
-                </div>
-              </div>
-              <Avatar className="mt-1 h-10 w-10 border-2 border-white shadow-lg">
-                <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold">ME</AvatarFallback>
-              </Avatar>
-            </div>
-
-            {/* Incoming Message */}
-            <div className="flex items-start gap-3">
-              <Avatar className="mt-1 h-10 w-10 border-2 border-white shadow-lg">
-                <AvatarFallback className="bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold">PM</AvatarFallback>
-              </Avatar>
-              <div className="glass-card border border-border/50 rounded-2xl p-4 max-w-[80%] bg-background/80 backdrop-blur-sm">
-                <p className="text-sm text-foreground">
-                  I'm sorry to hear that. We'll send a plumber to check it out. Is tomorrow between 10am-12pm a good
-                  time for you?
-                </p>
-                <div className="flex items-center gap-2 mt-2">
-                  <p className="text-xs text-muted-foreground">11:00 AM</p>
-                  <CheckCircle2 className="h-3 w-3 text-green-500" />
-                </div>
-              </div>
-            </div>
-
-            {/* Outgoing Message */}
-            <div className="flex items-start justify-end gap-3">
-              <div className="glass-card border border-primary/50 rounded-2xl p-4 max-w-[80%] bg-gradient-to-r from-primary to-accent text-white shadow-lg">
-                <p className="text-sm">Yes, that works for me. Thank you!</p>
-                <div className="flex items-center gap-2 mt-2 justify-end">
-                  <CheckCircle2 className="h-3 w-3 text-white/70" />
-                  <p className="text-xs text-white/70">11:05 AM</p>
-                </div>
-              </div>
-              <Avatar className="mt-1 h-10 w-10 border-2 border-white shadow-lg">
-                <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold">ME</AvatarFallback>
-              </Avatar>
-            </div>
-
-            {/* Incoming Message */}
-            <div className="flex items-start gap-3">
-              <Avatar className="mt-1 h-10 w-10 border-2 border-white shadow-lg">
-                <AvatarFallback className="bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold">PM</AvatarFallback>
-              </Avatar>
-              <div className="glass-card border border-border/50 rounded-2xl p-4 max-w-[80%] bg-background/80 backdrop-blur-sm">
-                <p className="text-sm text-foreground">
-                  Great! We've scheduled the plumber to visit your apartment tomorrow between 10am-12pm. Please make
-                  sure someone is home to let them in.
-                </p>
-                <div className="flex items-center gap-2 mt-2">
-                  <p className="text-xs text-muted-foreground">11:15 AM</p>
-                  <CheckCircle2 className="h-3 w-3 text-green-500" />
-                </div>
-              </div>
-            </div>
-          </CardContent>
-
-          {/* Message Input */}
-          <div className="border-t border-border/50 p-4 md:p-6">
-            <div className="glass-card border border-border/50 rounded-2xl p-3 bg-background/80 backdrop-blur-sm">
-              <div className="flex items-center gap-3">
-                <Button variant="outline" size="icon" className="shrink-0 btn-outline hover:shadow-md rounded-xl">
-                  <PaperclipIcon className="h-4 w-4" />
-                  <span className="sr-only">Attach file</span>
-                </Button>
-                <Input 
-                  placeholder="Type your message..." 
-                  className="flex-1 border-0 bg-transparent focus:ring-0 focus:ring-offset-0 text-foreground placeholder:text-muted-foreground" 
-                />
-                <Button size="icon" className="shrink-0 btn-primary shadow-lg hover:shadow-xl rounded-xl">
-                  <SendIcon className="h-4 w-4" />
-                  <span className="sr-only">Send message</span>
-                </Button>
-              </div>
-            </div>
-            <p className="text-xs text-muted-foreground mt-2 text-center">
-              Press Enter to send • Shift + Enter for new line
+        <aside className="space-y-4">
+          <section className="rounded-2xl border border-border bg-card p-5">
+            <h2 className="text-sm font-medium text-foreground">Other ways to reach them</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Messages here are not delivered yet, so for anything urgent use the phone.
             </p>
-          </div>
-        </Card>
+
+            <div className="mt-4 flex items-center gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent/10 text-sm font-semibold text-accent-text">
+                {tenancy.agent.name
+                  .split(' ')
+                  .slice(0, 2)
+                  .map((w) => w[0])
+                  .join('')}
+              </span>
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-foreground">{tenancy.agent.name}</p>
+                <p className="text-xs text-muted-foreground">Your agent</p>
+              </div>
+            </div>
+
+            <a
+              href={`tel:${tenancy.agent.phone.replace(/\s/g, '')}`}
+              className="mt-4 flex h-10 items-center justify-center gap-2 rounded-lg bg-accent px-4 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+            >
+              <Icon name="Phone" className="h-4 w-4" />
+              <span className="whitespace-nowrap tabular-nums">{tenancy.agent.phone}</span>
+            </a>
+          </section>
+
+          <section className="rounded-2xl border border-border bg-card">
+            <header className="p-5 pb-3">
+              <h2 className="text-sm font-medium text-foreground">Try this first</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Some things have their own screen, and get dealt with faster there than in a
+                message.
+              </p>
+            </header>
+
+            <ul className="pb-2">
+              {ROUTES.map((r, i) => (
+                <li key={r.href}>
+                  <Link
+                    href={r.href}
+                    className={cn(
+                      'group flex items-start gap-3 px-5 py-3 transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/40',
+                      i < ROUTES.length - 1 && 'rule-b',
+                    )}
+                  >
+                    <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+                      <Icon name={r.icon} className="h-4 w-4" />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="flex items-center gap-1.5 text-sm font-medium text-foreground">
+                        {r.label}
+                        <Icon
+                          name="ArrowRight"
+                          className="h-3.5 w-3.5 text-muted-foreground transition-transform group-hover:translate-x-0.5"
+                        />
+                      </span>
+                      <span className="mt-0.5 block text-xs text-muted-foreground">
+                        {r.detail}
+                      </span>
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </aside>
       </div>
     </div>
   )
 }
+
+/** Where a question belongs when it is not really a message. Every one of these
+ *  screens exists and does the thing described. */
+const ROUTES: { href: string; label: string; detail: string; icon: 'Wrench' | 'CreditCard' | 'FileText' }[] = [
+  {
+    href: '/dashboard/tenant/maintenance',
+    label: 'Something is broken',
+    detail: 'Raise it as a request so it is tracked and a contractor can be booked.',
+    icon: 'Wrench',
+  },
+  {
+    href: '/dashboard/tenant/payments',
+    label: 'A payment question',
+    detail: 'Check the reference and status of every month you have paid.',
+    icon: 'CreditCard',
+  },
+  {
+    href: '/dashboard/tenant/documents',
+    label: 'Your lease or deposit',
+    detail: 'The agreement and anything else filed against your tenancy.',
+    icon: 'FileText',
+  },
+]
