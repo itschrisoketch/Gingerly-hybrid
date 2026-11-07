@@ -90,7 +90,7 @@ export function useRegisterCustomer(
   return useMutation<MessageResponse, CustomerRegistrationFormData>(
     async (form) => customerService.register(toCustomerRegistrationPayload(form)),
     {
-      successMessage: 'Account created. Check your phone for a verification code.',
+      successMessage: 'Account created. Check your email for a verification code.',
       ...options,
     }
   )
@@ -106,14 +106,15 @@ export function useRegisterMerchant(
   return useMutation<MessageResponse, MerchantRegistrationFormData>(
     async (form) => merchantService.register(toMerchantRegistrationPayload(form)),
     {
-      successMessage: 'Account created. Check your phone for a verification code.',
+      successMessage: 'Account created. Check your email for a verification code.',
       ...options,
     }
   )
 }
 
 /**
- * Verify a new account with the OTP sent by SMS.
+ * Verify a new account with the OTP emailed to the user (SMS delivery is
+ * not live on the backend yet).
  */
 export function useVerifyAccount(
   options?: MutationOptions<MessageResponse, { msisdn: string; otp: string }>
@@ -151,7 +152,7 @@ export function useForgotPassword(
   return useMutation<ForgotPasswordResponse, { msisdn: string }>(
     async (data) => authService.forgotPassword(data),
     {
-      successMessage: 'Reset code sent to your phone',
+      successMessage: 'Reset code sent to your email',
       ...options,
     }
   )

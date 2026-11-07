@@ -22,8 +22,11 @@ import { OTP_LENGTH, verifyAccountSchema, type VerifyAccountFormData } from '@/l
  *
  * New accounts are created inactive: POST /customers/register returns
  * { msg, success } and login then fails with "user account is inactive".
- * The OTP is delivered by SMS to the msisdn — which is why this screen keys
- * on the phone number rather than the email address.
+ *
+ * The code is delivered by EMAIL for now — SMS delivery is not working on the
+ * backend yet. We still collect the msisdn because the verify endpoint keys on
+ * it, but the copy tells the user to look in their email, not their texts.
+ * Flip back to SMS wording once the backend's SMS channel is live.
  */
 function VerifyAccountContent() {
   const router = useRouter()
@@ -61,7 +64,10 @@ function VerifyAccountContent() {
   return (
     // No min-h-screen or max-w wrapper here: app/(auth)/layout.tsx owns page framing.
     <div className="space-y-8">
-      <AuthHeading accent="account" description={`Enter the ${OTP_LENGTH}-digit code we sent by SMS.`}>
+      <AuthHeading
+        accent="account"
+        description={`Enter your phone number and the ${OTP_LENGTH}-digit code we emailed you.`}
+      >
         Verify your
       </AuthHeading>
 
@@ -116,7 +122,7 @@ function VerifyAccountContent() {
       <div className="space-y-3 text-center text-sm text-muted-foreground">
         <div>
           {resent ? (
-            <span>Code sent again.</span>
+            <span>Code sent again — check your email.</span>
           ) : (
             <button
               type="button"
