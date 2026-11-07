@@ -84,7 +84,7 @@ export default function TenantSettingsPage() {
           id="settings-banner"
           eyebrow="Not verified"
           title="Your account is not verified yet"
-          description="Until it is, some things will not work. Verifying takes a one-time code sent to your phone."
+          description="Until it is, some things will not work. Verifying takes a one-time code sent to your email."
           action={{ href: '/verify-account', label: 'Verify now' }}
         />
       )}
